@@ -340,15 +340,17 @@ public class ActivityRecognitionService extends Service implements GoogleApiClie
             if(mLastLocation != null){
                 Log.d(TAG, "Location !=null: Lat=" + mLastLocation.getLatitude() + " Lon=" + mLastLocation.getLongitude());
             }
-            new AddDetectedContextAsyncTask(deviceId,mCurrentContext,mLastLocation){
-                @Override
-                protected void onPostExecute(us.idinfor.smartcitizen.backend.contextApi.model.Context context) {
-                    if(context != null){
-                        sendContext = false;
-                        Log.d(TAG, "New context saved in datastore: " + context.getContext());
+            if(Utils.isInternetAvailable(this)){
+                new AddDetectedContextAsyncTask(deviceId,mCurrentContext,mLastLocation){
+                    @Override
+                    protected void onPostExecute(us.idinfor.smartcitizen.backend.contextApi.model.Context context) {
+                        if(context != null){
+                            sendContext = false;
+                            Log.d(TAG, "New context saved in datastore: " + context.getContext());
+                        }
                     }
-                }
-            }.execute();
+                }.execute();
+            }
         }
     }
 

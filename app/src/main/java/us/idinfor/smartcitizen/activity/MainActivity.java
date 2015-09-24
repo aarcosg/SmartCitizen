@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity
             }
             mRegId = getRegistrationId(this);
 
-            if (mRegId.isEmpty()) {
+            if (mRegId.isEmpty() && Utils.isInternetAvailable(this)) {
                 new GcmRegistrationAsyncTask(this){
                     @Override
                     protected void onPostExecute(Device device) {
