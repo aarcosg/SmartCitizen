@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -31,12 +32,14 @@ import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.asynctask.GcmRegistrationAsyncTask;
 import us.idinfor.smartcitizen.backend.deviceApi.model.Device;
 import us.idinfor.smartcitizen.fragment.HomeFragment;
+import us.idinfor.smartcitizen.fragment.LocationFragment;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = MainActivity.class.getCanonicalName();
 
+    private static final long DRAWER_DELAY_MS = 265;
     private static final String NAV_ITEM_ID = "nav_item_id";
 
     @InjectView(R.id.toolbar)
@@ -46,6 +49,7 @@ public class MainActivity extends AppCompatActivity
     @InjectView(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
 
+    private final Handler mDrawerActionHandler = new Handler();
     private ActionBarDrawerToggle mDrawerToggle;
     private int mNavItemId;
     private CharSequence mDrawerTitle;
@@ -148,6 +152,9 @@ public class MainActivity extends AppCompatActivity
             case R.id.navigation_home:
                 fragment = HomeFragment.newInstance();
                 break;
+            case R.id.navigation_location:
+                fragment = LocationFragment.newInstance();
+                break;
             case R.id.navigation_settings:
                 SettingsActivity.launch(this);
                 break;
@@ -164,7 +171,12 @@ public class MainActivity extends AppCompatActivity
         item.setChecked(true);
         mNavItemId = item.getItemId();
         mDrawerLayout.closeDrawer(GravityCompat.START);
-        selectDrawerItem(mNavItemId);
+        mDrawerActionHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                selectDrawerItem(mNavItemId);
+            }
+        }, DRAWER_DELAY_MS);
         return true;
     }
 

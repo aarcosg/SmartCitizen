@@ -17,6 +17,8 @@ public class Constants {
     public static final String PROPERTY_APP_VERSION = "app_version";
     public static final String PROPERTY_DRAWER_LEARNED = "drawer_learned";
     public static final String PROPERTY_LAST_DETECTED_ACTIVITY = "last_detected_activity";
+    public static final String PROPERTY_LAST_LATITUDE = "last_latitude";
+    public static final String PROPERTY_LAST_LONGITUDE = "last_longitude";
     public static final String PROPERTY_ACTIVITY_UPDATES = "activity_updates";
     public static final String PROPERTY_LOCATION_UPDATES = "location_updates";
 

@@ -8,9 +8,11 @@ import com.google.api.server.spi.response.NotFoundException;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.cmd.Query;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -151,6 +153,38 @@ public class ContextEndpoint {
         }
         return CollectionResponse.<Context>builder().setItems(contextList).setNextPageToken(queryIterator.getCursor().toWebSafeString()).build();
     }
+
+
+    @ApiMethod(
+            name = "device",
+            path = "device/{id}",
+            httpMethod = ApiMethod.HttpMethod.GET)
+    public List<Context> contextsByDevice(@Named("id") Long id) {
+        Device device = new Device();
+        device.setId(id);
+        Ref<Device> deviceKey = Ref.create(device);
+        return ofy().load().type(Context.class).filter("device", deviceKey).list();
+    }
+
+    @ApiMethod(
+            name = "time",
+            path = "device/{id}/{time}",
+            httpMethod = ApiMethod.HttpMethod.GET)
+    public List<Context> contextsByDeviceAndTime(@Named("id") Long id, @Named("time") String time) {
+        Device device = new Device();
+        device.setId(id);
+        Ref<Device> deviceKey = Ref.create(device);
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.SECOND,0);
+        today.set(Calendar.MINUTE,0);
+        today.set(Calendar.HOUR_OF_DAY,0);
+        return ofy().load().type(Context.class)
+                .filter("device", deviceKey)
+                .filter("time >",today.getTime())
+                .list();
+    }
+
+
 
     private void checkExists(Long id) throws NotFoundException {
         try {

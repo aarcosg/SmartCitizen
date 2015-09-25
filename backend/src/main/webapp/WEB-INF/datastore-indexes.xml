@@ -14,4 +14,8 @@
         <property name="context" direction="asc" />
         <property name="time" direction="desc" />
     </datastore-index>
+    <datastore-index kind="Context" ancestor="false" source="manual">
+        <property name="device" direction="asc"/>
+        <property name="time" direction="asc"/>
+    </datastore-index>
 </datastore-indexes>

@@ -140,6 +140,10 @@ public class ActivityRecognitionService extends Service implements GoogleApiClie
     private void handleActionLocationChangedResult(LocationResult locationResult) {
         mLastLocation = locationResult.getLastLocation();
         prefs = Utils.getSharedPreferences(this);
+        prefs.edit()
+                .putFloat(Constants.PROPERTY_LAST_LATITUDE,(float)mLastLocation.getLatitude())
+                .putFloat(Constants.PROPERTY_LAST_LONGITUDE,(float)mLastLocation.getLongitude())
+                .apply();
         deviceId = prefs.getLong(Constants.PROPERTY_DEVICE_ID, 0L);
         if (deviceId > 0L) {
             sendContext = true;

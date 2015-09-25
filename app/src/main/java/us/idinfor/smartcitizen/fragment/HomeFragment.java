@@ -8,6 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -15,6 +20,8 @@ import butterknife.OnClick;
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
+import us.idinfor.smartcitizen.asynctask.LoadActivitiesAsyncTask;
+import us.idinfor.smartcitizen.backend.contextApi.model.Context;
 import us.idinfor.smartcitizen.service.ActivityRecognitionService;
 
 /**
@@ -32,6 +39,10 @@ public class HomeFragment extends Fragment {
 
     boolean isRunning;
     SharedPreferences prefs;
+    @InjectView(R.id.stillVal)
+    TextView stillVal;
+    @InjectView(R.id.walkingVal)
+    TextView walkingVal;
 
     public static HomeFragment newInstance() {
         HomeFragment fragment = new HomeFragment();
@@ -62,6 +73,34 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        new LoadActivitiesAsyncTask(prefs.getLong(Constants.PROPERTY_DEVICE_ID, 0L)) {
+            @Override
+            protected void onPostExecute(List<Context> contexts) {
+                super.onPostExecute(contexts);
+                Map<String, Integer> counterMap = new HashMap<String, Integer>();
+                for (Context c : contexts) {
+                    if (!counterMap.containsKey(c.getContext())) {
+                        counterMap.put(c.getContext(), 1);
+                    } else {
+                        counterMap.put(c.getContext(), counterMap.get(c.getContext()) + 1);
+                    }
+                }
+
+                if (counterMap.containsKey("Still")) {
+                    stillVal.setText(counterMap.get("Still").toString());
+                }
+                if (counterMap.containsKey("On foot")) {
+                    walkingVal.setText(counterMap.get("On foot").toString());
+                }
+
+            }
+        }.execute();
+
+    }
+
     @OnClick(R.id.startBtn)
     public void startService() {
         ActivityRecognitionService.actionStartActivityRecognition(getActivity().getApplicationContext());
@@ -81,9 +120,9 @@ public class HomeFragment extends Fragment {
         stopBtn.setEnabled(isRunning);
     }
 
-    private void setRunning(boolean running){
+    private void setRunning(boolean running) {
         isRunning = running;
-        prefs.edit().putBoolean(Constants.PROPERTY_ACTIVITY_UPDATES,isRunning).apply();
+        prefs.edit().putBoolean(Constants.PROPERTY_ACTIVITY_UPDATES, isRunning).apply();
     }
 
 

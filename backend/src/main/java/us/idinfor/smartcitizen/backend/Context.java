@@ -17,6 +17,7 @@ public class Context {
     @Index
     @Load
     Ref<Device> device;
+    @Index
     String context;
     @Index
     GeoPt location;

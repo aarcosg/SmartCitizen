@@ -52,6 +52,8 @@
             android:name="us.idinfor.smartcitizen.service.ActivityRecognitionService"
             android:exported="false" />
 
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyAO828Jh6rJrTYNfj9U_Rt6pzDpHLWWR30"/>
+
     </application>
 
 </manifest>
