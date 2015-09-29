@@ -167,10 +167,11 @@ public class ContextEndpoint {
     }
 
     @ApiMethod(
-            name = "time",
+            name = "activity",
             path = "device/{id}/{time}",
             httpMethod = ApiMethod.HttpMethod.GET)
-    public List<Context> contextsByDeviceAndTime(@Named("id") Long id, @Named("time") String time) {
+    public List<Activity> contextsByDeviceAndTime(@Named("id") Long id, @Named("time") String time) {
+        List<Activity> activities = new ArrayList<>();
         Device device = new Device();
         device.setId(id);
         Ref<Device> deviceKey = Ref.create(device);
@@ -178,10 +179,22 @@ public class ContextEndpoint {
         today.set(Calendar.SECOND,0);
         today.set(Calendar.MINUTE,0);
         today.set(Calendar.HOUR_OF_DAY,0);
-        return ofy().load().type(Context.class)
-                .filter("device", deviceKey)
-                .filter("time >",today.getTime())
-                .list();
+        for(Activity.Type type : Activity.Type.values()){
+            List<Context> contexts = ofy().load().type(Context.class)
+                    .filter("device", deviceKey)
+                    .filter("context",type.getId())
+                    .filter("time >", today.getTime())
+                    .list();
+            if(contexts != null && !contexts.isEmpty()){
+                Activity activity = new Activity();
+                activity.setId(type.getId());
+                activity.setName(type.getName());
+                activity.setDuration(contexts.size());
+                activities.add(activity);
+            }
+        }
+
+        return activities;
     }
 
 
