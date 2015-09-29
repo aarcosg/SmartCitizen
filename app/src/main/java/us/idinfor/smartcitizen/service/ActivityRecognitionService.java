@@ -33,7 +33,7 @@ public class ActivityRecognitionService extends Service implements GoogleApiClie
     private static final String TAG = ActivityRecognitionService.class.getCanonicalName();
 
     private GoogleApiClient mGoogleApiClient;
-    private Integer mCurrentContext;
+    private Integer mCurrentActivity;
     private Long deviceId;
     private PendingIntent mActivityRecognitionPI;
     private PendingIntent mLocationChangedPI;
@@ -106,9 +106,9 @@ public class ActivityRecognitionService extends Service implements GoogleApiClie
         Log.d(TAG,"@handleActionActivityRecognitionResult");
         Log.i(TAG, result.toString());
         DetectedActivity detectedActivity = result.getMostProbableActivity();
-        mCurrentContext = detectedActivity.getType();
+        mCurrentActivity = detectedActivity.getType();
         int confidence = detectedActivity.getConfidence();
-        Log.d(TAG, "Detected context=" + Constants.getActivityString(this,mCurrentContext) + " Confidence=" + confidence);
+        Log.d(TAG, "Detected context=" + Constants.getActivityString(this,mCurrentActivity) + " Confidence=" + confidence);
 
         // Get the list of the probable activities associated with the current state of the
         // device. Each activity is associated with a confidence level, which is an int between
@@ -130,7 +130,7 @@ public class ActivityRecognitionService extends Service implements GoogleApiClie
             if (deviceId > 0L) {
                 Log.d(TAG,"Save last detected activity on prefs");
                 prefs.edit()
-                        .putInt(Constants.PROPERTY_LAST_DETECTED_ACTIVITY, mCurrentContext)
+                        .putInt(Constants.PROPERTY_LAST_DETECTED_ACTIVITY, mCurrentActivity)
                         .apply();
             }
         }
@@ -337,19 +337,19 @@ public class ActivityRecognitionService extends Service implements GoogleApiClie
     }
 
     private void sendContextToBackend(){
-        mCurrentContext = prefs.getInt(Constants.PROPERTY_LAST_DETECTED_ACTIVITY,-1);
-        if(mCurrentContext >= 0){
-            Log.d(TAG, "Send new context to backend: " + mCurrentContext);
+        mCurrentActivity = prefs.getInt(Constants.PROPERTY_LAST_DETECTED_ACTIVITY,-1);
+        if(mCurrentActivity >= 0){
+            Log.d(TAG, "Send new context to backend: " + mCurrentActivity);
             if(mLastLocation != null){
                 Log.d(TAG, "Location !=null: Lat=" + mLastLocation.getLatitude() + " Lon=" + mLastLocation.getLongitude());
             }
             if(Utils.isInternetAvailable(this)){
-                new AddDetectedContextAsyncTask(deviceId,mCurrentContext,mLastLocation){
+                new AddDetectedContextAsyncTask(deviceId,mCurrentActivity,mLastLocation){
                     @Override
                     protected void onPostExecute(us.idinfor.smartcitizen.backend.contextApi.model.Context context) {
                         if(context != null){
                             sendContext = false;
-                            Log.d(TAG, "New context saved in datastore: " + context.getContext());
+                            Log.d(TAG, "New context saved in datastore: " + context.getActivity());
                         }
                     }
                 }.execute();

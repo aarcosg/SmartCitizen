@@ -1,25 +1,26 @@
 package us.idinfor.smartcitizen.adapter;
 
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.List;
-
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
-import us.idinfor.smartcitizen.backend.contextApi.model.Activity;
 
 public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHolder> {
 
     private static final String TAG = ActivityAdapter.class.getCanonicalName();
-    private List<Activity> activities;
+    private SparseArray activities;
+    private Context context;
 
-    public ActivityAdapter(List<Activity> activities){
+    public ActivityAdapter(SparseArray activities){
         this.activities = activities;
     }
 
@@ -27,14 +28,14 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_activity_item, parent, false);
         ViewHolder holder = new ViewHolder(v);
+        context = parent.getContext();
         return holder;
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Activity activity = activities.get(position);
-        holder.label.setText(activity.getName());
-        holder.value.setText(activity.getDuration().toString());
+        holder.label.setText(Constants.getActivityString(context, activities.keyAt(position)));
+        holder.value.setText(activities.valueAt(position).toString());
     }
 
     @Override
@@ -42,18 +43,15 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
         return activities.size();
     }
 
-    public void add(Activity acitivty, int position){
-        activities.add(position,acitivty);
-        notifyItemInserted(position);
-    }
-
-    public void add(Activity activity){
-        activities.add(activity);
+    public void add(Integer activityId , Long activityDuration){
+        activities.put(activityId, activityDuration);
         notifyItemInserted(activities.size()-1);
     }
 
-    public void addAll(List<Activity> activities){
-        this.activities.addAll(activities);
+    public void addAll(SparseArray activities){
+        for(int i = 0; i < activities.size(); i++){
+            this.activities.put(activities.keyAt(i),activities.valueAt(i));
+        }
         notifyDataSetChanged();
     }
 

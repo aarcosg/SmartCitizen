@@ -7,11 +7,11 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -38,7 +38,7 @@ public class HomeFragment extends Fragment {
 
     boolean isRunning;
     SharedPreferences prefs;
-    List<Activity> activities;
+    SparseArray activities;
     ActivityAdapter adapter;
 
     public static HomeFragment newInstance() {
@@ -65,11 +65,11 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         ButterKnife.inject(this, view);
 
-        activitiesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),2));
+        activitiesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         activitiesRecyclerView.addItemDecoration(new MarginDecoration(getActivity()));
         activitiesRecyclerView.setItemAnimator(new DefaultItemAnimator());
         activitiesRecyclerView.setHasFixedSize(true);
-        activities = new ArrayList<>();
+        activities = new SparseArray();
         adapter = new ActivityAdapter(activities);
         activitiesRecyclerView.setAdapter(adapter);
 
@@ -84,8 +84,18 @@ public class HomeFragment extends Fragment {
             protected void onPostExecute(List<Activity> activitiesResult) {
                 super.onPostExecute(activitiesResult);
                 if (activitiesResult != null && !activitiesResult.isEmpty()) {
+                    SparseArray aggregatedDuration = new SparseArray();
+                    for(Activity activity : activitiesResult){
+                        if(aggregatedDuration.indexOfKey(activity.getId()) < 0){
+                            aggregatedDuration.put(activity.getId(), activity.getDuration());
+                        }else{
+                            aggregatedDuration.setValueAt(activity.getId(),
+                                    (Long) aggregatedDuration.get(activity.getId()) + activity.getDuration());
+                        }
+                    }
+
                     adapter.clear();
-                    adapter.addAll(activitiesResult);
+                    adapter.addAll(aggregatedDuration);
                 }
             }
         }.execute();
