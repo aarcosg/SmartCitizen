@@ -85,4 +85,7 @@
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="location">Location</string>
+    <string name="minutes">minutes</string>
+    <string name="pref_title_activity_recognition">Enable activity recognition</string>
+    <string name="version">Version</string>
 </resources>

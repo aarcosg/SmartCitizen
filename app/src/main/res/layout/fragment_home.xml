@@ -1,123 +1,26 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="us.idinfor.smartcitizen.fragment.HomeFragment"
-    android:measureAllChildren="false"
-    android:layout_margin="@dimen/activity_horizontal_margin">
+    android:measureAllChildren="false">
 
+<!--        <us.idinfor.smartcitizen.ui.AutofitRecyclerView
+            android:id="@+id/activitiesRecyclerView"
+            android:scrollbars="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:columnWidth="@dimen/column_width"
+            android:layout_below="@+id/stopBtn"
+            android:layout_marginTop="@dimen/activity_vertical_margin"/>-->
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/start"
-        android:id="@+id/startBtn"
-        android:layout_gravity="start|top"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/stop"
-        android:id="@+id/stopBtn"
-        android:layout_gravity="end|top"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <LinearLayout
-        android:orientation="vertical"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/activitiesRecyclerView"
+        android:scrollbars="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/stopBtn"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        >
-
-        <android.support.v7.widget.CardView
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/activity_vertical_margin">
-
-                <TextView
-                    android:id="@+id/stillLbl"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="@color/primaryDark"
-                    android:text="Still"/>
-
-                <TextView
-                    android:id="@+id/stillVal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                    android:textColor="@android:color/black"
-                    android:fontFamily="sans-serif-light"
-                    android:text="0"
-                    android:layout_below="@id/stillLbl"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                    android:text="minutes"
-                    android:layout_toRightOf="@id/stillVal"
-                    android:layout_alignBottom="@id/stillVal"/>
-
-            </RelativeLayout>
-
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/activity_vertical_margin">
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/activity_vertical_margin">
-
-                <TextView
-                    android:id="@+id/walkingLbl"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textColor="@color/primaryDark"
-                    android:text="Walking"/>
-
-                <TextView
-                    android:id="@+id/walkingVal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                    android:textColor="@android:color/black"
-                    android:fontFamily="sans-serif-light"
-                    android:text="0"
-                    android:layout_below="@id/walkingLbl"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                    android:text="minutes"
-                    android:layout_toRightOf="@id/walkingVal"
-                    android:layout_alignBottom="@id/walkingVal"/>
-
-            </RelativeLayout>
-
-        </android.support.v7.widget.CardView>
+        android:layout_height="match_parent"/>
 
 
-
-
-
-    </LinearLayout>
 
 </RelativeLayout>

@@ -1,8 +1,8 @@
 package us.idinfor.smartcitizen;
 
-import android.app.Application;
+import android.support.multidex.MultiDexApplication;
 
-public class SmartCitizenApplication extends Application {
+public class SmartCitizenApplication extends MultiDexApplication {
     private static final String TAG = SmartCitizenApplication.class.getCanonicalName();
 
     public SmartCitizenApplication(){

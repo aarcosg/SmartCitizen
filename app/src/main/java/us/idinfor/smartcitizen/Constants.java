@@ -89,7 +89,7 @@ public class Constants {
             case DetectedActivity.UNKNOWN:
                 return resources.getString(R.string.unknown);
             default:
-                return resources.getString(R.string.unknown);
+                return resources.getString(R.string.other);
         }
     }
 }

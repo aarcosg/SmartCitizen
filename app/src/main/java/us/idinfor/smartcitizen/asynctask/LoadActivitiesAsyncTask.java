@@ -10,10 +10,10 @@ import java.util.List;
 
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.backend.contextApi.ContextApi;
-import us.idinfor.smartcitizen.backend.contextApi.model.Context;
+import us.idinfor.smartcitizen.backend.contextApi.model.Activity;
 
 
-public class LoadActivitiesAsyncTask extends AsyncTask<Void,Void,List<Context>> {
+public class LoadActivitiesAsyncTask extends AsyncTask<Void,Void,List<Activity>> {
 
     private static final String TAG = LoadActivitiesAsyncTask.class.getCanonicalName();
     private static ContextApi contextApi = null;
@@ -24,8 +24,8 @@ public class LoadActivitiesAsyncTask extends AsyncTask<Void,Void,List<Context>> 
     }
 
     @Override
-    protected List<Context> doInBackground(Void... params) {
-        List<Context> contexts = null;
+    protected List<Activity> doInBackground(Void... params) {
+        List<Activity> activities = null;
         if (contextApi == null) {
             ContextApi.Builder builder = new ContextApi.Builder(AndroidHttp.newCompatibleTransport(),new AndroidJsonFactory(), null)
                     .setRootUrl(Constants.GOOGLE_APPENGINE_URL)
@@ -34,11 +34,11 @@ public class LoadActivitiesAsyncTask extends AsyncTask<Void,Void,List<Context>> 
         }
 
         try {
-            contexts = contextApi.time(deviceId,"today").execute().getItems();
+            activities = contextApi.activity(deviceId, "today").execute().getItems();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return contexts;
+        return activities;
     }
 }

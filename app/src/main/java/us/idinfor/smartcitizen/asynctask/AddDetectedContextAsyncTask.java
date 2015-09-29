@@ -19,10 +19,10 @@ public class AddDetectedContextAsyncTask extends AsyncTask<Void, Void, Context> 
     private static final String TAG = AddDetectedContextAsyncTask.class.getCanonicalName();
     private static ContextApi contextApi = null;
     private Long deviceId;
-    private String detectedContext;
+    private Integer detectedContext;
     private Location location;
 
-    public AddDetectedContextAsyncTask(Long deviceId, String detectedContext, Location location) {
+    public AddDetectedContextAsyncTask(Long deviceId, Integer detectedContext, Location location) {
         this.deviceId = deviceId;
         this.detectedContext = detectedContext;
         this.location = location;
@@ -51,7 +51,7 @@ public class AddDetectedContextAsyncTask extends AsyncTask<Void, Void, Context> 
             context.setContext(detectedContext);
             context.setDevice(device);
             newContext = contextApi.insert(context).execute();
-            Log.d(TAG,"New context added: " + detectedContext);
+            Log.d(TAG, "New context added: " + detectedContext);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
