@@ -18,7 +18,7 @@ public class Context {
     @Load
     Ref<Device> device;
     @Index
-    Integer context;
+    Integer activity;
     @Index
     GeoPt location;
     @Index
@@ -40,12 +40,12 @@ public class Context {
         this.device = Ref.create(device);
     }
 
-    public Integer getContext() {
-        return context;
+    public Integer getActivity() {
+        return activity;
     }
 
-    public void setContext(Integer context) {
-        this.context = context;
+    public void setActivity(Integer activity) {
+        this.activity = activity;
     }
 
     public Date getTime() {

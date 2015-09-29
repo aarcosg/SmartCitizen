@@ -1,10 +1,14 @@
 package us.idinfor.smartcitizen.backend;
 
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 public class Activity{
 
     Integer id;
     String name;
-    Integer duration;
+    Date from;
+    Date to;
 
     public Integer getId() {
         return id;
@@ -22,12 +26,26 @@ public class Activity{
         this.name = name;
     }
 
-    public Integer getDuration() {
-        return duration;
+    public Date getFrom() {
+        return from;
     }
 
-    public void setDuration(Integer duration) {
-        this.duration = duration;
+    public void setFrom(Date from) {
+        this.from = from;
+    }
+
+    public Date getTo() {
+        return to;
+    }
+
+    public void setTo(Date to) {
+        this.to = to;
+    }
+
+    public Long getDuration(){
+        Long duration = Math.abs(getFrom().getTime() - getTo().getTime());
+        Long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(duration);
+        return diffInMinutes;
     }
 
     public Activity() {
@@ -57,6 +75,13 @@ public class Activity{
 
         public String getName() {
             return name;
+        }
+
+        public static Type getById(int id){
+            for(Type type : values()){
+                if(type.getId() == id) return type;
+            }
+            return Type.UNKNOWN;
         }
     }
 }

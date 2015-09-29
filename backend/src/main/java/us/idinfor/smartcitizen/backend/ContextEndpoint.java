@@ -86,7 +86,7 @@ public class ContextEndpoint {
         // If your client provides the ID then you should probably use PUT instead.
         context.setTime(new Date());
         ofy().save().entity(context).now();
-        logger.info("Created Context with ID = " + context.getId() +". Context = " + context.getContext());
+        logger.info("Created Context with ID = " + context.getId() +". Context = " + context.getActivity());
 
         return ofy().load().entity(context).now();
     }
@@ -163,7 +163,10 @@ public class ContextEndpoint {
         Device device = new Device();
         device.setId(id);
         Ref<Device> deviceKey = Ref.create(device);
-        return ofy().load().type(Context.class).filter("device", deviceKey).list();
+        return ofy().load().type(Context.class)
+                .filter("device", deviceKey)
+                .order("time")
+                .list();
     }
 
     @ApiMethod(
@@ -179,17 +182,58 @@ public class ContextEndpoint {
         today.set(Calendar.SECOND,0);
         today.set(Calendar.MINUTE,0);
         today.set(Calendar.HOUR_OF_DAY,0);
-        for(Activity.Type type : Activity.Type.values()){
+        /*for(Activity.Type type : Activity.Type.values()){
             List<Context> contexts = ofy().load().type(Context.class)
                     .filter("device", deviceKey)
                     .filter("context",type.getId())
                     .filter("time >", today.getTime())
+                    .order("time")
                     .list();
             if(contexts != null && !contexts.isEmpty()){
                 Activity activity = new Activity();
                 activity.setId(type.getId());
                 activity.setName(type.getName());
                 activity.setDuration(contexts.size());
+                activities.add(activity);
+            }
+        }*/
+        List<Context> contexts = ofy().load().type(Context.class)
+                .filter("device", deviceKey)
+                .filter("time >", today.getTime())
+                .order("time")
+                .list();
+        if(contexts != null && !contexts.isEmpty()){
+            int lastActivity = -1;
+            Date startDate = null;
+            Context prevContext = null;
+            for(Context context : contexts){
+                if(lastActivity < 0){
+                    lastActivity = context.getActivity();
+                    startDate = context.getTime();
+                    prevContext = context;
+                }else if(context.getActivity() == lastActivity){
+                    prevContext = context;
+                }else{
+                    Activity activity = new Activity();
+                    activity.setId(lastActivity);
+                    if(Activity.Type.getById(lastActivity).getName() != null){
+                        activity.setName(Activity.Type.getById(lastActivity).getName());
+                    }
+                    activity.setFrom(startDate);
+                    activity.setTo(prevContext.getTime());
+                    activities.add(activity);
+                    lastActivity = -1;
+                    prevContext = null;
+                }
+            }
+            if(prevContext != null){
+                Activity activity = new Activity();
+                activity.setId(lastActivity);
+                if(Activity.Type.getById(lastActivity).getName() != null){
+                    activity.setName(Activity.Type.getById(lastActivity).getName());
+                }
+                activity.setFrom(startDate);
+                activity.setTo(prevContext.getTime());
                 activities.add(activity);
             }
         }
