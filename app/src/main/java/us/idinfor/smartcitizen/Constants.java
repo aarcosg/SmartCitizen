@@ -21,6 +21,7 @@ public class Constants {
     public static final String PROPERTY_LAST_LONGITUDE = "last_longitude";
     public static final String PROPERTY_ACTIVITY_UPDATES = "activity_updates";
     public static final String PROPERTY_LOCATION_UPDATES = "location_updates";
+    public static final String PROPERTY_USER_NAME = "user_name";
 
 
     public static final String EXTRA_DETECTED_CONTEXTS = PACKAGE_NAME + ".EXTRA_DETECTED_CONTEXTS";
@@ -48,6 +49,8 @@ public class Constants {
     public static final String ACTION_STOP_ACTIVITY_RECOGNITION = PACKAGE_NAME + ".ACTION_STOP_ACTIVITY_RECOGNITION";
     public static final String ACTION_ACTIVITY_RECOGNITION_RESULT = PACKAGE_NAME + ".ACTION_ACTIVITY_RECOGNITION_RESULT";
     public static final String ACTION_LOCATION_CHANGED_RESULT = PACKAGE_NAME + ".ACTION_LOCATION_CHANGED_RESULT";
+
+    public static final String DATABASE_NAME = "smartcitizen-db";
 
 
 
