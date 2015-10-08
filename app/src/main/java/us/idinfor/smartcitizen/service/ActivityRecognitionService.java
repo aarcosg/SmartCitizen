@@ -21,9 +21,11 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
+import java.util.Date;
 import java.util.List;
 
 import us.idinfor.smartcitizen.Constants;
+import us.idinfor.smartcitizen.SmartCitizenApplication;
 import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.asynctask.AddDetectedContextAsyncTask;
 
@@ -350,11 +352,25 @@ public class ActivityRecognitionService extends Service implements GoogleApiClie
                         if(context != null){
                             sendContext = false;
                             Log.d(TAG, "New context saved in datastore: " + context.getActivity());
+                            saveContextInLocalDB(context);
                         }
                     }
                 }.execute();
             }
         }
+    }
+
+    private void saveContextInLocalDB(us.idinfor.smartcitizen.backend.contextApi.model.Context context) {
+
+        us.idinfor.smartcitizen.model.Context entity = new us.idinfor.smartcitizen.model.Context();
+        entity.setActivity(context.getActivity());
+        entity.setDeviceId(context.getDevice().getDeviceId());
+        entity.setLatitude(context.getLocation().getLatitude().doubleValue());
+        entity.setLongitude(context.getLocation().getLongitude().doubleValue());
+        entity.setTime(new Date(context.getTime().getValue()));
+        entity.setUser(prefs.getString(Constants.PROPERTY_USER_NAME, "alvaro"));
+        Log.d(TAG, "Add context to local db");
+        ((SmartCitizenApplication)getApplicationContext()).getDaoSession().getContextDao().insert(entity);
     }
 
 
