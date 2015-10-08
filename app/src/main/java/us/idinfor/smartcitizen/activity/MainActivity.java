@@ -1,6 +1,8 @@
 package us.idinfor.smartcitizen.activity;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -9,13 +11,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,7 +37,7 @@ import us.idinfor.smartcitizen.backend.deviceApi.model.Device;
 import us.idinfor.smartcitizen.fragment.HomeFragment;
 import us.idinfor.smartcitizen.fragment.LocationFragment;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = MainActivity.class.getCanonicalName();
@@ -69,8 +72,10 @@ public class MainActivity extends AppCompatActivity
         ButterKnife.inject(this);
         UDID = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         prefs = Utils.getSharedPreferences(this);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        if(TextUtils.isEmpty(prefs.getString(Constants.PROPERTY_USER_NAME, ""))){
+            LoginActivity.launch(this);
+        }
+        Toolbar toolbar = buildActionBarToolbar(getString(R.string.app_name),false);
 
         mTitle = mDrawerTitle = getTitle();
 
@@ -291,5 +296,10 @@ public class MainActivity extends AppCompatActivity
         editor.putString(Constants.PROPERTY_GCM_ID, regId);
         editor.putInt(Constants.PROPERTY_APP_VERSION, appVersion);
         editor.apply();
+    }
+
+    public static void launch(Activity activity) {
+        Intent intent = new Intent(activity, MainActivity.class);
+        ActivityCompat.startActivity(activity, intent, null);
     }
 }

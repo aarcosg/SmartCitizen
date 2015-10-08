@@ -21,6 +21,7 @@
     <string name="other">Other</string>
 
     <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_login">Sign in</string>
 
     <!-- Strings related to Settings -->
 
@@ -88,4 +89,11 @@
     <string name="minutes">minutes</string>
     <string name="pref_title_activity_recognition">Enable activity recognition</string>
     <string name="version">Version</string>
+    <string name="prompt_email">Email</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="error_field_required">Field required</string>
+    <string name="error_invalid_user">Invalid user</string>
+    <string name="error_user_not_found">User not found</string>
+    <string name="send_data">Send data to Hermes Citizen server</string>
+    <string name="sending_data">Sending data to SmartCitizen server</string>
 </resources>

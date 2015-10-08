@@ -5,6 +5,10 @@
         android:title="@string/pref_title_activity_recognition"
         android:defaultValue="false" />
     <Preference
+        android:key="send_data"
+        android:title="@string/send_data"
+        android:summary=""/>
+    <Preference
         android:key="app_version"
         android:title="@string/version"
         android:summary=""/>

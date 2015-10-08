@@ -16,6 +16,8 @@ import android.widget.Toast;
 
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
+import us.idinfor.smartcitizen.Utils;
+import us.idinfor.smartcitizen.asynctask.SendLocalDataAsyncTask;
 import us.idinfor.smartcitizen.service.ActivityRecognitionService;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
@@ -27,7 +29,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        context = getApplicationContext();
+        context = SettingsActivity.this;
         try {
             version = "v. " + getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
         } catch (PackageManager.NameNotFoundException e) {
@@ -78,6 +80,18 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     }else{
                         ActivityRecognitionService.actionStopActivityRecognition(context);
                         Toast.makeText(context, "Activity recognition disabled", Toast.LENGTH_LONG).show();
+                    }
+                    return true;
+                }
+            });
+            Preference sendDataPref = findPreference("send_data");
+            sendDataPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    if (Utils.isInternetAvailable(context)) {
+                        new SendLocalDataAsyncTask(context).execute();
+                    } else {
+                        Toast.makeText(context,"Internet unavailable",Toast.LENGTH_LONG).show();
                     }
                     return true;
                 }
