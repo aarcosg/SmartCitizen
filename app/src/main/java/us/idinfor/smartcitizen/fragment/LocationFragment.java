@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -40,6 +41,7 @@ public class LocationFragment extends Fragment implements OnMapReadyCallback {
     private ArrayList<LatLng> locations;
     private HeatmapTileProvider mProvider;
     private TileOverlay mOverlay;
+    private ProgressBar mProgressBar;
 
     public static LocationFragment newInstance() {
         LocationFragment fragment = new LocationFragment();
@@ -66,6 +68,7 @@ public class LocationFragment extends Fragment implements OnMapReadyCallback {
             SupportMapFragment mapFragment = (SupportMapFragment)getChildFragmentManager().findFragmentById(R.id.map);
             mapFragment.getMapAsync(this);
         }
+        mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
 
         return view;
     }
@@ -83,8 +86,15 @@ public class LocationFragment extends Fragment implements OnMapReadyCallback {
 
         new LoadLocationsAsyncTask(prefs.getLong(Constants.PROPERTY_DEVICE_ID,0L)){
             @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                mProgressBar.setVisibility(View.VISIBLE);
+            }
+
+            @Override
             protected void onPostExecute(List<Context> contexts) {
                 super.onPostExecute(contexts);
+                mProgressBar.setVisibility(View.GONE);
                 if(contexts != null && !contexts.isEmpty()){
                     locations = new ArrayList<LatLng>();
                     for(Context c : contexts){

@@ -11,6 +11,7 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import java.util.List;
 
@@ -34,7 +35,8 @@ public class HomeFragment extends Fragment {
     private static final String TAG = HomeFragment.class.getCanonicalName();
     @InjectView(R.id.activitiesRecyclerView)
     RecyclerView activitiesRecyclerView;
-    //AutofitRecyclerView activitiesRecyclerView;
+    @InjectView(R.id.progressBar)
+    ProgressBar progressBar;
 
     boolean isRunning;
     SharedPreferences prefs;
@@ -79,10 +81,18 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         new LoadActivitiesAsyncTask(prefs.getLong(Constants.PROPERTY_DEVICE_ID, 0L)) {
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                progressBar.setVisibility(View.VISIBLE);
+            }
+
             @Override
             protected void onPostExecute(List<Activity> activitiesResult) {
                 super.onPostExecute(activitiesResult);
+                progressBar.setVisibility(View.GONE);
                 if (activitiesResult != null && !activitiesResult.isEmpty()) {
                     SparseArray aggregatedDuration = new SparseArray();
                     for(Activity activity : activitiesResult){

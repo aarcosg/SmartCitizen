@@ -15,11 +15,15 @@
             android:layout_below="@+id/stopBtn"
             android:layout_marginTop="@dimen/activity_vertical_margin"/>-->
 
+    <include layout="@layout/progress_bar"
+        android:id="@+id/progressBar"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/activitiesRecyclerView"
         android:scrollbars="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_below="@id/progressBar"/>
 
 
 
