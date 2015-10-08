@@ -163,8 +163,13 @@ public class ContextEndpoint {
         Device device = new Device();
         device.setId(id);
         Ref<Device> deviceKey = Ref.create(device);
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.SECOND,0);
+        today.set(Calendar.MINUTE,0);
+        today.set(Calendar.HOUR_OF_DAY,0);
         return ofy().load().type(Context.class)
                 .filter("device", deviceKey)
+                .filter("time >", today.getTime())
                 .order("time")
                 .list();
     }
