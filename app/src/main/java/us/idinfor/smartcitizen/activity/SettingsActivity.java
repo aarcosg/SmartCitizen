@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import us.idinfor.smartcitizen.Constants;
+import us.idinfor.smartcitizen.HermesCitizenApi;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.asynctask.SendLocalDataAsyncTask;
@@ -89,9 +90,29 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
                     if (Utils.isInternetAvailable(context)) {
-                        new SendLocalDataAsyncTask(context).execute();
+                        new SendLocalDataAsyncTask(context) {
+                            @Override
+                            protected void onPostExecute(Integer res) {
+                                super.onPostExecute(res);
+                                switch (res) {
+                                    case HermesCitizenApi.RESPONSE_OK:
+                                        Toast.makeText(context, "Data uploaded successfully", Toast.LENGTH_LONG).show();
+                                        break;
+                                    case HermesCitizenApi.RESPONSE_ERROR_UNKNOWN:
+                                        Toast.makeText(context, "Unknown error", Toast.LENGTH_LONG).show();
+                                        break;
+                                    case HermesCitizenApi.RESPONSE_ERROR_USER_NOT_FOUND:
+                                        Toast.makeText(context, "Error: User not found", Toast.LENGTH_LONG).show();
+                                        Utils.getSharedPreferences(context).edit().remove(Constants.PROPERTY_USER_NAME).commit();
+                                        break;
+                                    case HermesCitizenApi.RESPONSE_ERROR_DATA_NOT_UPLOADED:
+                                        Toast.makeText(context, "Error: Data not uploaded", Toast.LENGTH_LONG).show();
+                                        break;
+                                }
+                            }
+                        }.execute();
                     } else {
-                        Toast.makeText(context,"Internet unavailable",Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, "Internet unavailable", Toast.LENGTH_LONG).show();
                     }
                     return true;
                 }

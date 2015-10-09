@@ -15,8 +15,6 @@ import android.widget.ProgressBar;
 
 import java.util.List;
 
-import butterknife.ButterKnife;
-import butterknife.InjectView;
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
@@ -33,12 +31,10 @@ import us.idinfor.smartcitizen.decorator.MarginDecoration;
 public class HomeFragment extends Fragment {
 
     private static final String TAG = HomeFragment.class.getCanonicalName();
-    @InjectView(R.id.activitiesRecyclerView)
+
     RecyclerView activitiesRecyclerView;
-    @InjectView(R.id.progressBar)
     ProgressBar progressBar;
 
-    boolean isRunning;
     SharedPreferences prefs;
     SparseArray activities;
     ActivityAdapter adapter;
@@ -65,8 +61,8 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        ButterKnife.inject(this, view);
 
+        activitiesRecyclerView = (RecyclerView)view.findViewById(R.id.activitiesRecyclerView);
         activitiesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
         activitiesRecyclerView.addItemDecoration(new MarginDecoration(getActivity()));
         activitiesRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -74,6 +70,8 @@ public class HomeFragment extends Fragment {
         activities = new SparseArray();
         adapter = new ActivityAdapter(activities);
         activitiesRecyclerView.setAdapter(adapter);
+
+        progressBar = (ProgressBar)view.findViewById(R.id.progressBar);
 
         return view;
     }
@@ -110,12 +108,5 @@ public class HomeFragment extends Fragment {
             }
         }.execute();
 
-    }
-
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        ButterKnife.reset(this);
     }
 }
