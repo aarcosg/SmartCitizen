@@ -4,7 +4,6 @@ package us.idinfor.smartcitizen.asynctask;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import java.util.List;
 
@@ -12,7 +11,7 @@ import us.idinfor.smartcitizen.HermesCitizenApi;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.SmartCitizenApplication;
 
-public class SendLocalDataAsyncTask  extends AsyncTask<Void,Integer,Boolean>{
+public class SendLocalDataAsyncTask  extends AsyncTask<Void,Integer,Integer>{
 
     private ProgressDialog progressDialog;
     private Context context;
@@ -36,16 +35,15 @@ public class SendLocalDataAsyncTask  extends AsyncTask<Void,Integer,Boolean>{
     }
 
     @Override
-    protected Boolean doInBackground(Void... params) {
+    protected Integer doInBackground(Void... params) {
         List<us.idinfor.smartcitizen.model.Context> contexts = ((SmartCitizenApplication)context.getApplicationContext())
-                .getDaoSession().getContextDao().loadAll();
+                .getDaoSession().getContextDao().loadAll().subList(0,5);
         return HermesCitizenApi.sendContexts(contexts);
     }
 
     @Override
-    protected void onPostExecute(Boolean aBoolean) {
-        super.onPostExecute(aBoolean);
+    protected void onPostExecute(Integer res) {
+        super.onPostExecute(res);
         progressDialog.dismiss();
-        Log.e("SendLocaldataasync",aBoolean.toString());
     }
 }

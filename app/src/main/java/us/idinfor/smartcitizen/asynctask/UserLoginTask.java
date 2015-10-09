@@ -3,6 +3,8 @@ package us.idinfor.smartcitizen.asynctask;
 
 import android.os.AsyncTask;
 
+import us.idinfor.smartcitizen.HermesCitizenApi;
+
 public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
     private String username;
 
@@ -12,7 +14,6 @@ public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... params) {
-        //return HermesCitizenApi.existsUser(username);
-        return true;
+        return HermesCitizenApi.existsUser(username);
     }
 }
