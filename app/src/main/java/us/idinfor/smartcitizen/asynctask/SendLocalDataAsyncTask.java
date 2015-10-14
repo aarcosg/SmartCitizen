@@ -10,6 +10,7 @@ import java.util.List;
 import us.idinfor.smartcitizen.HermesCitizenApi;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.SmartCitizenApplication;
+import us.idinfor.smartcitizen.model.ContextDao;
 
 public class SendLocalDataAsyncTask  extends AsyncTask<Void,Integer,Integer>{
 
@@ -20,7 +21,7 @@ public class SendLocalDataAsyncTask  extends AsyncTask<Void,Integer,Integer>{
         this.context = context;
         progressDialog = new ProgressDialog(context);
         progressDialog.setMessage(context.getString(R.string.sending_data));
-        progressDialog.setMax(100);
+        progressDialog.setCancelable(false);
     }
 
     @Override
@@ -30,14 +31,13 @@ public class SendLocalDataAsyncTask  extends AsyncTask<Void,Integer,Integer>{
     }
 
     @Override
-    protected void onProgressUpdate(Integer... values) {
-        progressDialog.setProgress(values[0]);
-    }
-
-    @Override
     protected Integer doInBackground(Void... params) {
         List<us.idinfor.smartcitizen.model.Context> contexts = ((SmartCitizenApplication)context.getApplicationContext())
-                .getDaoSession().getContextDao().loadAll().subList(0,5);
+                .getDaoSession().getContextDao()
+                .queryBuilder()
+                .where(ContextDao.Properties.Sent.eq(0))
+                .orderAsc(ContextDao.Properties.Time)
+                .list();
         return HermesCitizenApi.sendContexts(contexts);
     }
 

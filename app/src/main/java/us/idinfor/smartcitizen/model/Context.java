@@ -13,6 +13,7 @@ public class Context {
     private Double latitude;
     private Double longitude;
     private java.util.Date time;
+    private int sent;
 
     public Context() {
     }
@@ -21,7 +22,7 @@ public class Context {
         this.id = id;
     }
 
-    public Context(Long id, String user, String deviceId, Integer activity, Double latitude, Double longitude, java.util.Date time) {
+    public Context(Long id, String user, String deviceId, Integer activity, Double latitude, Double longitude, java.util.Date time, int sent) {
         this.id = id;
         this.user = user;
         this.deviceId = deviceId;
@@ -29,6 +30,7 @@ public class Context {
         this.latitude = latitude;
         this.longitude = longitude;
         this.time = time;
+        this.sent = sent;
     }
 
     public Long getId() {
@@ -85,6 +87,14 @@ public class Context {
 
     public void setTime(java.util.Date time) {
         this.time = time;
+    }
+
+    public int getSent() {
+        return sent;
+    }
+
+    public void setSent(int sent) {
+        this.sent = sent;
     }
 
 }

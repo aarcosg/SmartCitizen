@@ -65,7 +65,6 @@ public class HermesCitizenApi {
         jsonContextList.setContexts(aux);
 
         String json = new Gson().toJson(jsonContextList, JsonContextList.class);
-        Log.e(TAG,json);
 
         RequestBody formBody = RequestBody.create(JSON,json);
         Request request = new Request.Builder()
@@ -81,7 +80,7 @@ public class HermesCitizenApi {
         }catch (Exception e){
             Log.e(TAG,"Exception: " + e);
         }
-        
+
         try{
             return Integer.valueOf(responseString);
         }catch (NumberFormatException e){
