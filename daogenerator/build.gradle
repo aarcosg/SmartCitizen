@@ -1,6 +1,8 @@
 apply plugin: 'application'
 apply plugin: 'java'
 
+mainClassName = "us.idinfor.smartcitizen.daogenerator.SmartCitizenDaoGenerator"
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile files('libs/greendao-generator-2.0.0.jar')

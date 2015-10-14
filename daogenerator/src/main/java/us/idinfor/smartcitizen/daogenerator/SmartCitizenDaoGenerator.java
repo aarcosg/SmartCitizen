@@ -7,7 +7,7 @@ import de.greenrobot.daogenerator.Schema;
 public class SmartCitizenDaoGenerator {
 
     public static void main(String[] args) throws Exception {
-        Schema schema = new Schema(1, "us.idinfor.smartcitizen.model");
+        Schema schema = new Schema(2, "us.idinfor.smartcitizen.model");
 
         Entity context = schema.addEntity("Context");
         context.addIdProperty();
@@ -17,6 +17,7 @@ public class SmartCitizenDaoGenerator {
         context.addDoubleProperty("latitude");
         context.addDoubleProperty("longitude");
         context.addDateProperty("time");
+        context.addIntProperty("sent").notNull();
 
         new DaoGenerator().generateAll(schema,"app/src/main/java");
     }
