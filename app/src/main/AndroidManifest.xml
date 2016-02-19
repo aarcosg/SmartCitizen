@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="us.idinfor.smartcitizen" >
+    package="us.idinfor.smartcitizen">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="android.permission.BODY_SENSORS" />
 
     <permission
         android:name="us.idinfor.smartcitizen.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
+
     <uses-permission android:name="us.idinfor.smartcitizen.permission.C2D_MESSAGE" />
 
     <application
@@ -22,7 +24,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name">
@@ -35,33 +37,60 @@
         <activity
             android:name=".activity.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".activity.MainActivity" >
+            android:parentActivityName=".activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="us.idinfor.smartcitizen.activity.MainActivity" />
         </activity>
-
         <activity
             android:name=".activity.LoginActivity"
             android:label="@string/title_activity_login"
-            android:parentActivityName=".activity.MainActivity" >
+            android:parentActivityName=".activity.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="us.idinfor.smartcitizen.activity.MainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.FitnessActivity"
+            android:label="@string/title_activity_fitness"
+            android:parentActivityName=".activity.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="us.idinfor.smartcitizen.activity.MainActivity" />
+        </activity>
+        <activity
+            android:name=".activity.LocationDetailsActivity"
+            android:label="@string/title_activity_location_details"
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="us.idinfor.smartcitizen.activity.MainActivity" />
         </activity>
 
-        <receiver android:name=".receiver.OnBootReceiver" >
+        <receiver android:name=".receiver.OnBootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
         <service
-            android:name="us.idinfor.smartcitizen.service.ActivityRecognitionService"
+            android:name=".service.ActivityRecognitionService"
             android:exported="false" />
 
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyAO828Jh6rJrTYNfj9U_Rt6pzDpHLWWR30"/>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDT6YeYiTQ-08f0t211M8Fe0dLj8lf9BJU" />
 
+        <activity
+            android:name=".activity.ActivityDetailsActivity"
+            android:label="@string/title_activity_activity_details"
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="us.idinfor.smartcitizen.activity.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

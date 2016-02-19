@@ -7,5 +7,19 @@
     <color name="primaryText">#212121</color>
     <color name="secondaryText">#727272</color>
     <color name="icons">#FFFFFF</color>
-    <color name="divider">#B6B6B6</color>
+    <color name="divider">#1f000000</color>
+    <color name="purple">#9C27B0</color>
+    <color name="purpleLight">#E1BEE7</color>
+    <color name="deepPurple">#673AB7</color>
+    <color name="green">#4CAF50</color>
+    <color name="cyan">#00BCD4</color>
+    <color name="indigo">#3F51B5</color>
+    <color name="brown">#795548</color>
+    <color name="blueGrey">#607D8B</color>
+    <color name="deepOrange">#FF5722</color>
+    <color name="red">#F44336</color>
+
+    <color name="activity_still">#212121</color>
+    <color name="activity_walking">#FF5722</color>
+    <color name="activity_running">#9C27B0</color>
 </resources>

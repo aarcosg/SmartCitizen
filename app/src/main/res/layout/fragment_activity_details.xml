@@ -1,0 +1,24 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragment.ActivityDetailsActivityFragment"
+    tools:showIn="@layout/activity_activity_details"
+    android:orientation="vertical">
+
+    <include layout="@layout/progress_bar"
+        android:id="@+id/progressBar"/>
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="wrap_content"
+        android:background="@color/divider"
+        android:layout_marginLeft="29dp"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/activitiesRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/progressBar"/>
+
+</RelativeLayout>

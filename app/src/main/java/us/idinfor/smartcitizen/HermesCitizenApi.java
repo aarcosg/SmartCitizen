@@ -20,7 +20,7 @@ import us.idinfor.smartcitizen.model.Context;
 public class HermesCitizenApi {
 
     private static final String TAG = HermesCitizenApi.class.getCanonicalName();
-    private static final String HOST_URL = "http://10.141.1.53:8080/HermesWeb/webresources/hermes.citizen.";
+    private static final String HOST_URL = "http://10.141.0.50:8080/HermesWeb/webresources/hermes.citizen.";
     private static final String USER_URL = HOST_URL + "person/existsUser/";
     private static final String CONTEXT_URL = HOST_URL + "context/create";
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");

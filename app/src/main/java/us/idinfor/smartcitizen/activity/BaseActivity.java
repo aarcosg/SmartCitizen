@@ -7,6 +7,7 @@ import us.idinfor.smartcitizen.R;
 
 
 public class BaseActivity extends AppCompatActivity {
+
     Toolbar mActionBarToolbar;
 
     protected Toolbar buildActionBarToolbar(String title, boolean upEnabled) {

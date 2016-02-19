@@ -9,9 +9,9 @@ import com.google.android.gms.location.DetectedActivity;
 public class Constants {
 
     public static final String PACKAGE_NAME = "us.idinfor.smartcitizen";
-    public static final String GOOGLE_APPENGINE_URL = "https://smartcitizen-1077.appspot.com/_ah/api/";
-    public static final String GOOGLE_APPENGINE_APP_NAME = "smartcitizen-1077";
-    public static final String GCM_SENDER_ID = "623491664412";
+    public static final String GOOGLE_APPENGINE_URL = "https://hermes-smart-citizen.appspot.com/_ah/api/";
+    public static final String GOOGLE_APPENGINE_APP_NAME = "hermes-smart-citizen";
+    public static final String GCM_SENDER_ID = "208008499190";
     public static final String PROPERTY_DEVICE_ID = "device_id";
     public static final String PROPERTY_GCM_ID = "gcm_id";
     public static final String PROPERTY_APP_VERSION = "app_version";
@@ -52,6 +52,10 @@ public class Constants {
 
     public static final String DATABASE_NAME = "smartcitizen-db";
 
+    public static final int RANGE_DAY = 0;
+    public static final int RANGE_WEEK = 1;
+    public static final int RANGE_MONTH = 2;
+    public static final int RANGE_YEAR = 3;
 
 
 

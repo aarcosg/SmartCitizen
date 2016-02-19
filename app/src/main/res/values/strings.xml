@@ -83,10 +83,11 @@
     <string name="start">Start</string>
     <string name="stop">Stop</string>
 
-<!-- TODO: Remove or change this placeholder text -->
+    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="location">Location</string>
     <string name="minutes">minutes</string>
+    <string name="hours">hours</string>
     <string name="pref_title_activity_recognition">Enable activity recognition</string>
     <string name="version">Version</string>
     <string name="prompt_email">Email</string>
@@ -96,4 +97,23 @@
     <string name="error_user_not_found">User not found</string>
     <string name="send_data">Send data to Hermes Citizen server</string>
     <string name="sending_data">Sending data to SmartCitizen server</string>
+    <string name="fitness">Fitness</string>
+    <string name="action_unregister_listener">Unregister listener</string>
+    <string name="intro_text">Hi! Let\\\'s listen to some available data sources! Check the menu for more actions!</string>
+    <string name="title_activity_fitness">Fitness</string>
+    <string name="steps">steps</string>
+    <string name="kilometers">kilometers</string>
+    <string name="calories">calories</string>
+    <string name="never">Never</string>
+    <string name="details">Details</string>
+    <string name="bpm">bpm</string>
+    <string name="km">km</string>
+    <string name="kcal">kcal</string>
+    <string name="duration_min">%1$d <small>minutes</small></string>
+    <string name="duration_min_abbrev">%1$d <small>m</small></string>
+    <string name="duration_hour_min">%1$s <small>hours</small> %2$s <small>minutes</small></string>
+    <string name="duration_hour_min_abbrev">%1$s <small>h</small> %2$s <small>m</small></string>
+    <string name="activity">Activity</string>
+    <string name="title_activity_location_details">Location details</string>
+    <string name="title_activity_activity_details">Activity details</string>
 </resources>

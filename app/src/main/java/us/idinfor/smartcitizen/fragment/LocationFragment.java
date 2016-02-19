@@ -1,9 +1,12 @@
 package us.idinfor.smartcitizen.fragment;
 
 
+import android.Manifest;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,7 +84,9 @@ public class LocationFragment extends Fragment implements OnMapReadyCallback {
                 prefs.getFloat(Constants.PROPERTY_LAST_LATITUDE,(float)Constants.DEFAULT_LATITUDE),
                 prefs.getFloat(Constants.PROPERTY_LAST_LONGITUDE,(float)Constants.DEFAULT_LONGITUDE));
 
-        mMap.setMyLocationEnabled(true);
+        if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            mMap.setMyLocationEnabled(true);
+        }
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastLocation, 13));
 
         new LoadLocationsAsyncTask(prefs.getLong(Constants.PROPERTY_DEVICE_ID,0L)){
