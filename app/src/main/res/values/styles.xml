@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primaryDark</item>
         <item name="colorAccent">@color/accent</item>
+        <item name="vpiCirclePageIndicatorStyle">@style/CustomCirclePageIndicatorStyle</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -20,4 +21,11 @@
 
     <style name="ActionBarPopupThemeOverlay" parent="ThemeOverlay.AppCompat" />
 
+    <style name="CustomCirclePageIndicatorStyle">
+        <item name="radius">4dp</item>
+        <item name="fillColor">@color/purple</item>
+        <item name="pageColor">@color/purpleLight</item>
+        <item name="strokeColor">@android:color/transparent</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
 </resources>

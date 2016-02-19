@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center">
+
+    <FrameLayout
+        android:id="@+id/activityType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/activityIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"/>
+
+        <TextView
+            android:id="@+id/activityName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:fontFamily="sans-serif-thin"
+            android:textColor="@color/accent"
+            android:visibility="gone"/>
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/activityDuration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/activityType"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:fontFamily="sans-serif-light"
+        android:text="@string/never"/>
+
+<!--    <TextView
+        android:id="@+id/activityDurationLbl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/item_margin"
+        android:paddingStart="@dimen/item_margin"
+        android:layout_toRightOf="@id/activityDuration"
+        android:layout_alignBottom="@id/activityDuration"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:fontFamily="sans-serif-light"
+        android:text="@string/minutes"/>-->
+
+</RelativeLayout>

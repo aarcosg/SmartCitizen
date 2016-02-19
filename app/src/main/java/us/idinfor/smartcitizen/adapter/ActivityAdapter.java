@@ -9,8 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
 
@@ -61,14 +61,14 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityAdapter.ViewHo
     }
 
     protected static class ViewHolder extends RecyclerView.ViewHolder {
-        @InjectView(R.id.activityLbl)
+        @Bind(R.id.activityLbl)
         TextView label;
-        @InjectView(R.id.activityVal)
+        @Bind(R.id.activityVal)
         TextView value;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.inject(this, itemView);
+            ButterKnife.bind(this, itemView);
         }
     }
 }

@@ -38,8 +38,8 @@ import static us.idinfor.smartcitizen.backend.OfyService.ofy;
         version = "v1",
         //resource = "device",
         namespace = @ApiNamespace(
-                ownerDomain = "backend.moodlecontext.idinfor.us",
-                ownerName = "backend.moodlecontext.idinfor.us",
+                ownerDomain = "backend.smartcitizen.idinfor.us",
+                ownerName = "backend.smartcitizen.idinfor.us",
                 packagePath = ""
         )
 )

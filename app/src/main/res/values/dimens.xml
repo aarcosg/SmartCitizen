@@ -8,4 +8,7 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="column_width">150dp</dimen>
     <dimen name="item_margin">8dp</dimen>
+    <dimen name="list_item_margin_left">56dp</dimen>
+    <dimen name="divider_height">1dp</dimen>
+    <dimen name="divider_left_margin">72dp</dimen>
 </resources>

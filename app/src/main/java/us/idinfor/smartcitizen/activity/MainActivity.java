@@ -27,13 +27,14 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.asynctask.GcmRegistrationAsyncTask;
 import us.idinfor.smartcitizen.backend.deviceApi.model.Device;
+import us.idinfor.smartcitizen.fragment.FitnessFragment;
 import us.idinfor.smartcitizen.fragment.HomeFragment;
 import us.idinfor.smartcitizen.fragment.LocationFragment;
 
@@ -45,11 +46,11 @@ public class MainActivity extends BaseActivity
     private static final long DRAWER_DELAY_MS = 265;
     private static final String NAV_ITEM_ID = "nav_item_id";
 
-    @InjectView(R.id.toolbar)
+    @Bind(R.id.toolbar)
     Toolbar mToolbar;
-    @InjectView(R.id.navigation_view)
+    @Bind(R.id.navigation_view)
     NavigationView mNavigationView;
-    @InjectView(R.id.drawer_layout)
+    @Bind(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
 
     private final Handler mDrawerActionHandler = new Handler();
@@ -73,7 +74,7 @@ public class MainActivity extends BaseActivity
             LoginActivity.launch(this);
         }
         setContentView(R.layout.activity_main);
-        ButterKnife.inject(this);
+        ButterKnife.bind(this);
         UDID = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
         Toolbar toolbar = buildActionBarToolbar(getString(R.string.app_name),false);
@@ -163,6 +164,10 @@ public class MainActivity extends BaseActivity
                 break;
             case R.id.navigation_settings:
                 SettingsActivity.launch(this);
+                break;
+            case R.id.navigation_fitness:
+                fragment = FitnessFragment.newInstance();
+                //FitnessActivity.launch(this);
                 break;
         }
 

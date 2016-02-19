@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="us.idinfor.smartcitizen.fragment.FitnessFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <include layout="@layout/progress_bar"
+            android:id="@+id/progressBar"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/item_margin"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:fontFamily="sans-serif-light"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/activity_horizontal_margin">
+
+                <ImageView
+                    android:id="@+id/stepsIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/shoe_24"/>
+
+                <TextView
+                    android:id="@+id/stepsCounter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/list_item_margin_left"
+                    android:layout_marginStart="@dimen/list_item_margin_left"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:fontFamily="sans-serif-light"
+                    android:text="-"/>
+
+                <TextView
+                    android:id="@+id/stepsLbl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/item_margin"
+                    android:layout_marginStart="@dimen/item_margin"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:fontFamily="sans-serif-light"
+                    android:layout_toRightOf="@id/stepsCounter"
+                    android:layout_toEndOf="@id/stepsCounter"
+                    android:layout_alignBottom="@id/stepsCounter"
+                    android:text="@string/steps"/>
+
+            </RelativeLayout>
+
+            <include layout="@layout/list_divider"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/activity_horizontal_margin">
+
+                <ImageView
+                    android:id="@+id/distanceIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_place_24dp"/>
+
+                <TextView
+                    android:id="@+id/distanceCounter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/list_item_margin_left"
+                    android:layout_marginStart="@dimen/list_item_margin_left"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:fontFamily="sans-serif-light"
+                    android:text="-"/>
+
+                <TextView
+                    android:id="@+id/distanceLbl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/item_margin"
+                    android:layout_marginStart="@dimen/item_margin"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:fontFamily="sans-serif-light"
+                    android:layout_toRightOf="@id/distanceCounter"
+                    android:layout_toEndOf="@id/distanceCounter"
+                    android:layout_alignBottom="@id/distanceCounter"
+                    android:text="@string/km"/>
+
+            </RelativeLayout>
+
+            <include layout="@layout/list_divider"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/activity_horizontal_margin">
+
+                <ImageView
+                    android:id="@+id/caloriesIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_calories_24dp"/>
+
+                <TextView
+                    android:id="@+id/caloriesCounter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/list_item_margin_left"
+                    android:layout_marginStart="@dimen/list_item_margin_left"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:fontFamily="sans-serif-light"
+                    android:text="-"/>
+
+                <TextView
+                    android:id="@+id/caloriesLbl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/item_margin"
+                    android:layout_marginStart="@dimen/item_margin"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:fontFamily="sans-serif-light"
+                    android:layout_toRightOf="@id/caloriesCounter"
+                    android:layout_toEndOf="@id/caloriesCounter"
+                    android:layout_alignBottom="@id/caloriesCounter"
+                    android:text="@string/calories"/>
+
+            </RelativeLayout>
+
+            <include layout="@layout/list_divider"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/activity_horizontal_margin">
+
+                <ImageView
+                    android:id="@+id/heartRateIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_heart_24dp"/>
+
+                <TextView
+                    android:id="@+id/heartRateCounter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/list_item_margin_left"
+                    android:layout_marginStart="@dimen/list_item_margin_left"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                    android:fontFamily="sans-serif-light"
+                    android:text="-"/>
+
+                <TextView
+                    android:id="@+id/heartRateLbl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/item_margin"
+                    android:layout_marginStart="@dimen/item_margin"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:fontFamily="sans-serif-light"
+                    android:layout_toRightOf="@id/heartRateCounter"
+                    android:layout_toEndOf="@id/heartRateCounter"
+                    android:layout_alignBottom="@id/heartRateCounter"
+                    android:text="@string/bpm"/>
+
+            </RelativeLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
+                android:text="@string/activity"/>
+
+            <android.support.v7.widget.CardView
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_vertical_margin">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <android.support.v4.view.ViewPager
+                        xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:id="@+id/timePager"
+                        android:layout_width="match_parent"
+                        android:layout_height="70dp"/>
+
+                    <com.viewpagerindicator.CirclePageIndicator
+                        xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/timePagerIndicator"
+                        android:layout_height="wrap_content"
+                        android:layout_width="match_parent"
+                        android:paddingBottom="10dp"/>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/purple">
+
+                        <Button
+                            android:id="@+id/activityDetailsBtn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@android:color/white"
+                            android:background="?selectableItemBackground"
+                            style="@style/Widget.AppCompat.Button.Borderless"
+                            android:text="@string/details"
+                            android:clickable="true"/>
+
+                    </FrameLayout>
+
+                </LinearLayout>
+
+            </android.support.v7.widget.CardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginStart="@dimen/activity_horizontal_margin"
+                android:textAppearance="@style/TextAppearance.AppCompat.Widget.ActionMode.Subtitle"
+                android:text="@string/location"/>
+
+            <android.support.v7.widget.CardView
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/activity_vertical_margin"
+                card_view:cardBackgroundColor="@color/red">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <fragment
+                        android:id="@+id/map"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        class="com.google.android.gms.maps.SupportMapFragment"/>
+
+                    <Button
+                        android:id="@+id/locationDetailsBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/white"
+                        android:background="?selectableItemBackground"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:text="@string/details"
+                        android:clickable="true"/>
+
+                </LinearLayout>
+
+
+            </android.support.v7.widget.CardView>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>
