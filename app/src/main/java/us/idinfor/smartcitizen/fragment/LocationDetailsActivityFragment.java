@@ -25,6 +25,7 @@ import com.google.maps.android.heatmaps.HeatmapTileProvider;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
@@ -102,32 +103,39 @@ public class LocationDetailsActivityFragment extends BaseGoogleFitFragment imple
     }
 
     @Override
-    protected void dumpDataSet(DataSet dataSet) {
-        super.dumpDataSet(dataSet);
+    protected void dumpDataSets(List<DataSet> dataSets) {
+        super.dumpDataSets(dataSets);
         //mProgressBar.setVisibility(View.VISIBLE);
-        if (dataSet.getDataType().equals(DataType.TYPE_LOCATION_SAMPLE)) {
-            if(locations == null){
-                locations = new ArrayList<LatLng>();
-            }
-            for (DataPoint dp : dataSet.getDataPoints()) {
-                if (dp.getDataType().equals(DataType.TYPE_LOCATION_SAMPLE)) {
-                    LatLng point = new LatLng(
-                            dp.getValue(Field.FIELD_LATITUDE).asFloat(),
-                            dp.getValue(Field.FIELD_LONGITUDE).asFloat());
-                    locations.add(point);
+        for (DataSet dataSet : dataSets) {
+            if (dataSet.getDataType().equals(DataType.TYPE_LOCATION_SAMPLE)) {
+                if(locations == null){
+                    locations = new ArrayList<LatLng>();
+                }
+                for (DataPoint dp : dataSet.getDataPoints()) {
+                    if (dp.getDataType().equals(DataType.TYPE_LOCATION_SAMPLE)) {
+                        LatLng point = new LatLng(
+                                dp.getValue(Field.FIELD_LATITUDE).asFloat(),
+                                dp.getValue(Field.FIELD_LONGITUDE).asFloat());
+                        locations.add(point);
+                    }
                 }
             }
-            if(mProvider == null){
-                mProvider = new HeatmapTileProvider.Builder().data(locations).build();
-                mOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
-            }else{
-                mProvider.setData(locations);
-                mOverlay.clearTileCache();
-            }
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locations.get(0), 10));
-            locations.clear();
         }
+
        // mProgressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    protected void onFitResultDumped() {
+        if(mProvider == null){
+            mProvider = new HeatmapTileProvider.Builder().data(locations).build();
+            mOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));
+        }else{
+            mProvider.setData(locations);
+            mOverlay.clearTileCache();
+        }
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locations.get(0), 10));
+        locations.clear();
     }
 
     public void updateMapData(int timeRange){

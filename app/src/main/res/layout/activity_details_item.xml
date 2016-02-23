@@ -83,8 +83,9 @@
                         android:id="@+id/stepsIcon"
                         android:layout_width="@dimen/activity_details_icon_size"
                         android:layout_height="@dimen/activity_details_icon_size"
-                        android:src="@drawable/shoe_24"
-                        android:layout_gravity="center"/>
+                        android:src="@drawable/ic_shoe"
+                        android:layout_gravity="center"
+                        android:tint="@color/secondaryText"/>
 
                     <TextView
                         android:id="@+id/stepsCounter"

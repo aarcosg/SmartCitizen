@@ -3,7 +3,6 @@ package us.idinfor.smartcitizen.model;
 
 public class ActivitySegmentFit {
 
-    Integer id;
     String name;
     Long startTime;
     Long endTime;
@@ -11,19 +10,10 @@ public class ActivitySegmentFit {
     public ActivitySegmentFit() {
     }
 
-    public ActivitySegmentFit(Integer id, String name, Long startTime, Long endTime) {
-        this.id = id;
+    public ActivitySegmentFit( String name, Long startTime, Long endTime) {
         this.name = name;
         this.startTime = startTime;
         this.endTime = endTime;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getName() {

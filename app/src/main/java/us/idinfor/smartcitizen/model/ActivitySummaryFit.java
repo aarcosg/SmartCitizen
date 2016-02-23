@@ -3,7 +3,6 @@ package us.idinfor.smartcitizen.model;
 
 public class ActivitySummaryFit {
 
-    Integer id;
     String name;
     Integer duration;
     Integer segments;
@@ -13,28 +12,18 @@ public class ActivitySummaryFit {
     public ActivitySummaryFit() {
     }
 
-    public ActivitySummaryFit(Integer id, String name, Integer duration, Integer segments) {
-        this.id = id;
+    public ActivitySummaryFit( String name, Integer duration, Integer segments) {
         this.name = name;
         this.duration = duration;
         this.segments = segments;
     }
 
-    public ActivitySummaryFit(Integer id, String name, Integer duration, Integer segments, Long startTime, Long endTime) {
-        this.id = id;
+    public ActivitySummaryFit(String name, Integer duration, Integer segments, Long startTime, Long endTime) {
         this.name = name;
         this.duration = duration;
         this.segments = segments;
         this.startTime = startTime;
         this.endTime = endTime;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getName() {

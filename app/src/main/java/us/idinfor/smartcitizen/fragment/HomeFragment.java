@@ -15,6 +15,8 @@ import android.widget.ProgressBar;
 
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
@@ -32,12 +34,14 @@ public class HomeFragment extends Fragment {
 
     private static final String TAG = HomeFragment.class.getCanonicalName();
 
-    RecyclerView activitiesRecyclerView;
-    ProgressBar progressBar;
-
     SharedPreferences prefs;
     SparseArray activities;
     ActivityAdapter adapter;
+
+    @Bind(R.id.progressBar)
+    ProgressBar mProgressBar;
+    @Bind(R.id.activitiesRecyclerView)
+    RecyclerView mActivitiesRecyclerView;
 
     public static HomeFragment newInstance() {
         HomeFragment fragment = new HomeFragment();
@@ -61,17 +65,15 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        ButterKnife.bind(this, view);
 
-        activitiesRecyclerView = (RecyclerView)view.findViewById(R.id.activitiesRecyclerView);
-        activitiesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
-        activitiesRecyclerView.addItemDecoration(new MarginDecoration(getActivity()));
-        activitiesRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        activitiesRecyclerView.setHasFixedSize(true);
+        mActivitiesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+        mActivitiesRecyclerView.addItemDecoration(new MarginDecoration(getActivity()));
+        mActivitiesRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mActivitiesRecyclerView.setHasFixedSize(true);
         activities = new SparseArray();
         adapter = new ActivityAdapter(activities);
-        activitiesRecyclerView.setAdapter(adapter);
-
-        progressBar = (ProgressBar)view.findViewById(R.id.progressBar);
+        mActivitiesRecyclerView.setAdapter(adapter);
 
         return view;
     }
@@ -84,19 +86,19 @@ public class HomeFragment extends Fragment {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                progressBar.setVisibility(View.VISIBLE);
+                mProgressBar.setVisibility(View.VISIBLE);
             }
 
             @Override
             protected void onPostExecute(List<Activity> activitiesResult) {
                 super.onPostExecute(activitiesResult);
-                progressBar.setVisibility(View.GONE);
+                mProgressBar.setVisibility(View.GONE);
                 if (activitiesResult != null && !activitiesResult.isEmpty()) {
                     SparseArray aggregatedDuration = new SparseArray();
-                    for(Activity activity : activitiesResult){
-                        if(aggregatedDuration.indexOfKey(activity.getId()) < 0){
+                    for (Activity activity : activitiesResult) {
+                        if (aggregatedDuration.indexOfKey(activity.getId()) < 0) {
                             aggregatedDuration.put(activity.getId(), activity.getDuration());
-                        }else{
+                        } else {
                             aggregatedDuration.setValueAt(activity.getId(),
                                     (Long) aggregatedDuration.get(activity.getId()) + activity.getDuration());
                         }
@@ -108,5 +110,11 @@ public class HomeFragment extends Fragment {
             }
         }.execute();
 
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
     }
 }

@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
@@ -48,7 +49,13 @@ import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.activity.ActivityDetailsActivity;
 import us.idinfor.smartcitizen.activity.LocationDetailsActivity;
 import us.idinfor.smartcitizen.adapter.ActivityDurationPagerAdapter;
+import us.idinfor.smartcitizen.model.ActivityDetails;
 import us.idinfor.smartcitizen.model.ActivitySummaryFit;
+import us.idinfor.smartcitizen.model.CaloriesExpendedFit;
+import us.idinfor.smartcitizen.model.DistanceDeltaFit;
+import us.idinfor.smartcitizen.model.HeartRateSummary;
+import us.idinfor.smartcitizen.model.LocationBoundingBoxFit;
+import us.idinfor.smartcitizen.model.StepCountDeltaFit;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -88,6 +95,9 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
     private LatLngBounds bounds;
     private boolean boundingBoxReady;
 
+    List<ActivitySummaryFit> activities = new ArrayList<>();
+    private ActivityDetails activityDetails;
+
     public static FitnessFragment newInstance() {
         FitnessFragment fragment = new FitnessFragment();
         Bundle args = new Bundle();
@@ -115,6 +125,8 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
         mDate.setText(DateUtils.formatDateTime(getContext(),
                 System.currentTimeMillis(),
                 DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_ABBREV_MONTH));
+
+        boundingBoxReady = false;
 
         if (mMap == null) {
             SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -149,9 +161,6 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
         if(ContextCompat.checkSelfPermission(getContext(),Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             mMap.setMyLocationEnabled(true);
         }
-
-
-
 //        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mMap.getMyLocation().getLatitude(),mMap.getMyLocation().getLongitude()), 8));
 
         if (boundingBoxReady) {
@@ -164,6 +173,7 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
     @Override
     public void onConnected(Bundle bundle) {
         super.onConnected(bundle);
+        mProgressBar.setVisibility(View.VISIBLE);
         launchQuery(Utils.getStartTimeRange(Constants.RANGE_DAY), new Date().getTime());
 
     }
@@ -189,100 +199,205 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
     }
 
     @Override
-    protected void dumpDataSet(DataSet dataSet) {
-        super.dumpDataSet(dataSet);
-        mProgressBar.setVisibility(View.VISIBLE);
+    protected void dumpBuckets(List<Bucket> buckets) {
+        super.dumpBuckets(buckets);
+        activityDetails = new ActivityDetails();
+
+        // Single bucket expected
+        for (DataSet dataSet : buckets.get(0).getDataSets()) {
+            if (dataSet.getDataType().equals(DataType.AGGREGATE_STEP_COUNT_DELTA)) {
+                for (DataPoint dp : dataSet.getDataPoints()) {
+                    if (dp.getDataType().equals(DataType.AGGREGATE_STEP_COUNT_DELTA)) {
+                        //mStepsCounter.setText(dp.getValue(Field.FIELD_STEPS).toString());
+                        StepCountDeltaFit stepCount = new StepCountDeltaFit(
+                                dp.getValue(Field.FIELD_STEPS).asInt(),
+                                dp.getStartTime(TimeUnit.SECONDS),
+                                dp.getEndTime(TimeUnit.SECONDS)
+                        );
+                        activityDetails.setStepCountDelta(stepCount);
+                    }
+                }
+            }
+            if (dataSet.getDataType().equals(DataType.AGGREGATE_DISTANCE_DELTA)) {
+                for (DataPoint dp : dataSet.getDataPoints()) {
+                    if (dp.getDataType().equals(DataType.AGGREGATE_DISTANCE_DELTA)) {
+                        //mDistanceCounter.setText(df.format(dp.getValue(Field.FIELD_DISTANCE).asFloat() / 1000));
+                        DistanceDeltaFit distanceDelta = new DistanceDeltaFit(
+                                dp.getValue(Field.FIELD_DISTANCE).asFloat() / 1000,
+                                dp.getStartTime(TimeUnit.SECONDS),
+                                dp.getEndTime(TimeUnit.SECONDS)
+                        );
+                        activityDetails.setDistanceDelta(distanceDelta);
+                    }
+                }
+
+            }
+            if (dataSet.getDataType().equals(DataType.AGGREGATE_CALORIES_EXPENDED)) {
+                for (DataPoint dp : dataSet.getDataPoints()) {
+                    if (dp.getDataType().equals(DataType.AGGREGATE_CALORIES_EXPENDED)) {
+                        //mCaloriesCounter.setText(df.format(dp.getValue(Field.FIELD_CALORIES).asFloat()));
+                        CaloriesExpendedFit caloriesExpended = new CaloriesExpendedFit(
+                                dp.getValue(Field.FIELD_CALORIES).asFloat(),
+                                dp.getStartTime(TimeUnit.SECONDS),
+                                dp.getEndTime(TimeUnit.SECONDS)
+                        );
+                        activityDetails.setCaloriesExpended(caloriesExpended);
+                    }
+                }
+            }
+            if (dataSet.getDataType().equals(DataType.AGGREGATE_ACTIVITY_SUMMARY)) {
+                if (activities == null) {
+                    activities = new ArrayList<ActivitySummaryFit>();
+                } else {
+                    activities.clear();
+                }
+                for (DataPoint dp : dataSet.getDataPoints()) {
+                    if (dp.getDataType().equals(DataType.AGGREGATE_ACTIVITY_SUMMARY)) {
+                        ActivitySummaryFit activity = new ActivitySummaryFit(
+                                dp.getValue(Field.FIELD_ACTIVITY).asActivity(),
+                                dp.getValue(Field.FIELD_DURATION).asInt() / 1000 / 60,
+                                dp.getValue(Field.FIELD_NUM_SEGMENTS).asInt()
+                        );
+                        activities.add(activity);
+                    }
+                }
+                //mTimePager.setAdapter(new ActivityDurationPagerAdapter(this.getContext(), activities));
+                //mTimePagerIndicator.setViewPager(mTimePager);
+            }
+            if (dataSet.getDataType().equals(DataType.AGGREGATE_LOCATION_BOUNDING_BOX)) {
+                Float latitudeSW, longitudeSW, latitudeNE, longitudeNE;
+                for (DataPoint dp : dataSet.getDataPoints()) {
+                    if (dp.getDataType().equals(DataType.AGGREGATE_LOCATION_BOUNDING_BOX)) {
+
+                        latitudeSW = dp.getValue(Field.FIELD_LOW_LATITUDE).asFloat();
+                        longitudeSW = dp.getValue(Field.FIELD_LOW_LONGITUDE).asFloat();
+
+                        latitudeNE = dp.getValue(Field.FIELD_HIGH_LATITUDE).asFloat();
+                        longitudeNE = dp.getValue(Field.FIELD_HIGH_LONGITUDE).asFloat();
+
+                        LocationBoundingBoxFit locationBoundingBox = new LocationBoundingBoxFit(
+                                latitudeSW,
+                                longitudeSW,
+                                latitudeNE,
+                                longitudeNE,
+                                dp.getStartTime(TimeUnit.SECONDS),
+                                dp.getEndTime(TimeUnit.SECONDS)
+                        );
+                        activityDetails.setLocationBoundingBox(locationBoundingBox);
+
+                /*latitudeSW = dp.getValue(Field.FIELD_LOW_LATITUDE).asFloat();
+                longitudeSW = dp.getValue(Field.FIELD_LOW_LONGITUDE).asFloat();
+
+                latitudeNE = dp.getValue(Field.FIELD_HIGH_LATITUDE).asFloat();
+                longitudeNE = dp.getValue(Field.FIELD_HIGH_LONGITUDE).asFloat();
+
+                LatLng locationSW = new LatLng(latitudeSW, longitudeSW);
+                LatLng locationNE = new LatLng(latitudeNE, longitudeNE);
+
+                boundingBoxPolygon = new PolygonOptions()
+                        .add(locationNE, //ne
+                                new LatLng(latitudeNE, longitudeSW),
+                                locationSW, //sw
+                                new LatLng(latitudeSW, longitudeNE))
+                        .strokeColor(Color.argb(180, 0, 150, 136))
+                        .fillColor(Color.argb(110, 0, 150, 136))
+                        .strokeWidth(5)
+                        .geodesic(true);
+
+                LatLngBounds.Builder boundsBuilder = LatLngBounds.builder();
+                for (LatLng point : boundingBoxPolygon.getPoints()) {
+                    boundsBuilder.include(point);
+                }
+                bounds = boundsBuilder.build();
+
+                boundingBoxCenter = SphericalUtil.interpolate(locationSW, locationNE, 0.5);
+
+                if (mMap != null) {
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 12));
+                    mMap.moveCamera(CameraUpdateFactory.zoomOut());
+                    mMap.addPolygon(boundingBoxPolygon);
+                    boundingBoxReady = true;
+                }*/
+                    }
+                }
+
+            }
+            if (dataSet.getDataType().equals(DataType.AGGREGATE_HEART_RATE_SUMMARY)) {
+                for (DataPoint dp : dataSet.getDataPoints()) {
+                    if (dp.getDataType().equals(DataType.AGGREGATE_HEART_RATE_SUMMARY)) {
+                        //mHeartRateCounter.setText(dp.getValue(Field.FIELD_AVERAGE).toString());
+                        HeartRateSummary heartRateSummary = new HeartRateSummary(
+                                dp.getValue(Field.FIELD_AVERAGE).asFloat(),
+                                dp.getValue(Field.FIELD_MIN).asFloat(),
+                                dp.getValue(Field.FIELD_MAX).asFloat(),
+                                dp.getStartTime(TimeUnit.SECONDS),
+                                dp.getEndTime(TimeUnit.SECONDS)
+                        );
+                        activityDetails.setHeartRateSummary(heartRateSummary);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void onFitResultDumped() {
         NumberFormat df = DecimalFormat.getInstance();
         df.setMaximumFractionDigits(2);
-        if (dataSet.getDataType().equals(DataType.AGGREGATE_STEP_COUNT_DELTA)) {
-            for (DataPoint dp : dataSet.getDataPoints()) {
-                if (dp.getDataType().equals(DataType.AGGREGATE_STEP_COUNT_DELTA)) {
-                    mStepsCounter.setText(dp.getValue(Field.FIELD_STEPS).toString());
-                }
-            }
-        }
-        if (dataSet.getDataType().equals(DataType.AGGREGATE_DISTANCE_DELTA)) {
-            for (DataPoint dp : dataSet.getDataPoints()) {
-                if (dp.getDataType().equals(DataType.AGGREGATE_DISTANCE_DELTA)) {
-                    mDistanceCounter.setText(df.format(dp.getValue(Field.FIELD_DISTANCE).asFloat() / 1000));
-                }
-            }
 
+        if(activityDetails.getStepCountDelta() != null){
+            mStepsCounter.setText(activityDetails.getStepCountDelta().getSteps().toString());
         }
-        if (dataSet.getDataType().equals(DataType.AGGREGATE_CALORIES_EXPENDED)) {
-            for (DataPoint dp : dataSet.getDataPoints()) {
-                if (dp.getDataType().equals(DataType.AGGREGATE_CALORIES_EXPENDED)) {
-                    mCaloriesCounter.setText(df.format(dp.getValue(Field.FIELD_CALORIES).asFloat()
-                    ));
-                }
-            }
+
+        if(activityDetails.getDistanceDelta() != null){
+            mDistanceCounter.setText(df.format(activityDetails.getDistanceDelta().getDistance()));
         }
-        if (dataSet.getDataType().equals(DataType.AGGREGATE_ACTIVITY_SUMMARY)) {
-            List<ActivitySummaryFit> activities = new ArrayList<>();
-            for (DataPoint dp : dataSet.getDataPoints()) {
-                if (dp.getDataType().equals(DataType.AGGREGATE_ACTIVITY_SUMMARY)) {
-                    ActivitySummaryFit activity = new ActivitySummaryFit(
-                            dp.getValue(Field.FIELD_ACTIVITY).asInt(),
-                            dp.getValue(Field.FIELD_ACTIVITY).asActivity(),
-                            dp.getValue(Field.FIELD_DURATION).asInt() / 1000 / 60,
-                            dp.getValue(Field.FIELD_NUM_SEGMENTS).asInt()
-                    );
-                    activities.add(activity);
-                }
-            }
+
+        if(activityDetails.getCaloriesExpended() != null){
+            mCaloriesCounter.setText(df.format(activityDetails.getCaloriesExpended().getCalories()));
+        }
+
+        if(activities != null && !activities.isEmpty()){
             mTimePager.setAdapter(new ActivityDurationPagerAdapter(this.getContext(), activities));
             mTimePagerIndicator.setViewPager(mTimePager);
         }
-        if (dataSet.getDataType().equals(DataType.AGGREGATE_LOCATION_BOUNDING_BOX)) {
-            double latitudeSW, longitudeSW, latitudeNE, longitudeNE;
-            for (DataPoint dp : dataSet.getDataPoints()) {
-                if (dp.getDataType().equals(DataType.AGGREGATE_LOCATION_BOUNDING_BOX)) {
 
-                    latitudeSW = dp.getValue(Field.FIELD_LOW_LATITUDE).asFloat();
-                    longitudeSW = dp.getValue(Field.FIELD_LOW_LONGITUDE).asFloat();
-
-                    latitudeNE = dp.getValue(Field.FIELD_HIGH_LATITUDE).asFloat();
-                    longitudeNE = dp.getValue(Field.FIELD_HIGH_LONGITUDE).asFloat();
-
-                    LatLng locationSW = new LatLng(latitudeSW, longitudeSW);
-                    LatLng locationNE = new LatLng(latitudeNE, longitudeNE);
-
-                    boundingBoxPolygon = new PolygonOptions()
-                            .add(locationNE, //ne
-                                    new LatLng(latitudeNE, longitudeSW),
-                                    locationSW, //sw
-                                    new LatLng(latitudeSW, longitudeNE))
-                            .strokeColor(Color.argb(180, 0, 150, 136))
-                            .fillColor(Color.argb(110, 0, 150, 136))
-                            .strokeWidth(5)
-                            .geodesic(true);
-
-                    LatLngBounds.Builder boundsBuilder = LatLngBounds.builder();
-                    for (LatLng point : boundingBoxPolygon.getPoints()) {
-                        boundsBuilder.include(point);
-                    }
-                    bounds = boundsBuilder.build();
-
-                    boundingBoxCenter = SphericalUtil.interpolate(locationSW, locationNE, 0.5);
-
-                    if (mMap != null) {
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 12));
-                        mMap.moveCamera(CameraUpdateFactory.zoomOut());
-                        mMap.addPolygon(boundingBoxPolygon);
-                        boundingBoxReady = true;
-                    }
-                }
-            }
-
+        if(activityDetails.getHeartRateSummary() != null){
+            mHeartRateCounter.setText(Integer.valueOf(activityDetails.getHeartRateSummary().getAverage().intValue()).toString());
         }
-        if (dataSet.getDataType().equals(DataType.AGGREGATE_HEART_RATE_SUMMARY)) {
-            for (DataPoint dp : dataSet.getDataPoints()) {
-                if (dp.getDataType().equals(DataType.AGGREGATE_HEART_RATE_SUMMARY)) {
-                    mHeartRateCounter.setText(dp.getValue(Field.FIELD_AVERAGE).toString());
-                }
+
+        if(activityDetails.getLocationBoundingBox() != null){
+            boundingBoxPolygon = new PolygonOptions()
+                    .add(activityDetails.getLocationBoundingBox().getLocationNE(), //ne
+                            new LatLng(activityDetails.getLocationBoundingBox().getLatitudeNE(), activityDetails.getLocationBoundingBox().getLongitudeSW()),
+                            activityDetails.getLocationBoundingBox().getLocationSW(), //sw
+                            new LatLng(activityDetails.getLocationBoundingBox().getLatitudeSW(), activityDetails.getLocationBoundingBox().getLongitudeNE()))
+                    .strokeColor(Color.argb(180, 0, 150, 136))
+                    .fillColor(Color.argb(110, 0, 150, 136))
+                    .strokeWidth(5)
+                    .geodesic(true);
+
+            LatLngBounds.Builder boundsBuilder = LatLngBounds.builder();
+            for (LatLng point : boundingBoxPolygon.getPoints()) {
+                boundsBuilder.include(point);
             }
+            bounds = boundsBuilder.build();
+            boundingBoxCenter = SphericalUtil.interpolate(activityDetails.getLocationBoundingBox().getLocationSW(), activityDetails.getLocationBoundingBox().getLocationNE(), 0.5);
+            onLocationBoundingBoxReady();
         }
 
         mProgressBar.setVisibility(View.GONE);
+
     }
+
+    private void onLocationBoundingBoxReady(){
+        if (mMap != null) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 12));
+            mMap.moveCamera(CameraUpdateFactory.zoomOut());
+            mMap.addPolygon(boundingBoxPolygon);
+            boundingBoxReady = true;
+        }
+    }
+
+
 }

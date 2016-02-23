@@ -33,6 +33,8 @@ public abstract class BaseGoogleFitFragment extends Fragment implements GoogleAp
     private static final String AUTH_PENDING = "auth_state_pending";
     private static final int REQUEST_OAUTH = 1;
     private static final String DATE_FORMAT = "yyyy.MM.dd HH:mm:ss";
+    private static final boolean LOGGER = false;
+
     private boolean authInProgress = false;
     protected GoogleApiClient mGoogleApiClient = null;
 
@@ -147,9 +149,30 @@ public abstract class BaseGoogleFitFragment extends Fragment implements GoogleAp
     @Override
     public void onResult(DataReadResult dataReadResult) {
         Log.e(TAG,"History API onResult");
-        // For the sake of the sample, we'll print the data so we can see what we just added.
-        // In general, logging fitness information should be avoided for privacy reasons.
-        printData(dataReadResult);
+        // If the DataReadRequest object specified aggregated data, dataReadResult will be returned
+        // as buckets containing DataSets, instead of just DataSets.
+        if (dataReadResult.getBuckets().size() > 0) {
+            Log.i(TAG, "Number of returned buckets of DataSets is: "
+                    + dataReadResult.getBuckets().size());
+            dumpBuckets(dataReadResult.getBuckets());
+            onFitResultDumped();
+            /*for (Bucket bucket : dataReadResult.getBuckets()) {
+                List<DataSet> dataSets = bucket.getDataSets();
+                for (DataSet dataSet : dataSets) {
+                    dumpDataSet(dataSet);
+                }
+            }*/
+
+        } else if (dataReadResult.getDataSets().size() > 0) {
+            Log.i(TAG, "Number of returned DataSets is: "
+                    + dataReadResult.getDataSets().size());
+            dumpDataSets(dataReadResult.getDataSets());
+            onFitResultDumped();
+            /*for (DataSet dataSet : dataReadResult.getDataSets()) {
+                dumpDataSet(dataSet);
+            }*/
+
+        }
     }
 
     /**
@@ -200,7 +223,7 @@ public abstract class BaseGoogleFitFragment extends Fragment implements GoogleAp
      * consideration. A better option would be to dump the data you receive to a local data
      * directory to avoid exposing it to other applications.
      */
-    private void printData(DataReadResult dataReadResult) {
+    /*private void printData(DataReadResult dataReadResult) {
         // [START parse_read_data_result]
         // If the DataReadRequest object specified aggregated data, dataReadResult will be returned
         // as buckets containing DataSets, instead of just DataSets.
@@ -213,38 +236,72 @@ public abstract class BaseGoogleFitFragment extends Fragment implements GoogleAp
                     dumpDataSet(dataSet);
                 }
             }
+            onDataSetDumped();
         } else if (dataReadResult.getDataSets().size() > 0) {
             Log.i(TAG, "Number of returned DataSets is: "
                     + dataReadResult.getDataSets().size());
             for (DataSet dataSet : dataReadResult.getDataSets()) {
                 dumpDataSet(dataSet);
             }
+            onDataSetDumped();
         }
         // [END parse_read_data_result]
-    }
+    }*/
 
     // [START parse_dataset]
-    protected  void dumpDataSet(DataSet dataSet) {
-        Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-
-        for (DataPoint dp : dataSet.getDataPoints()) {
-            Log.i(TAG, "Data point:");
-            Log.i(TAG, "\tType: " + dp.getDataType().getName());
-            Log.i(TAG, "\tStart: " + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
-            Log.i(TAG, "\tEnd: " + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
-            for (Field field : dp.getDataType().getFields()) {
-                Log.i(TAG, "\tField: " + field.getName());
-                if (field.getName().equalsIgnoreCase("activity")) {
-                    Log.i(TAG, " Value: " + dp.getValue(field).asActivity());
-                } else if (field.getName().equalsIgnoreCase("duration")) {
-                    Log.i(TAG, " Value: " + dp.getValue(field).asInt() / 1000 / 60 + " minutes");
-                } else {
-                    Log.i(TAG, " Value: " + dp.getValue(field));
+    protected  void dumpDataSets(List<DataSet> dataSets) {
+        if(LOGGER){
+            SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+            for (DataSet dataSet : dataSets) {
+                Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
+                for (DataPoint dp : dataSet.getDataPoints()) {
+                    Log.i(TAG, "Data point:");
+                    Log.i(TAG, "\tType: " + dp.getDataType().getName());
+                    Log.i(TAG, "\tStart: " + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
+                    Log.i(TAG, "\tEnd: " + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
+                    for (Field field : dp.getDataType().getFields()) {
+                        Log.i(TAG, "\tField: " + field.getName());
+                        if (field.getName().equalsIgnoreCase("activity")) {
+                            Log.i(TAG, " Value: " + dp.getValue(field).asActivity());
+                        } else if (field.getName().equalsIgnoreCase("duration")) {
+                            Log.i(TAG, " Value: " + dp.getValue(field).asInt() / 1000 / 60 + " minutes");
+                        } else {
+                            Log.i(TAG, " Value: " + dp.getValue(field));
+                        }
+                    }
                 }
             }
         }
     }
+
+    protected  void dumpBuckets(List<Bucket> buckets) {
+        if(LOGGER){
+            SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+            for (Bucket bucket : buckets) {
+                for (DataSet dataSet : bucket.getDataSets()) {
+                    Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
+                    for (DataPoint dp : dataSet.getDataPoints()) {
+                        Log.i(TAG, "Data point:");
+                        Log.i(TAG, "\tType: " + dp.getDataType().getName());
+                        Log.i(TAG, "\tStart: " + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
+                        Log.i(TAG, "\tEnd: " + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
+                        for (Field field : dp.getDataType().getFields()) {
+                            Log.i(TAG, "\tField: " + field.getName());
+                            if (field.getName().equalsIgnoreCase("activity")) {
+                                Log.i(TAG, " Value: " + dp.getValue(field).asActivity());
+                            } else if (field.getName().equalsIgnoreCase("duration")) {
+                                Log.i(TAG, " Value: " + dp.getValue(field).asInt() / 1000 / 60 + " minutes");
+                            } else {
+                                Log.i(TAG, " Value: " + dp.getValue(field));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected abstract void onFitResultDumped();
 
     protected void launchQuery(long startTime, long endTime){
         DataReadRequest readRequest = queryFitnessData(startTime,endTime);

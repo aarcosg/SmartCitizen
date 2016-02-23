@@ -227,6 +227,12 @@ public class MainActivity extends BaseActivity
         outState.putInt(NAV_ITEM_ID, mNavItemId);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ButterKnife.unbind(this);
+    }
+
     /**
      * Verify that Google Play services is available before making a request.
      *

@@ -36,7 +36,8 @@
                     android:id="@+id/stepsIcon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/shoe_24"/>
+                    android:src="@drawable/ic_shoe"
+                    android:tint="@color/accent"/>
 
                 <TextView
                     android:id="@+id/stepsCounter"
@@ -152,7 +153,7 @@
                     android:id="@+id/heartRateIcon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_heart_24dp"
+                    android:src="@drawable/ic_heartbeat"
                     android:tint="@color/accent"/>
 
                 <TextView

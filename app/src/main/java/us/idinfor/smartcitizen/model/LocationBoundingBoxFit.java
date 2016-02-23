@@ -1,6 +1,8 @@
 package us.idinfor.smartcitizen.model;
 
 
+import com.google.android.gms.maps.model.LatLng;
+
 public class LocationBoundingBoxFit {
 
     Float latitudeSW; //low latitude
@@ -9,6 +11,9 @@ public class LocationBoundingBoxFit {
     Float longitudeNE; // high longitude
     Long startTime;
     Long endTime;
+
+    LatLng locationSW;
+    LatLng locationNE;
 
     public LocationBoundingBoxFit() {
     }
@@ -20,6 +25,7 @@ public class LocationBoundingBoxFit {
         this.longitudeNE = longitudeNE;
         this.startTime = startTime;
         this.endTime = endTime;
+        setLatLngPoints();
     }
 
     public Float getLatitudeSW() {
@@ -68,5 +74,26 @@ public class LocationBoundingBoxFit {
 
     public void setEndTime(Long endTime) {
         this.endTime = endTime;
+    }
+
+    public LatLng getLocationSW() {
+        return locationSW;
+    }
+
+    public void setLocationSW(LatLng locationSW) {
+        this.locationSW = locationSW;
+    }
+
+    public LatLng getLocationNE() {
+        return locationNE;
+    }
+
+    public void setLocationNE(LatLng locationNE) {
+        this.locationNE = locationNE;
+    }
+
+    private void setLatLngPoints(){
+        locationSW = new LatLng(latitudeSW, longitudeSW);
+        locationNE = new LatLng(latitudeNE, longitudeNE);
     }
 }

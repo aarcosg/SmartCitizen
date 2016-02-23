@@ -1,23 +1,25 @@
 package us.idinfor.smartcitizen.model;
 
 
-public class ActivitySegmentDetails {
+public class ActivityDetails {
 
     ActivitySummaryFit activitySummary;
     LocationBoundingBoxFit locationBoundingBox;
     StepCountDeltaFit stepCountDelta;
     DistanceDeltaFit distanceDelta;
     CaloriesExpendedFit caloriesExpended;
+    HeartRateSummary heartRateSummary;
 
-    public ActivitySegmentDetails() {
+    public ActivityDetails() {
     }
 
-    public ActivitySegmentDetails(ActivitySummaryFit activitySummary, LocationBoundingBoxFit locationBoundingBox, StepCountDeltaFit stepCountDelta, DistanceDeltaFit distanceDelta, CaloriesExpendedFit caloriesExpended) {
+    public ActivityDetails(ActivitySummaryFit activitySummary, LocationBoundingBoxFit locationBoundingBox, StepCountDeltaFit stepCountDelta, DistanceDeltaFit distanceDelta, CaloriesExpendedFit caloriesExpended, HeartRateSummary heartRateSummary) {
         this.activitySummary = activitySummary;
         this.locationBoundingBox = locationBoundingBox;
         this.stepCountDelta = stepCountDelta;
         this.distanceDelta = distanceDelta;
         this.caloriesExpended = caloriesExpended;
+        this.heartRateSummary = heartRateSummary;
     }
 
     public ActivitySummaryFit getActivitySummary() {
@@ -58,5 +60,13 @@ public class ActivitySegmentDetails {
 
     public void setCaloriesExpended(CaloriesExpendedFit caloriesExpended) {
         this.caloriesExpended = caloriesExpended;
+    }
+
+    public HeartRateSummary getHeartRateSummary() {
+        return heartRateSummary;
+    }
+
+    public void setHeartRateSummary(HeartRateSummary heartRateSummary) {
+        this.heartRateSummary = heartRateSummary;
     }
 }

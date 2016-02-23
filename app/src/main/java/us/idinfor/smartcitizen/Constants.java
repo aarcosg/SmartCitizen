@@ -57,6 +57,8 @@ public class Constants {
     public static final int RANGE_MONTH = 2;
     public static final int RANGE_YEAR = 3;
 
+    public static final String ACTIVITY_SLEEP_PREFIX = "sleep";
+
 
 
     /**

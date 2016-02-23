@@ -13,6 +13,8 @@ import android.widget.TextView;
 
 import com.makeramen.roundedimageview.RoundedImageView;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -21,47 +23,52 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
-import us.idinfor.smartcitizen.model.ActivitySegmentFit;
+import us.idinfor.smartcitizen.model.ActivityDetails;
 
-public class ActivitySegmentAdapter extends RecyclerView.Adapter<ActivitySegmentAdapter.ViewHolder> implements View.OnClickListener {
+public class ActivitySegmentDetailsAdapter extends RecyclerView.Adapter<ActivitySegmentDetailsAdapter.ViewHolder> implements View.OnClickListener {
 
-    private static final String TAG = ActivityAdapter.class.getCanonicalName();
+    private static final String TAG = ActivitySegmentDetailsAdapter.class.getCanonicalName();
     private static final String DATE_FORMAT = "HH:mm";
 
-    private List<ActivitySegmentFit> mActivities;
+    private List<ActivityDetails> mActivities;
+    private NumberFormat df;
 
-    public ActivitySegmentAdapter(List<ActivitySegmentFit> activities) {
+    public ActivitySegmentDetailsAdapter(List<ActivityDetails> activities) {
         this.mActivities = activities;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_segment_item, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_details_item, parent, false);
         ViewHolder holder = new ViewHolder(v);
         holder.itemView.setOnClickListener(this);
+        df = DecimalFormat.getInstance();
+        df.setMaximumFractionDigits(2);
         return holder;
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        ActivitySegmentFit activitySegment = mActivities.get(position);
+        ActivityDetails activityDetails = mActivities.get(position);
         Context context = holder.itemView.getContext();
 
-        Integer iconResId = Utils.getIconResourceId(context, activitySegment.getName());
+        // Icon
+        Integer iconResId = Utils.getIconResourceId(context, activityDetails.getActivitySummary().getName());
         if (iconResId == 0) {
-            iconResId = R.drawable.ic_activity_default_24dp;
+            iconResId = R.drawable.ic_activity_default;
         }
         Drawable drawable = ContextCompat.getDrawable(context, iconResId);
         drawable = DrawableCompat.wrap(drawable);
         drawable.mutate();
         DrawableCompat.setTint(drawable, ContextCompat.getColor(context, R.color.icons));
-        holder.mIcon.setBackgroundColor(Utils.getIconColorId(context, activitySegment.getName()));
+        holder.mIcon.setBackgroundColor(Utils.getIconColorId(context, activityDetails.getActivitySummary().getName()));
         holder.mIcon.setImageDrawable(drawable);
 
+        // Activity  + duration
         StringBuilder sb = new StringBuilder();
         sb.append(" ");
-        sb.append(activitySegment.getName());
-        int duration = (int) (activitySegment.getEndTime() - activitySegment.getStartTime()) / 1000 / 60;
+        sb.append(activityDetails.getActivitySummary().getName());
+        int duration = (int) (activityDetails.getActivitySummary().getEndTime() - activityDetails.getActivitySummary().getStartTime()) / 1000 / 60;
         if (duration < 60) {
             sb.insert(0, holder.itemView.getContext().getResources().getString(R.string.duration_min, duration));
             holder.mDuration.setText(sb.toString());
@@ -72,8 +79,28 @@ public class ActivitySegmentAdapter extends RecyclerView.Adapter<ActivitySegment
             holder.mDuration.setText(sb.toString());
         }
 
+        // Start time
         SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-        holder.mStartTime.setText(dateFormat.format(new Date(activitySegment.getStartTime())));
+        holder.mStartTime.setText(dateFormat.format(new Date(activityDetails.getActivitySummary().getStartTime())));
+
+        // Card background color
+        holder.mWrapper.setBackgroundColor(Utils.getIconColorId(context,activityDetails.getActivitySummary().getName()));
+
+        // Steps
+        if(activityDetails.getStepCountDelta() != null){
+            holder.mStepsCounter.setText(activityDetails.getStepCountDelta().getSteps().toString());
+        }
+
+        // Calories
+        if(activityDetails.getCaloriesExpended() != null){
+            holder.mCaloriesCounter.setText(df.format(activityDetails.getCaloriesExpended().getCalories()));
+        }
+
+        // Distance
+        if(activityDetails.getDistanceDelta() != null){
+            holder.mDistanceCounter.setText(df.format(activityDetails.getDistanceDelta().getDistance()));
+        }
+
 
     }
 
@@ -87,7 +114,7 @@ public class ActivitySegmentAdapter extends RecyclerView.Adapter<ActivitySegment
 
     }
 
-    public void addAll(List<ActivitySegmentFit> activities) {
+    public void addAll(List<ActivityDetails> activities) {
         mActivities.addAll(activities);
         notifyDataSetChanged();
     }

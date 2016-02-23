@@ -2,11 +2,11 @@ apply plugin: 'com.android.application'
 
 android {
     signingConfigs {
-        config {
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-            storeFile file('C:/Users/Alvaro/.android/debug.keystore.jks')
-            storePassword 'android'
+        debug {
+            keyAlias DEBUG_KEY_ALIAS
+            keyPassword DEBUG_KEY_PASSWORD
+            storeFile file(DEBUG_STORE_FILE)
+            storePassword DEBUG_STORE_PASSWORD
         }
     }
     compileSdkVersion 23
@@ -28,7 +28,7 @@ android {
             multiDexEnabled true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.config
+            signingConfig signingConfigs.debug
         }
     }
     dexOptions {
