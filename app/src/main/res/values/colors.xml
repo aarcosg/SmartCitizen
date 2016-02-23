@@ -19,7 +19,9 @@
     <color name="deepOrange">#FF5722</color>
     <color name="red">#F44336</color>
 
-    <color name="activity_still">#212121</color>
-    <color name="activity_walking">#FF5722</color>
-    <color name="activity_running">#9C27B0</color>
+    <color name="activity_still">#9C27B0</color>
+    <color name="activity_walking">#F44336</color>
+    <color name="activity_running">#2196F3</color>
+    <color name="activity_in_vehicle">#4CAF50</color>
+    <color name="activity_sleep">#263238</color>
 </resources>
