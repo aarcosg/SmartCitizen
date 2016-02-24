@@ -1,6 +1,7 @@
 package us.idinfor.smartcitizen.fragment;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +17,9 @@ import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.request.DataReadRequest;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -25,6 +29,8 @@ import java.util.concurrent.TimeUnit;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.Constants;
+import us.idinfor.smartcitizen.GoogleFitHelper;
+import us.idinfor.smartcitizen.MessageEvent;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.adapter.ActivitySegmentDetailsAdapter;
@@ -36,7 +42,7 @@ import us.idinfor.smartcitizen.model.LocationBoundingBoxFit;
 import us.idinfor.smartcitizen.model.StepCountDeltaFit;
 
 
-public class ActivityDetailsActivityFragment extends BaseGoogleFitFragment {
+public class ActivityDetailsActivityFragment extends Fragment {
 
     private static final String TAG = ActivityDetailsActivityFragment.class.getCanonicalName();
 
@@ -47,8 +53,9 @@ public class ActivityDetailsActivityFragment extends BaseGoogleFitFragment {
 
     ActivitySegmentDetailsAdapter adapter;
 
-    //private ArrayList<ActivitySegmentFit> activities;
     private ArrayList<ActivityDetails> activities;
+
+    private GoogleFitHelper fitHelper;
 
     public ActivityDetailsActivityFragment() {
     }
@@ -64,47 +71,57 @@ public class ActivityDetailsActivityFragment extends BaseGoogleFitFragment {
         adapter = new ActivitySegmentDetailsAdapter(activities);
         mActivitiesRecyclerView.setAdapter(adapter);
 
+        fitHelper = GoogleFitHelper.getInstance(getActivity().getApplicationContext());
+
         return view;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        activities.clear();
+        //activities.clear();
+        if(!fitHelper.getGoogleApiClient().isConnected()){
+            fitHelper.getGoogleApiClient().connect();
+        }else{
+            fitHelper.queryFitnessData(
+                    Utils.getStartTimeRange(Constants.RANGE_DAY),
+                    new Date().getTime(),
+                    buildFitQuery());
+        }
     }
 
     @Override
-    protected DataReadRequest queryFitnessData(long startTime, long endTime) {
-        DataReadRequest.Builder readRequestBuilder;
-
-        readRequestBuilder = new DataReadRequest.Builder()
-                //.read(DataType.TYPE_ACTIVITY_SEGMENT);
-                //.read(DataType.TYPE_LOCATION_SAMPLE);
-                .aggregate(DataType.TYPE_LOCATION_SAMPLE, DataType.AGGREGATE_LOCATION_BOUNDING_BOX)
-                .aggregate(DataType.TYPE_ACTIVITY_SEGMENT, DataType.AGGREGATE_ACTIVITY_SUMMARY)
-                .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                .aggregate(DataType.TYPE_HEART_RATE_BPM, DataType.AGGREGATE_HEART_RATE_SUMMARY)
-                .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
-                .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA);
-
-        DataReadRequest readRequest = readRequestBuilder
-                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
-                .bucketByActivitySegment(1,TimeUnit.MINUTES)
-                .build();
-
-        return readRequest;
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 
-    @Override
-    public void onConnected(Bundle bundle) {
-        super.onConnected(bundle);
-        mProgressBar.setVisibility(View.VISIBLE);
-        launchQuery(Utils.getStartTimeRange(Constants.RANGE_DAY), new Date().getTime());
-    }
 
     @Override
-    protected void dumpBuckets(List<Bucket> buckets) {
-        super.dumpBuckets(buckets);
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
+    }
+
+    @Subscribe
+    public void onGoogleApiReady(MessageEvent event){
+        if(event.getMessage().equals(GoogleFitHelper.EVENT_GOOGLEAPICLIENT_READY)){
+            mProgressBar.setVisibility(View.VISIBLE);
+            fitHelper.queryFitnessData(
+                    Utils.getStartTimeRange(Constants.RANGE_DAY),
+                    new Date().getTime(),
+                    buildFitQuery());
+        }
+    }
+
+    @Subscribe
+    public void onQueryFitnessResult(List<Bucket> buckets){
         for (Bucket bucket : buckets) {
             ActivityDetails currentActivity = new ActivityDetails();
             for (DataSet dataSet : bucket.getDataSets()) {
@@ -189,17 +206,6 @@ public class ActivityDetailsActivityFragment extends BaseGoogleFitFragment {
                     }
                 }
             }
-            /*if (!activities.isEmpty()) {
-                ActivityDetails lastActivity = activities.get(activities.size() - 1);
-                if (lastActivity.getActivitySummary().getId() == currentActivity.getActivitySummary().getId()) {
-                    lastActivity.getActivitySummary().setEndTime(currentActivity.getActivitySummary().getEndTime());
-                    activities.set(activities.size() - 1, lastActivity);
-                } else {
-                    activities.add(currentActivity);
-                }
-            } else {
-                activities.add(currentActivity);
-            }*/
 
             if(!activities.isEmpty() && currentActivity.getActivitySummary().getName().equals(Constants.ACTIVITY_SLEEP_PREFIX)){
                 ActivityDetails lastActivity = activities.get(activities.size() - 1);
@@ -219,11 +225,7 @@ public class ActivityDetailsActivityFragment extends BaseGoogleFitFragment {
                 activities.add(currentActivity);
             }
         }
-
-
-
-
-
+        updateUI();
         /*if (dataSet.getDataType().equals(DataType.TYPE_ACTIVITY_SEGMENT)) {
             for (DataPoint dp : dataSet.getDataPoints()) {
                 if (dp.getDataType().equals(DataType.TYPE_ACTIVITY_SEGMENT)) {
@@ -254,8 +256,7 @@ public class ActivityDetailsActivityFragment extends BaseGoogleFitFragment {
         }*/
     }
 
-    @Override
-    protected void onFitResultDumped() {
+    private void updateUI() {
         if(!activities.isEmpty()){
             Collections.reverse(activities);
             adapter.notifyDataSetChanged();
@@ -263,10 +264,17 @@ public class ActivityDetailsActivityFragment extends BaseGoogleFitFragment {
         mProgressBar.setVisibility(View.GONE);
     }
 
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        ButterKnife.unbind(this);
+    private DataReadRequest.Builder buildFitQuery(){
+        DataReadRequest.Builder builder = new DataReadRequest.Builder()
+                //.read(DataType.TYPE_ACTIVITY_SEGMENT);
+                //.read(DataType.TYPE_LOCATION_SAMPLE);
+                .aggregate(DataType.TYPE_LOCATION_SAMPLE, DataType.AGGREGATE_LOCATION_BOUNDING_BOX)
+                .aggregate(DataType.TYPE_ACTIVITY_SEGMENT, DataType.AGGREGATE_ACTIVITY_SUMMARY)
+                .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                .aggregate(DataType.TYPE_HEART_RATE_BPM, DataType.AGGREGATE_HEART_RATE_SUMMARY)
+                .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
+                .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA)
+                .bucketByActivitySegment(1,TimeUnit.MINUTES);
+        return builder;
     }
 }
