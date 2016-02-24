@@ -15,12 +15,16 @@ import java.util.List;
 
 import us.idinfor.smartcitizen.json.JsonContext;
 import us.idinfor.smartcitizen.json.JsonContextList;
+import us.idinfor.smartcitizen.json.JsonListHermes;
+import us.idinfor.smartcitizen.model.ActivitySampleFit;
 import us.idinfor.smartcitizen.model.Context;
+import us.idinfor.smartcitizen.model.LocationSampleFit;
 
 public class HermesCitizenApi {
 
     private static final String TAG = HermesCitizenApi.class.getCanonicalName();
-    private static final String HOST_URL = "http://10.141.0.50:8080/HermesWeb/webresources/hermes.citizen.";
+    //private static final String HOST_URL = "http://10.141.0.50:8080/HermesWeb/webresources/hermes.citizen.";
+    private static final String HOST_URL = "https://www.hermescitizen.us.es/HermesWeb/webresources/hermes.citizen.";
     private static final String USER_URL = HOST_URL + "person/existsUser/";
     private static final String CONTEXT_URL = HOST_URL + "context/create";
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -89,4 +93,60 @@ public class HermesCitizenApi {
     }
 
 
+    public static Integer uploadLocations(String username, List<LocationSampleFit> locations) {
+        String responseString = "";
+        JsonListHermes<LocationSampleFit> jsonList = new JsonListHermes<LocationSampleFit>(username,locations);
+
+        String json = new Gson().toJson(jsonList, JsonListHermes.class);
+
+        RequestBody formBody = RequestBody.create(JSON,json);
+        Request request = new Request.Builder()
+                .url(CONTEXT_URL)
+                .post(formBody)
+                .build();
+        try{
+            Response response = client.newCall(request).execute();
+            Log.e(TAG,response.toString());
+            responseString = response.body().string();
+            response.body().close();
+
+        }catch (Exception e){
+            Log.e(TAG,"Exception: " + e);
+        }
+
+        try{
+            return Integer.valueOf(responseString);
+        }catch (NumberFormatException e){
+            return RESPONSE_ERROR_UNKNOWN;
+        }
+
+    }
+
+    public static Integer uploadActivities(String username, List<ActivitySampleFit> activities) {
+        String responseString = "";
+        JsonListHermes<ActivitySampleFit> jsonList = new JsonListHermes<ActivitySampleFit>(username,activities);
+
+        String json = new Gson().toJson(jsonList, JsonListHermes.class);
+
+        RequestBody formBody = RequestBody.create(JSON,json);
+        Request request = new Request.Builder()
+                .url(CONTEXT_URL)
+                .post(formBody)
+                .build();
+        try{
+            Response response = client.newCall(request).execute();
+            Log.e(TAG,response.toString());
+            responseString = response.body().string();
+            response.body().close();
+
+        }catch (Exception e){
+            Log.e(TAG,"Exception: " + e);
+        }
+
+        try{
+            return Integer.valueOf(responseString);
+        }catch (NumberFormatException e){
+            return RESPONSE_ERROR_UNKNOWN;
+        }
+    }
 }

@@ -38,7 +38,7 @@ public class LocationDetailsActivity extends BaseActivity {
     public void timeRangeSelected(int position){
         LocationDetailsActivityFragment locationDetailsFragment = (LocationDetailsActivityFragment)
                 getSupportFragmentManager().findFragmentById(R.id.locationDetailsFragment);
-        locationDetailsFragment.updateMapData(position);
+        locationDetailsFragment.onTimeRangeSelected(position);
     }
 
     public static void launch(Activity activity) {

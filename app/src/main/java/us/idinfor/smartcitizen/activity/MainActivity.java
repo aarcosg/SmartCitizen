@@ -23,8 +23,6 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import butterknife.Bind;
@@ -32,11 +30,7 @@ import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
-import us.idinfor.smartcitizen.asynctask.GcmRegistrationAsyncTask;
-import us.idinfor.smartcitizen.backend.deviceApi.model.Device;
-import us.idinfor.smartcitizen.fragment.FitnessFragment;
 import us.idinfor.smartcitizen.fragment.HomeFragment;
-import us.idinfor.smartcitizen.fragment.LocationFragment;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -81,7 +75,7 @@ public class MainActivity extends BaseActivity
 
         mTitle = mDrawerTitle = getTitle();
 
-        if (checkPlayServices()) {
+        /*if (checkPlayServices()) {
             if(mGCM == null){
                 mGCM = GoogleCloudMessaging.getInstance(this);
             }
@@ -100,7 +94,7 @@ public class MainActivity extends BaseActivity
             }
         } else {
             Log.i(TAG, "No valid Google Play Services APK found.");
-        }
+        }*/
 
         // Read in the flag indicating whether or not the user has demonstrated awareness of the drawer.
         mUserLearnedDrawer = prefs.getBoolean(Constants.PROPERTY_DRAWER_LEARNED, false);
@@ -156,18 +150,18 @@ public class MainActivity extends BaseActivity
     private void selectDrawerItem(int itemId) {
         Fragment fragment = null;
         switch (itemId) {
-            case R.id.navigation_home:
-                fragment = HomeFragment.newInstance();
+            /*case R.id.navigation_home:
+                fragment = HomeFragment_old.newInstance();
                 break;
             case R.id.navigation_location:
                 fragment = LocationFragment.newInstance();
+                break;*/
+            case R.id.navigation_home:
+                fragment = HomeFragment.newInstance();
+                //FitnessActivity.launch(this);
                 break;
             case R.id.navigation_settings:
                 SettingsActivity.launch(this);
-                break;
-            case R.id.navigation_fitness:
-                fragment = FitnessFragment.newInstance();
-                //FitnessActivity.launch(this);
                 break;
         }
 
@@ -238,7 +232,7 @@ public class MainActivity extends BaseActivity
      *
      * @return true if Google Play services is available, otherwise false
      */
-    protected boolean checkPlayServices() {
+   /* protected boolean checkPlayServices() {
         int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
         if (resultCode != ConnectionResult.SUCCESS) {
             if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
@@ -251,12 +245,12 @@ public class MainActivity extends BaseActivity
             return false;
         }
         return true;
-    }
+    }*/
 
     /**
      * @return Application's version code from the {@code PackageManager}.
      */
-    private static int getAppVersion(Context context) {
+    /*private static int getAppVersion(Context context) {
         try {
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             return packageInfo.versionCode;
@@ -264,7 +258,7 @@ public class MainActivity extends BaseActivity
             // should never happen
             throw new RuntimeException("Could not get package name: " + e);
         }
-    }
+    }*/
 
     /**
      * Gets the current registration ID for application on GCM service, if there is one.
@@ -274,7 +268,7 @@ public class MainActivity extends BaseActivity
      * @return registration ID, or empty string if there is no existing
      *         registration ID.
      */
-    private String getRegistrationId(Context context) {
+    /*private String getRegistrationId(Context context) {
         final SharedPreferences prefs = Utils.getSharedPreferences(context);
         String registrationId = prefs.getString(Constants.PROPERTY_GCM_ID, "");
         if (registrationId.isEmpty()) {
@@ -291,7 +285,7 @@ public class MainActivity extends BaseActivity
             return "";
         }
         return registrationId;
-    }
+    }*/
 
     /**
      * Stores the registration ID and the app versionCode in the application's
@@ -300,7 +294,7 @@ public class MainActivity extends BaseActivity
      * @param context application's context.
      * @param regId registration ID
      */
-    private void storeRegistrationId(Context context, String regId) {
+    /*private void storeRegistrationId(Context context, String regId) {
         final SharedPreferences prefs = Utils.getSharedPreferences(context);
         int appVersion = getAppVersion(context);
         Log.i(TAG, "Saving regId on app version " + appVersion);
@@ -308,7 +302,7 @@ public class MainActivity extends BaseActivity
         editor.putString(Constants.PROPERTY_GCM_ID, regId);
         editor.putInt(Constants.PROPERTY_APP_VERSION, appVersion);
         editor.apply();
-    }
+    }*/
 
     public static void launch(Activity activity) {
         Intent intent = new Intent(activity, MainActivity.class);

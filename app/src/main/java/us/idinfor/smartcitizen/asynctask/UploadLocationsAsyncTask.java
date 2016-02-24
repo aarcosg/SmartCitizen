@@ -9,18 +9,21 @@ import java.util.List;
 
 import us.idinfor.smartcitizen.HermesCitizenApi;
 import us.idinfor.smartcitizen.R;
-import us.idinfor.smartcitizen.SmartCitizenApplication;
-import us.idinfor.smartcitizen.model.ContextDao;
+import us.idinfor.smartcitizen.model.LocationSampleFit;
 
-public class SendLocalDataAsyncTask  extends AsyncTask<Void,Integer,Integer>{
+public class UploadLocationsAsyncTask extends AsyncTask<Void,Integer,Integer>{
 
     private ProgressDialog progressDialog;
     private Context context;
+    private List<LocationSampleFit> locations;
+    private String username;
 
-    public SendLocalDataAsyncTask(Context context){
+    public UploadLocationsAsyncTask(Context context, String username, List<LocationSampleFit> locations){
         this.context = context;
+        this.username = username;
+        this.locations = locations;
         progressDialog = new ProgressDialog(context);
-        progressDialog.setMessage(context.getString(R.string.uploading_data_hermes));
+        progressDialog.setMessage(context.getString(R.string.uploading_locations_hermes));
         progressDialog.setCancelable(false);
     }
 
@@ -32,13 +35,7 @@ public class SendLocalDataAsyncTask  extends AsyncTask<Void,Integer,Integer>{
 
     @Override
     protected Integer doInBackground(Void... params) {
-        List<us.idinfor.smartcitizen.model.Context> contexts = ((SmartCitizenApplication)context.getApplicationContext())
-                .getDaoSession().getContextDao()
-                .queryBuilder()
-                .where(ContextDao.Properties.Sent.eq(0))
-                .orderAsc(ContextDao.Properties.Time)
-                .list();
-        return HermesCitizenApi.sendContexts(contexts);
+        return HermesCitizenApi.uploadLocations(username,locations);
     }
 
     @Override

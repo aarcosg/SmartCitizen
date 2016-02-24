@@ -4,12 +4,13 @@
     <group android:checkableBehavior="single">
         <item android:id="@+id/navigation_home" android:icon="@drawable/ic_action_home"
             android:title="@string/home" />
-        <item android:id="@+id/navigation_location" android:icon="@drawable/ic_action_location"
-            android:title="@string/location" />
-        <item android:id="@+id/navigation_fitness" android:icon="@drawable/ic_walk_24dp"
-            android:title="@string/fitness" />
         <item android:id="@+id/navigation_settings" android:icon="@drawable/ic_action_settings"
             android:title="@string/settings" />
     </group>
+
+    <!--  <item android:id="@+id/navigation_location" android:icon="@drawable/ic_action_location"
+            android:title="@string/location" />
+        <item android:id="@+id/navigation_fitness" android:icon="@drawable/ic_walk_24dp"
+            android:title="@string/fitness" />-->
 
 </menu>

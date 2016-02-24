@@ -1,7 +1,6 @@
 package us.idinfor.smartcitizen.fragment;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,7 +16,6 @@ import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.request.DataReadRequest;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
@@ -42,7 +40,7 @@ import us.idinfor.smartcitizen.model.LocationBoundingBoxFit;
 import us.idinfor.smartcitizen.model.StepCountDeltaFit;
 
 
-public class ActivityDetailsActivityFragment extends Fragment {
+public class ActivityDetailsActivityFragment extends BaseGoogleFitFragment {
 
     private static final String TAG = ActivityDetailsActivityFragment.class.getCanonicalName();
 
@@ -54,8 +52,6 @@ public class ActivityDetailsActivityFragment extends Fragment {
     ActivitySegmentDetailsAdapter adapter;
 
     private ArrayList<ActivityDetails> activities;
-
-    private GoogleFitHelper fitHelper;
 
     public ActivityDetailsActivityFragment() {
     }
@@ -71,42 +67,27 @@ public class ActivityDetailsActivityFragment extends Fragment {
         adapter = new ActivitySegmentDetailsAdapter(activities);
         mActivitiesRecyclerView.setAdapter(adapter);
 
-        fitHelper = GoogleFitHelper.getInstance(getActivity().getApplicationContext());
-
         return view;
     }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        //activities.clear();
-        if(!fitHelper.getGoogleApiClient().isConnected()){
-            fitHelper.getGoogleApiClient().connect();
-        }else{
-            fitHelper.queryFitnessData(
-                    Utils.getStartTimeRange(Constants.RANGE_DAY),
-                    new Date().getTime(),
-                    buildFitQuery());
-        }
-    }
-
-    @Override
-    public void onStop() {
-        EventBus.getDefault().unregister(this);
-        super.onStop();
-    }
-
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
+    }
+
+    protected DataReadRequest.Builder buildFitQuery(){
+        DataReadRequest.Builder builder = new DataReadRequest.Builder()
+                //.read(DataType.TYPE_ACTIVITY_SEGMENT);
+                //.read(DataType.TYPE_LOCATION_SAMPLE);
+                .aggregate(DataType.TYPE_LOCATION_SAMPLE, DataType.AGGREGATE_LOCATION_BOUNDING_BOX)
+                .aggregate(DataType.TYPE_ACTIVITY_SEGMENT, DataType.AGGREGATE_ACTIVITY_SUMMARY)
+                .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
+                .aggregate(DataType.TYPE_HEART_RATE_BPM, DataType.AGGREGATE_HEART_RATE_SUMMARY)
+                .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
+                .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA)
+                .bucketByActivitySegment(1,TimeUnit.MINUTES);
+        return builder;
     }
 
     @Subscribe
@@ -262,19 +243,5 @@ public class ActivityDetailsActivityFragment extends Fragment {
             adapter.notifyDataSetChanged();
         }
         mProgressBar.setVisibility(View.GONE);
-    }
-
-    private DataReadRequest.Builder buildFitQuery(){
-        DataReadRequest.Builder builder = new DataReadRequest.Builder()
-                //.read(DataType.TYPE_ACTIVITY_SEGMENT);
-                //.read(DataType.TYPE_LOCATION_SAMPLE);
-                .aggregate(DataType.TYPE_LOCATION_SAMPLE, DataType.AGGREGATE_LOCATION_BOUNDING_BOX)
-                .aggregate(DataType.TYPE_ACTIVITY_SEGMENT, DataType.AGGREGATE_ACTIVITY_SUMMARY)
-                .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                .aggregate(DataType.TYPE_HEART_RATE_BPM, DataType.AGGREGATE_HEART_RATE_SUMMARY)
-                .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
-                .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA)
-                .bucketByActivitySegment(1,TimeUnit.MINUTES);
-        return builder;
     }
 }

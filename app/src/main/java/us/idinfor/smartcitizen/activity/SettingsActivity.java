@@ -4,6 +4,7 @@ package us.idinfor.smartcitizen.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.Preference;
@@ -19,14 +20,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.android.gms.fitness.data.DataType;
+import com.google.android.gms.fitness.request.DataReadRequest;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+import java.util.Date;
+import java.util.List;
+
 import us.idinfor.smartcitizen.Constants;
+import us.idinfor.smartcitizen.GoogleFitHelper;
 import us.idinfor.smartcitizen.HermesCitizenApi;
 import us.idinfor.smartcitizen.R;
-import us.idinfor.smartcitizen.SmartCitizenApplication;
 import us.idinfor.smartcitizen.Utils;
-import us.idinfor.smartcitizen.asynctask.SendLocalDataAsyncTask;
-import us.idinfor.smartcitizen.model.ContextDao;
-import us.idinfor.smartcitizen.service.ActivityRecognitionService;
+import us.idinfor.smartcitizen.asynctask.UploadActivitiesAsyncTask;
+import us.idinfor.smartcitizen.asynctask.UploadLocationsAsyncTask;
+import us.idinfor.smartcitizen.model.ActivitySampleFit;
+import us.idinfor.smartcitizen.model.LocationSampleFit;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
@@ -59,60 +70,45 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     }
 
     public static class GeneralPreferenceFragment extends PreferenceFragment {
+
+        private SharedPreferences prefs;
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+            prefs = Utils.getSharedPreferences(getActivity().getApplicationContext());
             addPreferencesFromResource(R.xml.pref_general);
             setHasOptionsMenu(true);
             findPreference(Constants.PROPERTY_APP_VERSION).setSummary(version);
-            Preference activityUpdatesPref = findPreference(Constants.PROPERTY_ACTIVITY_UPDATES);
-            activityUpdatesPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            Preference recordDataPref = findPreference(Constants.PROPERTY_RECORD_DATA);
+            recordDataPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    boolean activityUpdates = (boolean) newValue;
-                    if(activityUpdates){
-                        ActivityRecognitionService.actionStartActivityRecognition(context);
-                        Toast.makeText(context, "Activity recognition enabled", Toast.LENGTH_LONG).show();
+                    boolean recordData = (boolean) newValue;
+                    GoogleFitHelper fitHelper = GoogleFitHelper.getInstance(context);
+                    if(recordData){
+                        fitHelper.subscribeFitnessData();
+                        Toast.makeText(context, "Recording sensor data", Toast.LENGTH_LONG).show();
                     }else{
-                        ActivityRecognitionService.actionStopActivityRecognition(context);
-                        Toast.makeText(context, "Activity recognition disabled", Toast.LENGTH_LONG).show();
+                        fitHelper.unsubscribeFitnessData();
+                        Toast.makeText(context, "Recording stopped", Toast.LENGTH_LONG).show();
                     }
                     return true;
                 }
             });
-            Preference sendDataPref = findPreference("send_data");
-            sendDataPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            Preference sendLocationsPref = findPreference("upload_locations");
+            sendLocationsPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    if (Utils.isInternetAvailable(context)) {
-                        new SendLocalDataAsyncTask(context) {
-                            @Override
-                            protected void onPostExecute(Integer res) {
-                                super.onPostExecute(res);
-                                switch (res) {
-                                    case HermesCitizenApi.RESPONSE_OK:
-                                        Toast.makeText(context, "Data uploaded successfully", Toast.LENGTH_LONG).show();
-                                        ((SmartCitizenApplication)context.getApplicationContext())
-                                                .getDaoSession().getDatabase()
-                                                .execSQL("UPDATE " + ContextDao.TABLENAME + " SET " +
-                                                        ContextDao.Properties.Sent.columnName + "=?",
-                                                        new Object[]{1});
-                                        break;
-                                    case HermesCitizenApi.RESPONSE_ERROR_USER_NOT_FOUND:
-                                        Toast.makeText(context, "Error: User not found", Toast.LENGTH_LONG).show();
-                                        Utils.getSharedPreferences(context).edit().remove(Constants.PROPERTY_USER_NAME).commit();
-                                        break;
-                                    case HermesCitizenApi.RESPONSE_ERROR_DATA_NOT_UPLOADED:
-                                        Toast.makeText(context, "Error: Data not uploaded", Toast.LENGTH_LONG).show();
-                                        break;
-                                    default:
-                                        Toast.makeText(context, "Unknown error", Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        }.execute();
-                    } else {
-                        Toast.makeText(context, "Internet unavailable", Toast.LENGTH_LONG).show();
-                    }
+                    uploadLocations();
+                    return true;
+                }
+            });
+            Preference sendActivitiesPref = findPreference("upload_activities");
+            sendActivitiesPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    uploadActivities();
                     return true;
                 }
             });
@@ -129,6 +125,102 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 bar.setDisplayHomeAsUpEnabled(true);
             }
             return layout;
+        }
+
+        @Override
+        public void onStart() {
+            super.onStart();
+            EventBus.getDefault().register(this);
+        }
+
+        @Override
+        public void onStop() {
+            EventBus.getDefault().unregister(this);
+            super.onStop();
+        }
+
+        private void uploadLocations(){
+            GoogleFitHelper fitHelper = GoogleFitHelper.getInstance(getActivity().getApplicationContext());
+            long endTime = new Date().getTime();
+            long startTime = prefs.getLong(Constants.PROPERTY_LAST_LOCATION_TIME_SENT,Utils.getStartTimeRange(Constants.RANGE_DAY));
+            DataReadRequest.Builder builder = new DataReadRequest.Builder()
+                    .read(DataType.TYPE_LOCATION_SAMPLE);
+            fitHelper.queryFitnessData(
+                    startTime,
+                    endTime,
+                    builder,
+                    GoogleFitHelper.QUERY_LOCATIONS);
+            prefs.edit().putLong(Constants.PROPERTY_LAST_LOCATION_TIME_SENT,endTime).apply();
+        }
+
+        @Subscribe
+        public void onLocationsResult(List<LocationSampleFit> locations){
+            if (Utils.isInternetAvailable(context)) {
+                new UploadLocationsAsyncTask(context,prefs.getString(Constants.PROPERTY_USER_NAME,""),locations) {
+                    @Override
+                    protected void onPostExecute(Integer res) {
+                        super.onPostExecute(res);
+                        switch (res) {
+                            case HermesCitizenApi.RESPONSE_OK:
+                                Toast.makeText(context, "Locations uploaded successfully", Toast.LENGTH_LONG).show();
+                                break;
+                            case HermesCitizenApi.RESPONSE_ERROR_USER_NOT_FOUND:
+                                Toast.makeText(context, "Error: User not found", Toast.LENGTH_LONG).show();
+                                Utils.getSharedPreferences(context).edit().remove(Constants.PROPERTY_USER_NAME).commit();
+                                break;
+                            case HermesCitizenApi.RESPONSE_ERROR_DATA_NOT_UPLOADED:
+                                Toast.makeText(context, "Error: Locations not uploaded", Toast.LENGTH_LONG).show();
+                                break;
+                            default:
+                                Toast.makeText(context, "Unknown error", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }.execute();
+            } else {
+                Toast.makeText(context, "Internet unavailable", Toast.LENGTH_LONG).show();
+            }
+        }
+
+        private void uploadActivities(){
+            GoogleFitHelper fitHelper = GoogleFitHelper.getInstance(getActivity().getApplicationContext());
+            long endTime = new Date().getTime();
+            long startTime = prefs.getLong(Constants.PROPERTY_LAST_ACTIVITY_TIME_SENT,Utils.getStartTimeRange(Constants.RANGE_DAY));
+            DataReadRequest.Builder builder = new DataReadRequest.Builder()
+                    .read(DataType.TYPE_ACTIVITY_SAMPLE);
+            fitHelper.queryFitnessData(
+                    startTime,
+                    endTime,
+                    builder,
+                    GoogleFitHelper.QUERY_ACTIVITIES);
+            prefs.edit().putLong(Constants.PROPERTY_LAST_ACTIVITY_TIME_SENT,endTime).apply();
+        }
+
+        @Subscribe
+        public void onActivitiesResult(List<ActivitySampleFit> activities){
+            if (Utils.isInternetAvailable(context)) {
+                new UploadActivitiesAsyncTask(context,prefs.getString(Constants.PROPERTY_USER_NAME,""),activities) {
+                    @Override
+                    protected void onPostExecute(Integer res) {
+                        super.onPostExecute(res);
+                        switch (res) {
+                            case HermesCitizenApi.RESPONSE_OK:
+                                Toast.makeText(context, "Activities uploaded successfully", Toast.LENGTH_LONG).show();
+                                break;
+                            case HermesCitizenApi.RESPONSE_ERROR_USER_NOT_FOUND:
+                                Toast.makeText(context, "Error: User not found", Toast.LENGTH_LONG).show();
+                                Utils.getSharedPreferences(context).edit().remove(Constants.PROPERTY_USER_NAME).commit();
+                                break;
+                            case HermesCitizenApi.RESPONSE_ERROR_DATA_NOT_UPLOADED:
+                                Toast.makeText(context, "Error: Activities not uploaded", Toast.LENGTH_LONG).show();
+                                break;
+                            default:
+                                Toast.makeText(context, "Unknown error", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }.execute();
+            } else {
+                Toast.makeText(context, "Internet unavailable", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
