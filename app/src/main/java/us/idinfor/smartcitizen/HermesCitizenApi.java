@@ -16,17 +16,19 @@ import java.util.List;
 import us.idinfor.smartcitizen.json.JsonContext;
 import us.idinfor.smartcitizen.json.JsonContextList;
 import us.idinfor.smartcitizen.json.JsonListHermes;
-import us.idinfor.smartcitizen.model.ActivitySampleFit;
+import us.idinfor.smartcitizen.model.ActivitySegmentFit;
 import us.idinfor.smartcitizen.model.Context;
 import us.idinfor.smartcitizen.model.LocationSampleFit;
 
 public class HermesCitizenApi {
 
     private static final String TAG = HermesCitizenApi.class.getCanonicalName();
-    //private static final String HOST_URL = "http://10.141.0.50:8080/HermesWeb/webresources/hermes.citizen.";
-    private static final String HOST_URL = "https://www.hermescitizen.us.es/HermesWeb/webresources/hermes.citizen.";
-    private static final String USER_URL = HOST_URL + "person/existsUser/";
-    private static final String CONTEXT_URL = HOST_URL + "context/create";
+    private static final String HOST_URL = "http://10.141.0.50:8080/HermesWeb/webresources/hermes.citizen.";
+    //private static final String HOST_URL = "https://www.hermescitizen.us.es/HermesWeb/webresources/hermes.citizen.";
+    private static final String USER_ENDPOINT = HOST_URL + "person/existsUser/";
+    private static final String CONTEXT_ENDPOINT = HOST_URL + "context/create";
+    private static final String LOCATION_ENDPOINT = HOST_URL + "context/createLocation";
+    private static final String ACTIVITY_ENDPOINT = HOST_URL + "context/createActivity";
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     public static final int RESPONSE_ERROR_UNKNOWN = 0;
@@ -39,7 +41,7 @@ public class HermesCitizenApi {
     public static Boolean existsUser(String username){
         String responseString = "";
         Request request = new Request.Builder()
-                .url(USER_URL + username)
+                .url(USER_ENDPOINT + username)
                 .build();
         try{
             Response response = client.newCall(request).execute();
@@ -72,7 +74,7 @@ public class HermesCitizenApi {
 
         RequestBody formBody = RequestBody.create(JSON,json);
         Request request = new Request.Builder()
-                .url(CONTEXT_URL)
+                .url(CONTEXT_ENDPOINT)
                 .post(formBody)
                 .build();
         try{
@@ -101,7 +103,7 @@ public class HermesCitizenApi {
 
         RequestBody formBody = RequestBody.create(JSON,json);
         Request request = new Request.Builder()
-                .url(CONTEXT_URL)
+                .url(CONTEXT_ENDPOINT)
                 .post(formBody)
                 .build();
         try{
@@ -122,15 +124,15 @@ public class HermesCitizenApi {
 
     }
 
-    public static Integer uploadActivities(String username, List<ActivitySampleFit> activities) {
+    public static Integer uploadActivities(String username, List<ActivitySegmentFit> activities) {
         String responseString = "";
-        JsonListHermes<ActivitySampleFit> jsonList = new JsonListHermes<ActivitySampleFit>(username,activities);
+        JsonListHermes<ActivitySegmentFit> jsonList = new JsonListHermes<ActivitySegmentFit>(username,activities);
 
         String json = new Gson().toJson(jsonList, JsonListHermes.class);
 
         RequestBody formBody = RequestBody.create(JSON,json);
         Request request = new Request.Builder()
-                .url(CONTEXT_URL)
+                .url(CONTEXT_ENDPOINT)
                 .post(formBody)
                 .build();
         try{

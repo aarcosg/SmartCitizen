@@ -25,11 +25,12 @@ import com.google.android.gms.fitness.result.DataReadResult;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import us.idinfor.smartcitizen.model.ActivitySampleFit;
+import us.idinfor.smartcitizen.model.ActivitySegmentFit;
 import us.idinfor.smartcitizen.model.LocationSampleFit;
 
 public class GoogleFitHelper implements GoogleApiClient.ConnectionCallbacks,
@@ -92,7 +93,8 @@ public class GoogleFitHelper implements GoogleApiClient.ConnectionCallbacks,
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.e(TAG, "Connection failed. Cause: " + connectionResult.toString());
-        if (connectionResult.getErrorCode() == FitnessStatusCodes.NEEDS_OAUTH_PERMISSIONS) {
+        if (connectionResult.getErrorCode() == FitnessStatusCodes.NEEDS_OAUTH_PERMISSIONS ||
+                connectionResult.getErrorCode() == ConnectionResult.SIGN_IN_REQUIRED) {
             EventBus.getDefault().post(connectionResult);
         }else if (!connectionResult.hasResolution()) {
             GoogleApiAvailability.getInstance().showErrorNotification(mContext,connectionResult.getErrorCode());
@@ -186,7 +188,7 @@ public class GoogleFitHelper implements GoogleApiClient.ConnectionCallbacks,
                         EventBus.getDefault().post(convertToLocationSampleList(dataReadResult.getDataSets()));
                         break;
                     case QUERY_ACTIVITIES:
-                        EventBus.getDefault().post(convertToActivitySampleList(dataReadResult.getDataSets()));
+                        EventBus.getDefault().post(convertToActivitySegmentList(dataReadResult.getDataSets()));
                         break;
                 }
             }
@@ -212,6 +214,27 @@ public class GoogleFitHelper implements GoogleApiClient.ConnectionCallbacks,
     }
 
     private List<LocationSampleFit> convertToLocationSampleList(List<DataSet> dataSets){
+        final String DATE_FORMAT = "yyyy.MM.dd HH:mm:ss";
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+        for (DataSet dataSet : dataSets) {
+            Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
+            for (DataPoint dp : dataSet.getDataPoints()) {
+                Log.i(TAG, "Data point:");
+                Log.i(TAG, "\tType: " + dp.getDataType().getName());
+                Log.i(TAG, "\tStart: " + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
+                Log.i(TAG, "\tEnd: " + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
+                for (Field field : dp.getDataType().getFields()) {
+                    Log.i(TAG, "\tField: " + field.getName());
+                    if (field.getName().equalsIgnoreCase("activity")) {
+                        Log.i(TAG, " Value: " + dp.getValue(field).asActivity());
+                    } else if (field.getName().equalsIgnoreCase("duration")) {
+                        Log.i(TAG, " Value: " + dp.getValue(field).asInt() / 1000 / 60 + " minutes");
+                    } else {
+                        Log.i(TAG, " Value: " + dp.getValue(field));
+                    }
+                }
+            }
+        }
         List<LocationSampleFit> locations = null;
         for (DataSet dataSet : dataSets) {
             if (dataSet.getDataType().equals(DataType.TYPE_LOCATION_SAMPLE)) {
@@ -230,19 +253,53 @@ public class GoogleFitHelper implements GoogleApiClient.ConnectionCallbacks,
                 }
             }
         }
+
+        // Set end time of current location as start time of next location
+        if(locations != null && !locations.isEmpty()){
+            for(int i = 0; i < locations.size() - 2 ; i++){
+                LocationSampleFit current = locations.get(i);
+                LocationSampleFit next = locations.get(i+1);
+                current.setEndTime(next.getStartTime());
+                locations.set(i,current);
+                //Log.i(TAG, "\tStart: " + dateFormat.format(current.getStartTime()));
+                //Log.i(TAG, "\tEnd: " + dateFormat.format(current.getEndTime()));
+            }
+        }
         return locations;
     }
 
-    private List<ActivitySampleFit> convertToActivitySampleList(List<DataSet> dataSets){
-        List<ActivitySampleFit> activities = null;
+    private List<ActivitySegmentFit> convertToActivitySegmentList(List<DataSet> dataSets){
+        final String DATE_FORMAT = "yyyy.MM.dd HH:mm:ss";
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
         for (DataSet dataSet : dataSets) {
-            if (dataSet.getDataType().equals(DataType.TYPE_ACTIVITY_SAMPLE)) {
+            Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
+            for (DataPoint dp : dataSet.getDataPoints()) {
+                Log.i(TAG, "Data point:");
+                Log.i(TAG, "\tType: " + dp.getDataType().getName());
+                Log.i(TAG, "\tStart: " + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
+                Log.i(TAG, "\tEnd: " + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
+                for (Field field : dp.getDataType().getFields()) {
+                    Log.i(TAG, "\tField: " + field.getName());
+                    if (field.getName().equalsIgnoreCase("activity")) {
+                        Log.i(TAG, " Value: " + dp.getValue(field).asActivity());
+                    } else if (field.getName().equalsIgnoreCase("duration")) {
+                        Log.i(TAG, " Value: " + dp.getValue(field).asInt() / 1000 / 60 + " minutes");
+                    } else {
+                        Log.i(TAG, " Value: " + dp.getValue(field));
+                    }
+                }
+            }
+        }
+
+
+        List<ActivitySegmentFit> activities = null;
+        for (DataSet dataSet : dataSets) {
+            if (dataSet.getDataType().equals(DataType.TYPE_ACTIVITY_SEGMENT)) {
                 activities = new ArrayList<>();
                 for (DataPoint dp : dataSet.getDataPoints()) {
-                    if (dp.getDataType().equals(DataType.TYPE_ACTIVITY_SAMPLE)) {
-                        ActivitySampleFit activity = new ActivitySampleFit(
+                    if (dp.getDataType().equals(DataType.TYPE_ACTIVITY_SEGMENT)) {
+                        ActivitySegmentFit activity = new ActivitySegmentFit(
                                 dp.getValue(Field.FIELD_ACTIVITY).asActivity(),
-                                dp.getValue(Field.FIELD_CONFIDENCE).asFloat(),
                                 dp.getStartTime(TimeUnit.MILLISECONDS),
                                 dp.getEndTime(TimeUnit.MILLISECONDS)
                         );

@@ -58,4 +58,32 @@ public class Utils {
         Integer color = context.getResources().getIdentifier("activity_" + activity,"color",context.getPackageName());
         return color > 0 ? ContextCompat.getColor(context,color) : ContextCompat.getColor(context,R.color.accent);
     }
+
+    public static boolean sameDay(long startTime, long endTime){
+        Calendar start = Calendar.getInstance();
+        Calendar end = Calendar.getInstance();
+        start.setTimeInMillis(startTime);
+        end.setTimeInMillis(endTime);
+        return start.get(Calendar.DAY_OF_YEAR) == end.get(Calendar.DAY_OF_YEAR) &&
+                start.get(Calendar.YEAR) == end.get(Calendar.YEAR);
+    }
+
+    public static Calendar getLastMinuteOfDay(long time){
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(time);
+        cal.set(Calendar.HOUR,23);
+        cal.set(Calendar.MINUTE,59);
+        cal.set(Calendar.SECOND,59);
+        return cal;
+    }
+
+    public static Calendar getFirstMinuteOfNextDay(long time){
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(time);
+        cal.add(Calendar.DAY_OF_YEAR,1);
+        cal.set(Calendar.HOUR,0);
+        cal.set(Calendar.MINUTE,0);
+        cal.set(Calendar.SECOND,0);
+        return cal;
+    }
 }

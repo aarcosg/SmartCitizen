@@ -1,19 +1,14 @@
 package us.idinfor.smartcitizen.fragment;
 
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.fitness.FitnessStatusCodes;
 import com.google.android.gms.fitness.request.DataReadRequest;
 
 import org.greenrobot.eventbus.EventBus;
@@ -39,6 +34,7 @@ public abstract class BaseGoogleFitFragment extends Fragment {
         if(savedInstanceState != null){
             authInProgress = savedInstanceState.getBoolean(AUTH_PENDING);
         }
+        //FIXME called when the user is not logged in
         fitHelper = GoogleFitHelper.getInstance(getActivity().getApplicationContext());
     }
 

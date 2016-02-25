@@ -36,7 +36,7 @@ import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.asynctask.UploadActivitiesAsyncTask;
 import us.idinfor.smartcitizen.asynctask.UploadLocationsAsyncTask;
-import us.idinfor.smartcitizen.model.ActivitySampleFit;
+import us.idinfor.smartcitizen.model.ActivitySegmentFit;
 import us.idinfor.smartcitizen.model.LocationSampleFit;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
@@ -141,8 +141,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         private void uploadLocations(){
             GoogleFitHelper fitHelper = GoogleFitHelper.getInstance(getActivity().getApplicationContext());
-            long endTime = new Date().getTime();
             long startTime = prefs.getLong(Constants.PROPERTY_LAST_LOCATION_TIME_SENT,Utils.getStartTimeRange(Constants.RANGE_DAY));
+            long endTime = new Date().getTime();
+            boolean sameDay = Utils.sameDay(startTime,endTime);
+            if(!sameDay){
+                endTime = Utils.getLastMinuteOfDay(endTime).getTimeInMillis();
+            }
             DataReadRequest.Builder builder = new DataReadRequest.Builder()
                     .read(DataType.TYPE_LOCATION_SAMPLE);
             fitHelper.queryFitnessData(
@@ -150,7 +154,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     endTime,
                     builder,
                     GoogleFitHelper.QUERY_LOCATIONS);
-            prefs.edit().putLong(Constants.PROPERTY_LAST_LOCATION_TIME_SENT,endTime).apply();
+            if(!sameDay){
+                endTime = Utils.getFirstMinuteOfNextDay(endTime).getTimeInMillis();
+            }
+            //prefs.edit().putLong(Constants.PROPERTY_LAST_LOCATION_TIME_SENT,endTime).apply();
         }
 
         @Subscribe
@@ -183,20 +190,27 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         private void uploadActivities(){
             GoogleFitHelper fitHelper = GoogleFitHelper.getInstance(getActivity().getApplicationContext());
-            long endTime = new Date().getTime();
             long startTime = prefs.getLong(Constants.PROPERTY_LAST_ACTIVITY_TIME_SENT,Utils.getStartTimeRange(Constants.RANGE_DAY));
+            long endTime = new Date().getTime();
+            boolean sameDay = Utils.sameDay(startTime,endTime);
+            if(!sameDay){
+                endTime = Utils.getLastMinuteOfDay(endTime).getTimeInMillis();
+            }
             DataReadRequest.Builder builder = new DataReadRequest.Builder()
-                    .read(DataType.TYPE_ACTIVITY_SAMPLE);
+                    .read(DataType.TYPE_ACTIVITY_SEGMENT);
             fitHelper.queryFitnessData(
                     startTime,
                     endTime,
                     builder,
                     GoogleFitHelper.QUERY_ACTIVITIES);
-            prefs.edit().putLong(Constants.PROPERTY_LAST_ACTIVITY_TIME_SENT,endTime).apply();
+            if(!sameDay){
+                endTime = Utils.getFirstMinuteOfNextDay(endTime).getTimeInMillis();
+            }
+            //prefs.edit().putLong(Constants.PROPERTY_LAST_ACTIVITY_TIME_SENT,endTime).apply();
         }
 
         @Subscribe
-        public void onActivitiesResult(List<ActivitySampleFit> activities){
+        public void onActivitiesResult(List<ActivitySegmentFit> activities){
             if (Utils.isInternetAvailable(context)) {
                 new UploadActivitiesAsyncTask(context,prefs.getString(Constants.PROPERTY_USER_NAME,""),activities) {
                     @Override

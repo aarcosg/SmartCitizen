@@ -1,15 +1,13 @@
 package us.idinfor.smartcitizen.activity;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -19,9 +17,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
@@ -46,6 +44,9 @@ public class MainActivity extends BaseActivity
     NavigationView mNavigationView;
     @Bind(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
+    /*@Nullable
+    @Bind(R.id.username)
+    TextView mUserNameTV;*/
 
     private final Handler mDrawerActionHandler = new Handler();
     private ActionBarDrawerToggle mDrawerToggle;
@@ -74,6 +75,9 @@ public class MainActivity extends BaseActivity
         Toolbar toolbar = buildActionBarToolbar(getString(R.string.app_name),false);
 
         mTitle = mDrawerTitle = getTitle();
+
+        TextView userNameTV = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.username);
+        userNameTV.setText(prefs.getString(Constants.PROPERTY_USER_NAME,getString(R.string.user)));
 
         /*if (checkPlayServices()) {
             if(mGCM == null){
