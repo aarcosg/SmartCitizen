@@ -21,17 +21,17 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.Constants;
-import us.idinfor.smartcitizen.GoogleFitHelper;
-import us.idinfor.smartcitizen.MessageEvent;
+import us.idinfor.smartcitizen.GoogleFitService;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.adapter.ActivitySegmentDetailsAdapter;
+import us.idinfor.smartcitizen.event.FitBucketsResultEvent;
+import us.idinfor.smartcitizen.event.GoogleApiClientConnectedEvent;
 import us.idinfor.smartcitizen.model.ActivityDetails;
 import us.idinfor.smartcitizen.model.ActivitySummaryFit;
 import us.idinfor.smartcitizen.model.CaloriesExpendedFit;
@@ -71,11 +71,20 @@ public class ActivityDetailsActivityFragment extends BaseGoogleFitFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if(fitHelper.getGoogleApiClient().isConnected()){
+            queryGoogleFit(Constants.RANGE_DAY);
+        }
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
     }
 
+    @Override
     protected DataReadRequest.Builder buildFitQuery(){
         DataReadRequest.Builder builder = new DataReadRequest.Builder()
                 //.read(DataType.TYPE_ACTIVITY_SEGMENT);
@@ -90,20 +99,24 @@ public class ActivityDetailsActivityFragment extends BaseGoogleFitFragment {
         return builder;
     }
 
-    @Subscribe
-    public void onGoogleApiReady(MessageEvent event){
-        if(event.getMessage().equals(GoogleFitHelper.EVENT_GOOGLEAPICLIENT_READY)){
-            mProgressBar.setVisibility(View.VISIBLE);
-            fitHelper.queryFitnessData(
-                    Utils.getStartTimeRange(Constants.RANGE_DAY),
-                    new Date().getTime(),
-                    buildFitQuery());
-        }
+    @Override
+    protected void queryGoogleFit(int timeRange) {
+        mProgressBar.setVisibility(View.VISIBLE);
+        fitHelper.queryFitnessData(
+                Utils.getStartTimeRange(timeRange),
+                new Date().getTime(),
+                buildFitQuery(),
+                GoogleFitService.QUERY_DEFAULT);
     }
 
     @Subscribe
-    public void onQueryFitnessResult(List<Bucket> buckets){
-        for (Bucket bucket : buckets) {
+    public void onEvent(GoogleApiClientConnectedEvent event){
+        queryGoogleFit(Constants.RANGE_DAY);
+    }
+
+    @Subscribe
+    public void onEvent(FitBucketsResultEvent event){
+        for (Bucket bucket : event.getBuckets()) {
             ActivityDetails currentActivity = new ActivityDetails();
             for (DataSet dataSet : bucket.getDataSets()) {
                 if (dataSet.getDataType().equals(DataType.AGGREGATE_STEP_COUNT_DELTA)) {
@@ -207,34 +220,6 @@ public class ActivityDetailsActivityFragment extends BaseGoogleFitFragment {
             }
         }
         updateUI();
-        /*if (dataSet.getDataType().equals(DataType.TYPE_ACTIVITY_SEGMENT)) {
-            for (DataPoint dp : dataSet.getDataPoints()) {
-                if (dp.getDataType().equals(DataType.TYPE_ACTIVITY_SEGMENT)) {
-                    ActivitySegmentFit current = new ActivitySegmentFit(
-                            dp.getValue(Field.FIELD_ACTIVITY).asInt(),
-                            dp.getValue(Field.FIELD_ACTIVITY).asActivity(),
-                            dp.getStartTime(TimeUnit.MILLISECONDS),
-                            dp.getEndTime(TimeUnit.MILLISECONDS)
-                    );
-                    if (!activities.isEmpty()) {
-                        ActivitySegmentFit last = activities.get(activities.size() - 1);
-                        if (last.getId() == current.getId()) {
-                            last.setEndTime(current.getEndTime());
-                            activities.set(activities.size() - 1, last);
-                        } else {
-                            activities.add(current);
-                        }
-                    } else {
-                        activities.add(current);
-                    }
-                }
-            }
-            if(!activities.isEmpty()){
-                Collections.reverse(activities);
-                adapter.notifyDataSetChanged();
-                //adapter.addAll(activities);
-            }
-        }*/
     }
 
     private void updateUI() {

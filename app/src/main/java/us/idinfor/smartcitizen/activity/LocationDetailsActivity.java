@@ -7,11 +7,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
 
+import org.greenrobot.eventbus.EventBus;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnItemSelected;
 import us.idinfor.smartcitizen.R;
-import us.idinfor.smartcitizen.fragment.LocationDetailsActivityFragment;
+import us.idinfor.smartcitizen.event.TimeRangeSelectedEvent;
 
 public class LocationDetailsActivity extends BaseActivity {
 
@@ -36,9 +38,7 @@ public class LocationDetailsActivity extends BaseActivity {
 
     @OnItemSelected(R.id.toolbarSpinner)
     public void timeRangeSelected(int position){
-        LocationDetailsActivityFragment locationDetailsFragment = (LocationDetailsActivityFragment)
-                getSupportFragmentManager().findFragmentById(R.id.locationDetailsFragment);
-        locationDetailsFragment.onTimeRangeSelected(position);
+        EventBus.getDefault().post(new TimeRangeSelectedEvent(position));
     }
 
     public static void launch(Activity activity) {

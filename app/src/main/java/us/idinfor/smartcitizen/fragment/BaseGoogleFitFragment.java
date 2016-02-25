@@ -7,18 +7,14 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.fitness.request.DataReadRequest;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.util.Date;
-
-import us.idinfor.smartcitizen.Constants;
-import us.idinfor.smartcitizen.GoogleFitHelper;
-import us.idinfor.smartcitizen.Utils;
+import us.idinfor.smartcitizen.GoogleFitService;
+import us.idinfor.smartcitizen.event.ConnectionResultEvent;
 
 public abstract class BaseGoogleFitFragment extends Fragment {
 
@@ -26,7 +22,10 @@ public abstract class BaseGoogleFitFragment extends Fragment {
     private static final String AUTH_PENDING = "auth_state_pending";
     private static final int REQUEST_OAUTH = 1;
     private boolean authInProgress = false;
-    protected GoogleFitHelper fitHelper;
+    protected GoogleFitService fitHelper;
+
+    protected abstract DataReadRequest.Builder buildFitQuery();
+    protected abstract void queryGoogleFit(int timeRange);
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -34,8 +33,7 @@ public abstract class BaseGoogleFitFragment extends Fragment {
         if(savedInstanceState != null){
             authInProgress = savedInstanceState.getBoolean(AUTH_PENDING);
         }
-        //FIXME called when the user is not logged in
-        fitHelper = GoogleFitHelper.getInstance(getActivity().getApplicationContext());
+        fitHelper = GoogleFitService.getInstance(getActivity().getApplicationContext());
     }
 
     @Override
@@ -45,37 +43,25 @@ public abstract class BaseGoogleFitFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
+        EventBus.getDefault().register(this);
         if(!fitHelper.getGoogleApiClient().isConnected()){
             fitHelper.getGoogleApiClient().connect();
-        }else{
-            fitHelper.queryFitnessData(
-                    Utils.getStartTimeRange(Constants.RANGE_DAY),
-                    new Date().getTime(),
-                    buildFitQuery());
         }
     }
 
     @Override
-    public void onStop() {
+    public void onPause() {
         EventBus.getDefault().unregister(this);
-        super.onStop();
+        super.onPause();
     }
 
-    protected abstract DataReadRequest.Builder buildFitQuery();
-
     @Subscribe
-    public void handleFailedConnection(ConnectionResult result) {
-        Log.e(TAG, "Connection failed. Cause: " + result.toString());
-        if (!result.hasResolution()) {
-            GooglePlayServicesUtil.getErrorDialog(result.getErrorCode(),
+    public void onEvent(ConnectionResultEvent event) {
+        Log.e(TAG, "Connection failed. Cause: " + event.getResult().toString());
+        if (!event.getResult().hasResolution()) {
+            GooglePlayServicesUtil.getErrorDialog(event.getResult().getErrorCode(),
                     getActivity(), 0).show();
         }
         /* The failure has a resolution. Resolve it.
@@ -86,7 +72,7 @@ public abstract class BaseGoogleFitFragment extends Fragment {
             Log.e(TAG, "Attempting to resolve failed connection");
             authInProgress = true;
             try {
-                result.startResolutionForResult(getActivity(),REQUEST_OAUTH);
+                event.getResult().startResolutionForResult(getActivity(),REQUEST_OAUTH);
             } catch (IntentSender.SendIntentException e) {
                 Log.e(TAG,"Exception while starting resolution activity");
             }

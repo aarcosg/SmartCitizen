@@ -16,7 +16,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -44,9 +43,9 @@ public class MainActivity extends BaseActivity
     NavigationView mNavigationView;
     @Bind(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
-    /*@Nullable
+    @Nullable
     @Bind(R.id.username)
-    TextView mUserNameTV;*/
+    TextView mUserNameTV;
 
     private final Handler mDrawerActionHandler = new Handler();
     private ActionBarDrawerToggle mDrawerToggle;
@@ -64,11 +63,8 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        prefs = Utils.getSharedPreferences(this);
-        if(TextUtils.isEmpty(prefs.getString(Constants.PROPERTY_USER_NAME, ""))){
-            LoginActivity.launch(this);
-        }
         setContentView(R.layout.activity_main);
+        prefs = Utils.getSharedPreferences(this);
         ButterKnife.bind(this);
         UDID = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
@@ -76,29 +72,9 @@ public class MainActivity extends BaseActivity
 
         mTitle = mDrawerTitle = getTitle();
 
-        TextView userNameTV = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.username);
-        userNameTV.setText(prefs.getString(Constants.PROPERTY_USER_NAME,getString(R.string.user)));
-
-        /*if (checkPlayServices()) {
-            if(mGCM == null){
-                mGCM = GoogleCloudMessaging.getInstance(this);
-            }
-            mRegId = getRegistrationId(this);
-
-            if (mRegId.isEmpty() && Utils.isInternetAvailable(this)) {
-                new GcmRegistrationAsyncTask(this){
-                    @Override
-                    protected void onPostExecute(Device device) {
-                        if(device != null){
-                            Utils.getSharedPreferences(MainActivity.this).edit().putLong(Constants.PROPERTY_DEVICE_ID,device.getId()).apply();
-                            storeRegistrationId(MainActivity.this,device.getGcmId());
-                        }
-                    }
-                }.execute(UDID);
-            }
-        } else {
-            Log.i(TAG, "No valid Google Play Services APK found.");
-        }*/
+        if(mUserNameTV != null){
+            mUserNameTV.setText(prefs.getString(Constants.PROPERTY_USER_NAME,getString(R.string.user)));
+        }
 
         // Read in the flag indicating whether or not the user has demonstrated awareness of the drawer.
         mUserLearnedDrawer = prefs.getBoolean(Constants.PROPERTY_DRAWER_LEARNED, false);
@@ -230,83 +206,6 @@ public class MainActivity extends BaseActivity
         super.onDestroy();
         ButterKnife.unbind(this);
     }
-
-    /**
-     * Verify that Google Play services is available before making a request.
-     *
-     * @return true if Google Play services is available, otherwise false
-     */
-   /* protected boolean checkPlayServices() {
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
-                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
-                        Constants.PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                Log.i(TAG, "This device is not supported.");
-                finish();
-            }
-            return false;
-        }
-        return true;
-    }*/
-
-    /**
-     * @return Application's version code from the {@code PackageManager}.
-     */
-    /*private static int getAppVersion(Context context) {
-        try {
-            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            return packageInfo.versionCode;
-        } catch (PackageManager.NameNotFoundException e) {
-            // should never happen
-            throw new RuntimeException("Could not get package name: " + e);
-        }
-    }*/
-
-    /**
-     * Gets the current registration ID for application on GCM service, if there is one.
-     * <p>
-     * If result is empty, the app needs to register.
-     *
-     * @return registration ID, or empty string if there is no existing
-     *         registration ID.
-     */
-    /*private String getRegistrationId(Context context) {
-        final SharedPreferences prefs = Utils.getSharedPreferences(context);
-        String registrationId = prefs.getString(Constants.PROPERTY_GCM_ID, "");
-        if (registrationId.isEmpty()) {
-            Log.i(TAG, "Registration not found.");
-            return "";
-        }
-        // Check if app was updated; if so, it must clear the registration ID
-        // since the existing regID is not guaranteed to work with the new
-        // app version.
-        int registeredVersion = prefs.getInt(Constants.PROPERTY_APP_VERSION, Integer.MIN_VALUE);
-        int currentVersion = getAppVersion(context);
-        if (registeredVersion != currentVersion) {
-            Log.i(TAG, "App version changed.");
-            return "";
-        }
-        return registrationId;
-    }*/
-
-    /**
-     * Stores the registration ID and the app versionCode in the application's
-     * {@code SharedPreferences}.
-     *
-     * @param context application's context.
-     * @param regId registration ID
-     */
-    /*private void storeRegistrationId(Context context, String regId) {
-        final SharedPreferences prefs = Utils.getSharedPreferences(context);
-        int appVersion = getAppVersion(context);
-        Log.i(TAG, "Saving regId on app version " + appVersion);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(Constants.PROPERTY_GCM_ID, regId);
-        editor.putInt(Constants.PROPERTY_APP_VERSION, appVersion);
-        editor.apply();
-    }*/
 
     public static void launch(Activity activity) {
         Intent intent = new Intent(activity, MainActivity.class);

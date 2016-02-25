@@ -4,12 +4,14 @@ package us.idinfor.smartcitizen;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,11 +97,12 @@ public class HermesCitizenApi {
     }
 
 
-    public static Integer uploadLocations(String username, List<LocationSampleFit> locations) {
+    private static Integer uploadLocations(String username, List<LocationSampleFit> locations) {
         String responseString = "";
-        JsonListHermes<LocationSampleFit> jsonList = new JsonListHermes<LocationSampleFit>(username,locations);
 
-        String json = new Gson().toJson(jsonList, JsonListHermes.class);
+        JsonListHermes<LocationSampleFit> jsonList = new JsonListHermes<LocationSampleFit>(username,locations);
+        Type type = new TypeToken<JsonListHermes<LocationSampleFit>>(){}.getType();
+        String json = new Gson().toJson(jsonList, type);
 
         RequestBody formBody = RequestBody.create(JSON,json);
         Request request = new Request.Builder()
@@ -124,11 +127,12 @@ public class HermesCitizenApi {
 
     }
 
-    public static Integer uploadActivities(String username, List<ActivitySegmentFit> activities) {
+    private static Integer uploadActivities(String username, List<ActivitySegmentFit> activities) {
         String responseString = "";
-        JsonListHermes<ActivitySegmentFit> jsonList = new JsonListHermes<ActivitySegmentFit>(username,activities);
 
-        String json = new Gson().toJson(jsonList, JsonListHermes.class);
+        JsonListHermes<ActivitySegmentFit> jsonList = new JsonListHermes<ActivitySegmentFit>(username,activities);
+        Type type = new TypeToken<JsonListHermes<ActivitySegmentFit>>(){}.getType();
+        String json = new Gson().toJson(jsonList, type);
 
         RequestBody formBody = RequestBody.create(JSON,json);
         Request request = new Request.Builder()
@@ -150,5 +154,19 @@ public class HermesCitizenApi {
         }catch (NumberFormatException e){
             return RESPONSE_ERROR_UNKNOWN;
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> Integer uploadData(String username, List<T> items) {
+        Integer result = RESPONSE_ERROR_UNKNOWN;
+        if(items != null && !items.isEmpty()){
+            T item = items.get(0);
+            if(item instanceof LocationSampleFit) {
+                result = uploadLocations(username, (List<LocationSampleFit>) items);
+            } else if (item instanceof ActivitySegmentFit){
+                result = uploadActivities(username, (List<ActivitySegmentFit>) items);
+            }
+        }
+        return result;
     }
 }

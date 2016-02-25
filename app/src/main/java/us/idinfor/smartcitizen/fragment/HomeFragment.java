@@ -17,7 +17,6 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
@@ -46,13 +45,14 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import us.idinfor.smartcitizen.Constants;
-import us.idinfor.smartcitizen.GoogleFitHelper;
-import us.idinfor.smartcitizen.MessageEvent;
+import us.idinfor.smartcitizen.GoogleFitService;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.activity.ActivityDetailsActivity;
 import us.idinfor.smartcitizen.activity.LocationDetailsActivity;
 import us.idinfor.smartcitizen.adapter.ActivityDurationPagerAdapter;
+import us.idinfor.smartcitizen.event.FitBucketsResultEvent;
+import us.idinfor.smartcitizen.event.GoogleApiClientConnectedEvent;
 import us.idinfor.smartcitizen.model.ActivityDetails;
 import us.idinfor.smartcitizen.model.ActivitySummaryFit;
 import us.idinfor.smartcitizen.model.CaloriesExpendedFit;
@@ -120,7 +120,6 @@ public class HomeFragment extends BaseGoogleFitFragment implements OnMapReadyCal
         prefs = Utils.getSharedPreferences(getActivity());
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -139,6 +138,14 @@ public class HomeFragment extends BaseGoogleFitFragment implements OnMapReadyCal
         }
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(fitHelper.getGoogleApiClient().isConnected()){
+            queryGoogleFit(Constants.RANGE_DAY);
+        }
     }
 
     @Override
@@ -166,7 +173,7 @@ public class HomeFragment extends BaseGoogleFitFragment implements OnMapReadyCal
         if(ContextCompat.checkSelfPermission(getContext(),Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             mMap.setMyLocationEnabled(true);
         }
-        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+        /*mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
                 isMapReady = true;
@@ -177,9 +184,10 @@ public class HomeFragment extends BaseGoogleFitFragment implements OnMapReadyCal
                     isBoundingBoxReady = false;
                 }
             }
-        });
+        });*/
     }
 
+    @Override
     protected DataReadRequest.Builder buildFitQuery(){
         DataReadRequest.Builder builder = new DataReadRequest.Builder()
                 .aggregate(DataType.TYPE_LOCATION_SAMPLE, DataType.AGGREGATE_LOCATION_BOUNDING_BOX)
@@ -192,22 +200,26 @@ public class HomeFragment extends BaseGoogleFitFragment implements OnMapReadyCal
         return builder;
     }
 
-    @Subscribe
-    public void onGoogleApiReady(MessageEvent event){
-        if(event.getMessage().equals(GoogleFitHelper.EVENT_GOOGLEAPICLIENT_READY)){
-            mProgressBar.setVisibility(View.VISIBLE);
-            fitHelper.queryFitnessData(
-                    Utils.getStartTimeRange(Constants.RANGE_DAY),
-                    new Date().getTime(),
-                    buildFitQuery());
-        }
+    @Override
+    protected void queryGoogleFit(int timeRange) {
+        mProgressBar.setVisibility(View.VISIBLE);
+        fitHelper.queryFitnessData(
+                Utils.getStartTimeRange(timeRange),
+                new Date().getTime(),
+                buildFitQuery(),
+                GoogleFitService.QUERY_DEFAULT);
     }
 
     @Subscribe
-    public void onQueryFitnessResult(List<Bucket> buckets){
+    public void onEvent(GoogleApiClientConnectedEvent event){
+        queryGoogleFit(Constants.RANGE_DAY);
+    }
+
+    @Subscribe
+    public void onEvent(FitBucketsResultEvent event){
         activityDetails = new ActivityDetails();
         // Single bucket expected
-        for (DataSet dataSet : buckets.get(0).getDataSets()) {
+        for (DataSet dataSet : event.getBuckets().get(0).getDataSets()) {
             if (dataSet.getDataType().equals(DataType.AGGREGATE_STEP_COUNT_DELTA)) {
                 for (DataPoint dp : dataSet.getDataPoints()) {
                     if (dp.getDataType().equals(DataType.AGGREGATE_STEP_COUNT_DELTA)) {
@@ -347,13 +359,13 @@ public class HomeFragment extends BaseGoogleFitFragment implements OnMapReadyCal
             }
             bounds = boundsBuilder.build();
             boundingBoxCenter = SphericalUtil.interpolate(activityDetails.getLocationBoundingBox().getLocationSW(), activityDetails.getLocationBoundingBox().getLocationNE(), 0.5);
-            if (mMap != null && isMapReady) {
+            if (mMap != null/* && isMapReady*/) {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 12));
                 mMap.moveCamera(CameraUpdateFactory.zoomOut());
                 mMap.addPolygon(boundingBoxPolygon);
-            }else{
+            }/*else{
                 isBoundingBoxReady = true;
-            }
+            }*/
         }
         mProgressBar.setVisibility(View.GONE);
     }

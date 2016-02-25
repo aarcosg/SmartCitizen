@@ -1,11 +1,16 @@
 package us.idinfor.smartcitizen;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import java.util.Calendar;
 
@@ -27,6 +32,25 @@ public class Utils {
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
         return isConnected;
+    }
+
+    /**
+     * Verify that Google Play services is available before making a request.
+     *
+     * @return true if Google Play services is available, otherwise false
+     */
+    public static boolean checkPlayServices(Activity activity) {
+        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                GooglePlayServicesUtil.getErrorDialog(resultCode, activity,
+                        Constants.PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            } else {
+                Log.i(TAG, "This device is not supported.");
+            }
+            return false;
+        }
+        return true;
     }
 
     public static long getStartTimeRange(int range){

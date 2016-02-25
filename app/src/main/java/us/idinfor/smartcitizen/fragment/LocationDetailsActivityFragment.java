@@ -27,15 +27,16 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.Constants;
-import us.idinfor.smartcitizen.GoogleFitHelper;
-import us.idinfor.smartcitizen.MessageEvent;
+import us.idinfor.smartcitizen.GoogleFitService;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
+import us.idinfor.smartcitizen.event.FitDataSetsResultEvent;
+import us.idinfor.smartcitizen.event.GoogleApiClientConnectedEvent;
+import us.idinfor.smartcitizen.event.TimeRangeSelectedEvent;
 
 public class LocationDetailsActivityFragment extends BaseGoogleFitFragment implements OnMapReadyCallback {
 
@@ -77,34 +78,36 @@ public class LocationDetailsActivityFragment extends BaseGoogleFitFragment imple
         }
     }
 
+    @Override
     protected DataReadRequest.Builder buildFitQuery(){
         DataReadRequest.Builder builder = new DataReadRequest.Builder()
                 .read(DataType.TYPE_LOCATION_SAMPLE);
         return builder;
     }
 
-    public void onTimeRangeSelected(int timeRange){
+    @Override
+    protected void queryGoogleFit(int timeRange) {
         mProgressBar.setVisibility(View.VISIBLE);
         fitHelper.queryFitnessData(
                 Utils.getStartTimeRange(timeRange),
                 new Date().getTime(),
-                buildFitQuery());
+                buildFitQuery(),
+                GoogleFitService.QUERY_DEFAULT);
     }
 
     @Subscribe
-    public void onGoogleApiReady(MessageEvent event){
-        if(event.getMessage().equals(GoogleFitHelper.EVENT_GOOGLEAPICLIENT_READY)){
-            mProgressBar.setVisibility(View.VISIBLE);
-            fitHelper.queryFitnessData(
-                    Utils.getStartTimeRange(Constants.RANGE_DAY),
-                    new Date().getTime(),
-                    buildFitQuery());
-        }
+    public void onEvent(TimeRangeSelectedEvent event){
+        queryGoogleFit(event.getTimeRange());
     }
 
     @Subscribe
-    public void onQueryFitnessResult(List<DataSet> dataSets){
-        for (DataSet dataSet : dataSets) {
+    public void onEvent(GoogleApiClientConnectedEvent event){
+        queryGoogleFit(Constants.RANGE_DAY);
+    }
+
+    @Subscribe
+    public void onEvent(FitDataSetsResultEvent event){
+        for (DataSet dataSet : event.getDataSets()) {
             if (dataSet.getDataType().equals(DataType.TYPE_LOCATION_SAMPLE)) {
                 if(locations == null){
                     locations = new ArrayList<LatLng>();
@@ -123,7 +126,7 @@ public class LocationDetailsActivityFragment extends BaseGoogleFitFragment imple
     }
 
     private void updateUI(){
-        if(mMap != null){
+        if(mMap != null && locations != null && !locations.isEmpty()){
             if(mProvider == null){
                 mProvider = new HeatmapTileProvider.Builder().data(locations).build();
                 mOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mProvider));

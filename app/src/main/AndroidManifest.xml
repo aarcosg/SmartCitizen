@@ -25,26 +25,22 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
-            android:name=".activity.MainActivity"
-            android:label="@string/app_name">
+            android:name=".activity.LoginActivity"
+            android:label="@string/title_activity_login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".activity.MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="us.idinfor.smartcitizen.activity.MainActivity" />
+            android:name=".activity.MainActivity"
+            android:label="@string/app_name">
         </activity>
         <activity
-            android:name=".activity.LoginActivity"
-            android:label="@string/title_activity_login"
+            android:name=".activity.SettingsActivity"
+            android:label="@string/title_activity_settings"
             android:parentActivityName=".activity.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -67,6 +63,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="us.idinfor.smartcitizen.activity.MainActivity" />
         </activity>
+        <activity
+            android:name=".activity.ActivityDetailsActivity"
+            android:label="@string/title_activity_activity_details"
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="us.idinfor.smartcitizen.activity.MainActivity" />
+        </activity>
 
         <receiver android:name=".receiver.OnBootReceiver">
             <intent-filter>
@@ -82,15 +87,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDT6YeYiTQ-08f0t211M8Fe0dLj8lf9BJU" />
 
-        <activity
-            android:name=".activity.ActivityDetailsActivity"
-            android:label="@string/title_activity_activity_details"
-            android:parentActivityName=".activity.MainActivity"
-            android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="us.idinfor.smartcitizen.activity.MainActivity" />
-        </activity>
     </application>
 
 </manifest>
