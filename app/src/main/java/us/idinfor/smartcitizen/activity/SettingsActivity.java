@@ -29,6 +29,7 @@ import us.idinfor.smartcitizen.HermesCitizenSyncUtils;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.asynctask.UploadDataHermesCitizenAsyncTask;
+import us.idinfor.smartcitizen.event.FitBucketsResultEvent;
 import us.idinfor.smartcitizen.event.FitDataSetsResultEvent;
 import us.idinfor.smartcitizen.model.ActivitySegmentFit;
 import us.idinfor.smartcitizen.model.LocationSampleFit;
@@ -145,11 +146,22 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                 HermesCitizenSyncUtils.dataSetsToLocationSampleList(result.getDataSets()))
                                 .execute();
                         break;
+                }
+            } else {
+                Toast.makeText(context, "Internet unavailable", Toast.LENGTH_LONG).show();
+            }
+        }
+
+        @Subscribe
+        public void onFitDataResult(FitBucketsResultEvent result){
+            if (Utils.isInternetAvailable(context)) {
+                String username = prefs.getString(Constants.PROPERTY_USER_NAME,"");
+                switch (result.getQueryType()){
                     case GoogleFitService.QUERY_ACTIVITIES:
                         new UploadDataHermesCitizenAsyncTask<ActivitySegmentFit>(
                                 context,
                                 prefs.getString(Constants.PROPERTY_USER_NAME,""),
-                                HermesCitizenSyncUtils.dataSetsToActivitySegmentList(result.getDataSets()))
+                                HermesCitizenSyncUtils.bucketsToActivitySegmentList(result.getBuckets()))
                                 .execute();
                         break;
                 }

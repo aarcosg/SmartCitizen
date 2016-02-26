@@ -27,7 +27,7 @@ import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
-import us.idinfor.smartcitizen.fragment.HomeFragment;
+import us.idinfor.smartcitizen.fragment.FitnessFragment;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -137,7 +137,7 @@ public class MainActivity extends BaseActivity
                 fragment = LocationFragment.newInstance();
                 break;*/
             case R.id.navigation_home:
-                fragment = HomeFragment.newInstance();
+                fragment = FitnessFragment.newInstance();
                 //FitnessActivity.launch(this);
                 break;
             case R.id.navigation_settings:

@@ -3,6 +3,7 @@ package us.idinfor.smartcitizen;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
@@ -109,5 +110,17 @@ public class Utils {
         cal.set(Calendar.MINUTE,0);
         cal.set(Calendar.SECOND,0);
         return cal;
+    }
+
+    public static Drawable getFitnessProgresBarDrawable(Context context, Integer progress){
+        Integer drawable = R.drawable.fitness_progress_bar_100;
+        if(progress >= 0 && progress < 25){
+            drawable = R.drawable.fitness_progress_bar_25;
+        }else if(progress >= 25 && progress < 75){
+            drawable = R.drawable.fitness_progress_bar_25_75;
+        }else if(progress >=75 && progress < 100){
+            drawable = R.drawable.fitness_progress_bar_75;
+        }
+        return ContextCompat.getDrawable(context,drawable);
     }
 }

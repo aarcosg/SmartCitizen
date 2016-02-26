@@ -6,25 +6,13 @@
     android:padding="@dimen/activity_vertical_margin"
     android:background="?selectableItemBackground">
 
-<!--    <ImageView
-        android:id="@+id/icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="@dimen/item_margin"
-        android:src="@drawable/ic_activity_default_24dp"
-        android:tint="@android:color/white"
-        android:padding="2dp"
-        android:background="@color/accent"
-        android:elevation="3dp"/>-->
-
     <com.makeramen.roundedimageview.RoundedImageView
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_marginRight="@dimen/item_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:padding="2dp"
         android:src="@drawable/ic_activity_still"
         app:riv_oval="true"

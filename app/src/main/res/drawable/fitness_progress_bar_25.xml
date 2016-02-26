@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape>
+            <corners android:radius="@dimen/radius_progress_bar" />
+            <solid android:color="@color/background_progress_bar"/>
+        </shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape>
+                <corners android:radius="@dimen/radius_progress_bar" />
+                <solid android:color="@color/fitness_progress_25"/>
+            </shape>
+        </clip>
+    </item>
+</layer-list>

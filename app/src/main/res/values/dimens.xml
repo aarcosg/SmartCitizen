@@ -12,4 +12,6 @@
     <dimen name="divider_height">1dp</dimen>
     <dimen name="divider_left_margin">72dp</dimen>
     <dimen name="activity_details_icon_size">16dp</dimen>
+    <dimen name="radius_progress_bar">8dp</dimen>
+    <dimen name="border_width_progress_bar">1dp</dimen>
 </resources>

@@ -25,8 +25,8 @@ import us.idinfor.smartcitizen.model.LocationSampleFit;
 public class HermesCitizenApi {
 
     private static final String TAG = HermesCitizenApi.class.getCanonicalName();
-    private static final String HOST_URL = "http://10.141.0.50:8080/HermesWeb/webresources/hermes.citizen.";
-    //private static final String HOST_URL = "https://www.hermescitizen.us.es/HermesWeb/webresources/hermes.citizen.";
+    //private static final String HOST_URL = "http://10.141.0.50:8080/HermesWeb/webresources/hermes.citizen.";
+    private static final String HOST_URL = "https://www.hermescitizen.us.es/HermesWeb/webresources/hermes.citizen.";
     private static final String USER_ENDPOINT = HOST_URL + "person/existsUser/";
     private static final String CONTEXT_ENDPOINT = HOST_URL + "context/create";
     private static final String LOCATION_ENDPOINT = HOST_URL + "context/createLocation";

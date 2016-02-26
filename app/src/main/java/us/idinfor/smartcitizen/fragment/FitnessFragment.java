@@ -63,12 +63,12 @@ import us.idinfor.smartcitizen.model.StepCountDeltaFit;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link HomeFragment#newInstance} factory method to
+ * Use the {@link FitnessFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class HomeFragment extends BaseGoogleFitFragment implements OnMapReadyCallback {
+public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReadyCallback {
 
-    private static final String TAG = HomeFragment.class.getCanonicalName();
+    private static final String TAG = FitnessFragment.class.getCanonicalName();
 
     @Bind(R.id.progressBar)
     ProgressBar mProgressBar;
@@ -90,27 +90,31 @@ public class HomeFragment extends BaseGoogleFitFragment implements OnMapReadyCal
     Button mActivityDetailsBtn;
     @Bind(R.id.locationDetailsBtn)
     Button mLocationDetailsBtn;
+    @Bind(R.id.stepsProgress)
+    ProgressBar mStepsProgress;
+    @Bind(R.id.distanceProgress)
+    ProgressBar mDistanceProgress;
+    @Bind(R.id.caloriesProgress)
+    ProgressBar mCaloriesProgress;
 
     private SharedPreferences prefs;
     private GoogleMap mMap;
-    private boolean isMapReady;
 
     private PolygonOptions boundingBoxPolygon;
     private LatLng boundingBoxCenter;
     private LatLngBounds bounds;
-    private boolean isBoundingBoxReady;
 
     List<ActivitySummaryFit> activities = new ArrayList<>();
     private ActivityDetails activityDetails;
 
-    public static HomeFragment newInstance() {
-        HomeFragment fragment = new HomeFragment();
+    public static FitnessFragment newInstance() {
+        FitnessFragment fragment = new FitnessFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
     }
 
-    public HomeFragment() {
+    public FitnessFragment() {
         // Required empty public constructor
     }
 
@@ -123,18 +127,16 @@ public class HomeFragment extends BaseGoogleFitFragment implements OnMapReadyCal
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        View view = inflater.inflate(R.layout.fragment_fitness, container, false);
         ButterKnife.bind(this, view);
 
         mDate.setText(DateUtils.formatDateTime(getContext(),
                 System.currentTimeMillis(),
                 DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_ABBREV_MONTH));
 
-        isBoundingBoxReady = isMapReady =  false;
-
         if (mMap == null) {
             SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-            mapFragment.getMapAsync(HomeFragment.this);
+            mapFragment.getMapAsync(FitnessFragment.this);
         }
 
         return view;
@@ -143,7 +145,7 @@ public class HomeFragment extends BaseGoogleFitFragment implements OnMapReadyCal
     @Override
     public void onResume() {
         super.onResume();
-        if(fitHelper.getGoogleApiClient().isConnected()){
+        if (fitHelper.getGoogleApiClient().isConnected()) {
             queryGoogleFit(Constants.RANGE_DAY);
         }
     }
@@ -155,12 +157,12 @@ public class HomeFragment extends BaseGoogleFitFragment implements OnMapReadyCal
     }
 
     @OnClick(R.id.locationDetailsBtn)
-    public void openLocationDetailsActivity(){
+    public void openLocationDetailsActivity() {
         LocationDetailsActivity.launch(getActivity());
     }
 
     @OnClick(R.id.activityDetailsBtn)
-    public void openActivityDetailsActivity(){
+    public void openActivityDetailsActivity() {
         ActivityDetailsActivity.launch(getActivity());
     }
 
@@ -170,31 +172,19 @@ public class HomeFragment extends BaseGoogleFitFragment implements OnMapReadyCal
         mMap = map;
         mMap.getUiSettings().setAllGesturesEnabled(false);
         mMap.getUiSettings().setZoomControlsEnabled(true);
-        if(ContextCompat.checkSelfPermission(getContext(),Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
         }
-        /*mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-            @Override
-            public void onMapLoaded() {
-                isMapReady = true;
-                if (isBoundingBoxReady) {
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 12));
-                    mMap.moveCamera(CameraUpdateFactory.zoomOut());
-                    mMap.addPolygon(boundingBoxPolygon);
-                    isBoundingBoxReady = false;
-                }
-            }
-        });*/
     }
 
     @Override
-    protected DataReadRequest.Builder buildFitQuery(){
+    protected DataReadRequest.Builder buildFitQuery() {
         DataReadRequest.Builder builder = new DataReadRequest.Builder()
                 .aggregate(DataType.TYPE_LOCATION_SAMPLE, DataType.AGGREGATE_LOCATION_BOUNDING_BOX)
                 .aggregate(DataType.TYPE_ACTIVITY_SEGMENT, DataType.AGGREGATE_ACTIVITY_SUMMARY)
                 .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                .aggregate(DataType.TYPE_HEART_RATE_BPM,DataType.AGGREGATE_HEART_RATE_SUMMARY)
-                .aggregate(DataType.TYPE_CALORIES_EXPENDED,DataType.AGGREGATE_CALORIES_EXPENDED)
+                .aggregate(DataType.TYPE_HEART_RATE_BPM, DataType.AGGREGATE_HEART_RATE_SUMMARY)
+                .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
                 .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA)
                 .bucketByTime(1, TimeUnit.DAYS);
         return builder;
@@ -211,12 +201,12 @@ public class HomeFragment extends BaseGoogleFitFragment implements OnMapReadyCal
     }
 
     @Subscribe
-    public void onEvent(GoogleApiClientConnectedEvent event){
+    public void onEvent(GoogleApiClientConnectedEvent event) {
         queryGoogleFit(Constants.RANGE_DAY);
     }
 
     @Subscribe
-    public void onEvent(FitBucketsResultEvent event){
+    public void onEvent(FitBucketsResultEvent event) {
         activityDetails = new ActivityDetails();
         // Single bucket expected
         for (DataSet dataSet : event.getBuckets().get(0).getDataSets()) {
@@ -321,28 +311,45 @@ public class HomeFragment extends BaseGoogleFitFragment implements OnMapReadyCal
         NumberFormat df = DecimalFormat.getInstance();
         df.setMaximumFractionDigits(2);
 
-        if(activityDetails.getStepCountDelta() != null){
-            mStepsCounter.setText(activityDetails.getStepCountDelta().getSteps().toString());
+        if (activityDetails.getStepCountDelta() != null) {
+            Integer steps = activityDetails.getStepCountDelta().getSteps();
+            Double stepsGoal = Double.valueOf(getString(R.string.default_steps_goal));
+            Integer stepsProgress = (int)(steps * 100 / stepsGoal);
+            mStepsCounter.setText(steps.toString());
+            mStepsProgress.setProgressDrawable(Utils.getFitnessProgresBarDrawable(getActivity(),stepsProgress));
+            mStepsProgress.setProgress(stepsProgress > 100 ? 100 : stepsProgress);
+
         }
 
-        if(activityDetails.getDistanceDelta() != null){
-            mDistanceCounter.setText(df.format(activityDetails.getDistanceDelta().getDistance()));
+        if (activityDetails.getDistanceDelta() != null) {
+            Float distance = activityDetails.getDistanceDelta().getDistance();
+            Float distanceGoal = Float.valueOf(getString(R.string.default_distance_goal));
+            Integer distanceProgress = (int)(distance * 100 / distanceGoal);
+            mDistanceCounter.setText(df.format(distance));
+            mDistanceProgress.setProgressDrawable(Utils.getFitnessProgresBarDrawable(getActivity(),distanceProgress));
+            mDistanceProgress.setProgress(distanceProgress > 100 ? 100 : distanceProgress);
         }
 
-        if(activityDetails.getCaloriesExpended() != null){
-            mCaloriesCounter.setText(df.format(activityDetails.getCaloriesExpended().getCalories()));
+        if (activityDetails.getCaloriesExpended() != null) {
+            Float calories = activityDetails.getCaloriesExpended().getCalories();
+            Float caloriesGoal = Float.valueOf(getString(R.string.default_calories_goal));
+            Integer caloriesProgress = (int)(calories * 100 / caloriesGoal);
+            mCaloriesCounter.setText(df.format(calories));
+            mCaloriesProgress.setProgressDrawable(Utils.getFitnessProgresBarDrawable(getActivity(),caloriesProgress));
+            mCaloriesProgress.setProgress(caloriesProgress > 100 ? 100 : caloriesProgress);
+
         }
 
-        if(activities != null && !activities.isEmpty()){
+        if (activities != null && !activities.isEmpty()) {
             mTimePager.setAdapter(new ActivityDurationPagerAdapter(this.getContext(), activities));
             mTimePagerIndicator.setViewPager(mTimePager);
         }
 
-        if(activityDetails.getHeartRateSummary() != null){
+        if (activityDetails.getHeartRateSummary() != null) {
             mHeartRateCounter.setText(Integer.valueOf(activityDetails.getHeartRateSummary().getAverage().intValue()).toString());
         }
 
-        if(activityDetails.getLocationBoundingBox() != null){
+        if (activityDetails.getLocationBoundingBox() != null) {
             boundingBoxPolygon = new PolygonOptions()
                     .add(activityDetails.getLocationBoundingBox().getLocationNE(), //ne
                             new LatLng(activityDetails.getLocationBoundingBox().getLatitudeNE(), activityDetails.getLocationBoundingBox().getLongitudeSW()),
@@ -359,13 +366,11 @@ public class HomeFragment extends BaseGoogleFitFragment implements OnMapReadyCal
             }
             bounds = boundsBuilder.build();
             boundingBoxCenter = SphericalUtil.interpolate(activityDetails.getLocationBoundingBox().getLocationSW(), activityDetails.getLocationBoundingBox().getLocationNE(), 0.5);
-            if (mMap != null/* && isMapReady*/) {
+            if (mMap != null) {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 12));
                 mMap.moveCamera(CameraUpdateFactory.zoomOut());
                 mMap.addPolygon(boundingBoxPolygon);
-            }/*else{
-                isBoundingBoxReady = true;
-            }*/
+            }
         }
         mProgressBar.setVisibility(View.GONE);
     }
