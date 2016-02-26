@@ -28,4 +28,11 @@
         <item name="strokeColor">@android:color/transparent</item>
         <item name="strokeWidth">1dp</item>
     </style>
+
+    <style name="FitnessStatsProgressBar" parent="@android:style/Widget.ProgressBar.Horizontal">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/item_margin</item>
+        <item name="android:layout_marginTop">@dimen/item_margin</item>
+        <item name="android:max">100</item>
+    </style>
 </resources>

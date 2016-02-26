@@ -171,7 +171,7 @@ public class GoogleFitService implements GoogleApiClient.ConnectionCallbacks,
             if (dataReadResult.getBuckets().size() > 0) {
                 Log.i(TAG, "Number of returned buckets of DataSets is: "
                         + dataReadResult.getBuckets().size());
-                EventBus.getDefault().post(new FitBucketsResultEvent(dataReadResult.getBuckets()));
+                EventBus.getDefault().post(new FitBucketsResultEvent(queryType,dataReadResult.getBuckets()));
             } else if (dataReadResult.getDataSets().size() > 0) {
                 Log.i(TAG, "Number of returned DataSets is: "
                         + dataReadResult.getDataSets().size());

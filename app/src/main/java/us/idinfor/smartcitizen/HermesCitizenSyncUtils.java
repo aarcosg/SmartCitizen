@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
@@ -58,7 +59,9 @@ public class HermesCitizenSyncUtils {
             endTime = Utils.getLastMinuteOfDay(endTime).getTimeInMillis();
         }
         DataReadRequest.Builder builder = new DataReadRequest.Builder()
-                .read(DataType.TYPE_ACTIVITY_SEGMENT);
+                .aggregate(DataType.TYPE_ACTIVITY_SEGMENT,DataType.AGGREGATE_ACTIVITY_SUMMARY)
+                .bucketByActivitySegment(1,TimeUnit.MINUTES);
+                //.read(DataType.TYPE_ACTIVITY_SEGMENT);
         fitHelper.queryFitnessData(
                 startTime,
                 endTime,
@@ -112,50 +115,55 @@ public class HermesCitizenSyncUtils {
 
         // Set end time of current location as start time of next location
         if(locations != null && !locations.isEmpty()){
-            for(int i = 0; i < locations.size() - 2 ; i++){
+            for(int i = 0; i < locations.size() - 1 ; i++){
                 LocationSampleFit current = locations.get(i);
                 LocationSampleFit next = locations.get(i+1);
                 current.setEndTime(next.getStartTime());
                 locations.set(i,current);
+                //Log.i(TAG, "\tStart: " + dateFormat.format(current.getStartTime()));
+                //Log.i(TAG, "\tEnd: " + dateFormat.format(current.getEndTime()));
             }
         }
         return locations;
     }
 
-    public static List<ActivitySegmentFit> dataSetsToActivitySegmentList(List<DataSet> dataSets){
+    public static List<ActivitySegmentFit> bucketsToActivitySegmentList(List<Bucket> buckets){
         SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
-        for (DataSet dataSet : dataSets) {
-            Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
-            for (DataPoint dp : dataSet.getDataPoints()) {
-                Log.i(TAG, "Data point:");
-                Log.i(TAG, "\tType: " + dp.getDataType().getName());
-                Log.i(TAG, "\tStart: " + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
-                Log.i(TAG, "\tEnd: " + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
-                for (Field field : dp.getDataType().getFields()) {
-                    Log.i(TAG, "\tField: " + field.getName());
-                    if (field.getName().equalsIgnoreCase("activity")) {
-                        Log.i(TAG, " Value: " + dp.getValue(field).asActivity());
-                    } else if (field.getName().equalsIgnoreCase("duration")) {
-                        Log.i(TAG, " Value: " + dp.getValue(field).asInt() / 1000 / 60 + " minutes");
-                    } else {
-                        Log.i(TAG, " Value: " + dp.getValue(field));
+        for (Bucket bucket : buckets) {
+            for (DataSet dataSet : bucket.getDataSets()) {
+                Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
+                for (DataPoint dp : dataSet.getDataPoints()) {
+                    Log.i(TAG, "Data point:");
+                    Log.i(TAG, "\tType: " + dp.getDataType().getName());
+                    Log.i(TAG, "\tStart: " + dateFormat.format(dp.getStartTime(TimeUnit.MILLISECONDS)));
+                    Log.i(TAG, "\tEnd: " + dateFormat.format(dp.getEndTime(TimeUnit.MILLISECONDS)));
+                    for (Field field : dp.getDataType().getFields()) {
+                        Log.i(TAG, "\tField: " + field.getName());
+                        if (field.getName().equalsIgnoreCase("activity")) {
+                            Log.i(TAG, " Value: " + dp.getValue(field).asActivity());
+                        } else if (field.getName().equalsIgnoreCase("duration")) {
+                            Log.i(TAG, " Value: " + dp.getValue(field).asInt() / 1000 / 60 + " minutes");
+                        } else {
+                            Log.i(TAG, " Value: " + dp.getValue(field));
+                        }
                     }
                 }
             }
         }
 
-        List<ActivitySegmentFit> activities = null;
-        for (DataSet dataSet : dataSets) {
-            if (dataSet.getDataType().equals(DataType.TYPE_ACTIVITY_SEGMENT)) {
-                activities = new ArrayList<>();
-                for (DataPoint dp : dataSet.getDataPoints()) {
-                    if (dp.getDataType().equals(DataType.TYPE_ACTIVITY_SEGMENT)) {
-                        ActivitySegmentFit activity = new ActivitySegmentFit(
-                                dp.getValue(Field.FIELD_ACTIVITY).asActivity(),
-                                dp.getStartTime(TimeUnit.MILLISECONDS),
-                                dp.getEndTime(TimeUnit.MILLISECONDS)
-                        );
-                        activities.add(activity);
+        List<ActivitySegmentFit> activities = activities = new ArrayList<>();
+        for (Bucket bucket : buckets) {
+            for (DataSet dataSet : bucket.getDataSets()) {
+                if (dataSet.getDataType().equals(DataType.AGGREGATE_ACTIVITY_SUMMARY)) {
+                    for (DataPoint dp : dataSet.getDataPoints()) {
+                        if (dp.getDataType().equals(DataType.AGGREGATE_ACTIVITY_SUMMARY)) {
+                            ActivitySegmentFit activity = new ActivitySegmentFit(
+                                    dp.getValue(Field.FIELD_ACTIVITY).asActivity(),
+                                    dp.getStartTime(TimeUnit.MILLISECONDS),
+                                    dp.getEndTime(TimeUnit.MILLISECONDS)
+                            );
+                            activities.add(activity);
+                        }
                     }
                 }
             }

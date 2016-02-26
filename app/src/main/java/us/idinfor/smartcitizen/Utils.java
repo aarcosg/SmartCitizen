@@ -110,4 +110,18 @@ public class Utils {
         cal.set(Calendar.SECOND,0);
         return cal;
     }
+
+    public static int getProgressBarColorByProgress(Context context, Integer progress){
+        int color = R.color.fitness_progress_default;
+        if(progress >= 0 && progress < 25){
+            color = R.color.fitness_progress_25;
+        }else if(progress >= 25 && progress < 75){
+            color = R.color.fitness_progress_25_75;
+        }else if(progress >=75 && progress < 100){
+            color = R.color.fitness_progress_75;
+        }else if(progress == 100){
+            color = R.color.fitness_progress_100;
+        }
+        return ContextCompat.getColor(context,color);
+    }
 }

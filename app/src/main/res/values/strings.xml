@@ -122,4 +122,7 @@
     <string name="pref_title_upload_locations_hermes">Send locations to Hermes Citizen server</string>
     <string name="pref_title_upload_activities_hermes">Send activities to Hermes Citizen server</string>
     <string name="pref_title_version">Version</string>
+    <string name="default_steps_goal">8000</string>
+    <string name="default_distance_goal">8</string>
+    <string name="default_calories_goal">3000</string>
 </resources>

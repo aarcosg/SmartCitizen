@@ -7,8 +7,8 @@ import java.util.List;
 
 public class FitDataSetsResultEvent {
 
-    int queryType;
-    List<DataSet> dataSets;
+    private int queryType;
+    private List<DataSet> dataSets;
 
     public FitDataSetsResultEvent(int queryType, List<DataSet> dataSets) {
         this.queryType = queryType;
