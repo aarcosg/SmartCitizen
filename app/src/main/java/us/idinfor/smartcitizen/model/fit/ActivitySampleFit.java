@@ -1,7 +1,7 @@
 package us.idinfor.smartcitizen.model.fit;
 
 
-public class ActivitySampleFit {
+public class ActivitySampleFit implements ISampleFit{
 
     String name;
     Float confidence;
