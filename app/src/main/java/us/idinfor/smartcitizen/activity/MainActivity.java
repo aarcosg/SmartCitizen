@@ -7,7 +7,6 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
-import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -43,8 +42,6 @@ public class MainActivity extends BaseActivity
     NavigationView mNavigationView;
     @Bind(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
-    @Nullable
-    @Bind(R.id.username)
     TextView mUserNameTV;
 
     private final Handler mDrawerActionHandler = new Handler();
@@ -71,10 +68,6 @@ public class MainActivity extends BaseActivity
         Toolbar toolbar = buildActionBarToolbar(getString(R.string.app_name),false);
 
         mTitle = mDrawerTitle = getTitle();
-
-        if(mUserNameTV != null){
-            mUserNameTV.setText(prefs.getString(Constants.PROPERTY_USER_NAME,getString(R.string.user)));
-        }
 
         // Read in the flag indicating whether or not the user has demonstrated awareness of the drawer.
         mUserLearnedDrawer = prefs.getBoolean(Constants.PROPERTY_DRAWER_LEARNED, false);
@@ -124,6 +117,11 @@ public class MainActivity extends BaseActivity
         // per the navigation drawer design guidelines.
         if(!mUserLearnedDrawer){
             mDrawerLayout.openDrawer(GravityCompat.START);
+        }
+
+        mUserNameTV = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.username);
+        if(mUserNameTV != null){
+            mUserNameTV.setText(prefs.getString(Constants.PROPERTY_USER_NAME,getString(R.string.user)));
         }
     }
 

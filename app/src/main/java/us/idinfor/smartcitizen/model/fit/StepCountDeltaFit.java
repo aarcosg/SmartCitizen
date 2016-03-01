@@ -1,4 +1,4 @@
-package us.idinfor.smartcitizen.model;
+package us.idinfor.smartcitizen.model.fit;
 
 
 public class StepCountDeltaFit {

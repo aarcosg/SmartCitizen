@@ -1,17 +1,19 @@
-package us.idinfor.smartcitizen.model;
+package us.idinfor.smartcitizen.model.fit;
 
 
-public class ActivitySegmentFit {
+public class ActivitySampleFit {
 
     String name;
+    Float confidence;
     Long startTime;
     Long endTime;
 
-    public ActivitySegmentFit() {
+    public ActivitySampleFit() {
     }
 
-    public ActivitySegmentFit( String name, Long startTime, Long endTime) {
+    public ActivitySampleFit(String name, Float confidence, Long startTime, Long endTime) {
         this.name = name;
+        this.confidence = confidence;
         this.startTime = startTime;
         this.endTime = endTime;
     }
@@ -24,7 +26,15 @@ public class ActivitySegmentFit {
         this.name = name;
     }
 
-    public long getStartTime() {
+    public Float getConfidence() {
+        return confidence;
+    }
+
+    public void setConfidence(Float confidence) {
+        this.confidence = confidence;
+    }
+
+    public Long getStartTime() {
         return startTime;
     }
 
@@ -32,7 +42,7 @@ public class ActivitySegmentFit {
         this.startTime = startTime;
     }
 
-    public long getEndTime() {
+    public Long getEndTime() {
         return endTime;
     }
 

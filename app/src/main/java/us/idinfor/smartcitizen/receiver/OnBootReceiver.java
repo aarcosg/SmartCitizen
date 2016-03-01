@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
+import us.idinfor.smartcitizen.service.SyncHermesCitizenService;
+
 public class OnBootReceiver extends WakefulBroadcastReceiver {
 
     private static final String TAG = OnBootReceiver.class.getCanonicalName();
@@ -15,6 +17,7 @@ public class OnBootReceiver extends WakefulBroadcastReceiver {
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             //Start activity recognition
             //ActivityRecognitionService.actionStartActivityRecognition(context.getApplicationContext());
+            SyncHermesCitizenService.startSync(context);
         }
     }
 }

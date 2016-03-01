@@ -20,19 +20,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+
+import java.util.ArrayList;
 
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.GoogleFitService;
 import us.idinfor.smartcitizen.HermesCitizenSyncUtils;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
-import us.idinfor.smartcitizen.asynctask.UploadDataHermesCitizenAsyncTask;
 import us.idinfor.smartcitizen.event.FitBucketsResultEvent;
 import us.idinfor.smartcitizen.event.FitDataSetsResultEvent;
-import us.idinfor.smartcitizen.model.ActivitySegmentFit;
-import us.idinfor.smartcitizen.model.LocationSampleFit;
+import us.idinfor.smartcitizen.model.fit.ActivitySegmentFit;
+import us.idinfor.smartcitizen.model.fit.LocationSampleFit;
+import us.idinfor.smartcitizen.service.SyncHermesCitizenService;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
@@ -91,6 +92,21 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     return true;
                 }
             });
+            Preference syncDataPref = findPreference(Constants.PROPERTY_SYNC_DATA_HERMES);
+            syncDataPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    boolean syncData = (boolean) newValue;
+                    if(syncData){
+                        SyncHermesCitizenService.startSync(context);
+                        Toast.makeText(context, "Sync with Hermes Citizen started", Toast.LENGTH_LONG).show();
+                    }else{
+                        SyncHermesCitizenService.stopSync(context);
+                        Toast.makeText(context, "Sync with Hermes Citizen stopped", Toast.LENGTH_LONG).show();
+                    }
+                    return true;
+                }
+            });
             Preference sendLocationsPref = findPreference("upload_locations");
             sendLocationsPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
@@ -122,7 +138,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return layout;
         }
 
-        @Override
+        /*@Override
         public void onStart() {
             super.onStart();
             EventBus.getDefault().register(this);
@@ -132,19 +148,35 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public void onStop() {
             EventBus.getDefault().unregister(this);
             super.onStop();
-        }
+        }*/
 
         @Subscribe
         public void onFitDataResult(FitDataSetsResultEvent result){
             if (Utils.isInternetAvailable(context)) {
                 String username = prefs.getString(Constants.PROPERTY_USER_NAME,"");
                 switch (result.getQueryType()){
-                    case GoogleFitService.QUERY_LOCATIONS:
-                        new UploadDataHermesCitizenAsyncTask<LocationSampleFit>(
+                    case GoogleFitService.QUERY_LOCATIONS_HERMES:
+                        /*List<List<LocationSampleFit>> locationsByDay =
+                                Utils.splitSamplesInDays(
+                                HermesCitizenSyncUtils.dataSetsToLocationSampleList(result.getDataSets()));
+                        for(List<LocationSampleFit> locations : locationsByDay){
+                            new UploadDataHermesCitizenAsyncTask<LocationSampleFit>(
+                                    context,
+                                    prefs.getString(Constants.PROPERTY_USER_NAME,""),
+                                    locations)
+                                    .execute();
+                        }*/
+                        /*new UploadDataHermesCitizenAsyncTask<LocationSampleFit>(
                                 context,
-                                prefs.getString(Constants.PROPERTY_USER_NAME,""),
+                                username,
                                 HermesCitizenSyncUtils.dataSetsToLocationSampleList(result.getDataSets()))
                                 .execute();
+                                */
+                        SyncHermesCitizenService.startActionUploadLocations(
+                                context,
+                                username,
+                                (ArrayList<LocationSampleFit>)HermesCitizenSyncUtils.dataSetsToLocationSampleList(result.getDataSets())
+                        );
                         break;
                 }
             } else {
@@ -157,13 +189,28 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             if (Utils.isInternetAvailable(context)) {
                 String username = prefs.getString(Constants.PROPERTY_USER_NAME,"");
                 switch (result.getQueryType()){
-                    case GoogleFitService.QUERY_ACTIVITIES:
-                        new UploadDataHermesCitizenAsyncTask<ActivitySegmentFit>(
+                    case GoogleFitService.QUERY_ACTIVITIES_HERMES:
+                        /*List<List<ActivitySegmentFit>> activitiesByDay =
+                                Utils.splitSamplesInDays(
+                                        HermesCitizenSyncUtils.bucketsToActivitySegmentList(result.getBuckets()));
+                        for(List<ActivitySegmentFit> activities : activitiesByDay){
+                            new UploadDataHermesCitizenAsyncTask<ActivitySegmentFit>(
+                                    context,
+                                    username,
+                                    activities)
+                                    .execute();
+                        }*/
+                        /*new UploadDataHermesCitizenAsyncTask<ActivitySegmentFit>(
                                 context,
                                 prefs.getString(Constants.PROPERTY_USER_NAME,""),
                                 HermesCitizenSyncUtils.bucketsToActivitySegmentList(result.getBuckets()))
                                 .execute();
-                        break;
+                        break;*/
+                        SyncHermesCitizenService.startActionUploadActivities(
+                                context,
+                                username,
+                                (ArrayList<ActivitySegmentFit>)HermesCitizenSyncUtils.bucketsToActivitySegmentList(result.getBuckets())
+                        );
                 }
             } else {
                 Toast.makeText(context, "Internet unavailable", Toast.LENGTH_LONG).show();

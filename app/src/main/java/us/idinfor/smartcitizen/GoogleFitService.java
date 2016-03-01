@@ -36,8 +36,8 @@ public class GoogleFitService implements GoogleApiClient.ConnectionCallbacks,
     public static final String EXTRA_FAILED_STATUS_CODE = "extra_failed_status_code";
     public static final String EXTRA_FAILED_INTENT = "extra_failed_intent";
     public static final int QUERY_DEFAULT = 0;
-    public static final int QUERY_LOCATIONS = 1;
-    public static final int QUERY_ACTIVITIES = 2;
+    public static final int QUERY_LOCATIONS_HERMES = 1;
+    public static final int QUERY_ACTIVITIES_HERMES = 2;
     private GoogleApiClient mGoogleApiClient = null;
     private Context mContext;
     private static GoogleFitService instance = null;

@@ -1,6 +1,12 @@
 package us.idinfor.smartcitizen.model;
 
 
+import us.idinfor.smartcitizen.model.fit.ActivitySummaryFit;
+import us.idinfor.smartcitizen.model.fit.CaloriesExpendedFit;
+import us.idinfor.smartcitizen.model.fit.DistanceDeltaFit;
+import us.idinfor.smartcitizen.model.fit.LocationBoundingBoxFit;
+import us.idinfor.smartcitizen.model.fit.StepCountDeltaFit;
+
 public class ActivityDetails {
 
     ActivitySummaryFit activitySummary;

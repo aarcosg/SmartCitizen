@@ -1,27 +1,27 @@
-package us.idinfor.smartcitizen.model;
+package us.idinfor.smartcitizen.model.fit;
 
 
-public class DistanceDeltaFit {
+public class CaloriesExpendedFit {
 
-    Float distance;
+    Float calories;
     Long startTime;
     Long endTime;
 
-    public DistanceDeltaFit() {
+    public CaloriesExpendedFit() {
     }
 
-    public DistanceDeltaFit(Float distance, Long startTime, Long endTime) {
-        this.distance = distance;
+    public CaloriesExpendedFit(Float calories, Long startTime, Long endTime) {
+        this.calories = calories;
         this.startTime = startTime;
         this.endTime = endTime;
     }
 
-    public Float getDistance() {
-        return distance;
+    public Float getCalories() {
+        return calories;
     }
 
-    public void setDistance(Float distance) {
-        this.distance = distance;
+    public void setCalories(Float calories) {
+        this.calories = calories;
     }
 
     public Long getStartTime() {
