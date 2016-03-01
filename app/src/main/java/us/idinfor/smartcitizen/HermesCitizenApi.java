@@ -4,31 +4,30 @@ package us.idinfor.smartcitizen;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 import us.idinfor.smartcitizen.json.JsonContext;
 import us.idinfor.smartcitizen.json.JsonContextList;
 import us.idinfor.smartcitizen.json.JsonListHermes;
-import us.idinfor.smartcitizen.model.ActivitySegmentFit;
+import us.idinfor.smartcitizen.model.fit.ActivitySegmentFit;
 import us.idinfor.smartcitizen.model.Context;
-import us.idinfor.smartcitizen.model.LocationSampleFit;
+import us.idinfor.smartcitizen.model.fit.LocationSampleFit;
 
 public class HermesCitizenApi {
 
     private static final String TAG = HermesCitizenApi.class.getCanonicalName();
-    //private static final String HOST_URL = "http://10.141.0.50:8080/HermesWeb/webresources/hermes.citizen.";
-    private static final String HOST_URL = "https://www.hermescitizen.us.es/HermesWeb/webresources/hermes.citizen.";
+    private static final String HOST_URL = "http://10.141.0.50:8080/HermesWeb/webresources/hermes.citizen.";
+    //private static final String HOST_URL = "https://www.hermescitizen.us.es/HermesWeb/webresources/hermes.citizen.";
     private static final String USER_ENDPOINT = HOST_URL + "person/existsUser/";
     private static final String CONTEXT_ENDPOINT = HOST_URL + "context/create";
+    private static final String CONTEXT_RANGE_ENDPOINT = HOST_URL + "context/createRange";
     private static final String LOCATION_ENDPOINT = HOST_URL + "context/createLocation";
     private static final String ACTIVITY_ENDPOINT = HOST_URL + "context/createActivity";
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
@@ -101,20 +100,19 @@ public class HermesCitizenApi {
         String responseString = "";
 
         JsonListHermes<LocationSampleFit> jsonList = new JsonListHermes<LocationSampleFit>(username,locations);
-        Type type = new TypeToken<JsonListHermes<LocationSampleFit>>(){}.getType();
-        String json = new Gson().toJson(jsonList, type);
+        String json = new Gson().toJson(jsonList, JsonListHermes.class);
 
         RequestBody formBody = RequestBody.create(JSON,json);
         Request request = new Request.Builder()
-                .url(CONTEXT_ENDPOINT)
+                //.url(CONTEXT_ENDPOINT)
+                .url(CONTEXT_RANGE_ENDPOINT)
                 .post(formBody)
                 .build();
         try{
             Response response = client.newCall(request).execute();
-            Log.e(TAG,response.toString());
+            Log.i(TAG,response.toString());
             responseString = response.body().string();
             response.body().close();
-
         }catch (Exception e){
             Log.e(TAG,"Exception: " + e);
         }
@@ -131,20 +129,19 @@ public class HermesCitizenApi {
         String responseString = "";
 
         JsonListHermes<ActivitySegmentFit> jsonList = new JsonListHermes<ActivitySegmentFit>(username,activities);
-        Type type = new TypeToken<JsonListHermes<ActivitySegmentFit>>(){}.getType();
-        String json = new Gson().toJson(jsonList, type);
+        String json = new Gson().toJson(jsonList, JsonListHermes.class);
 
         RequestBody formBody = RequestBody.create(JSON,json);
         Request request = new Request.Builder()
-                .url(CONTEXT_ENDPOINT)
+                //.url(CONTEXT_ENDPOINT)
+                .url(CONTEXT_RANGE_ENDPOINT)
                 .post(formBody)
                 .build();
         try{
             Response response = client.newCall(request).execute();
-            Log.e(TAG,response.toString());
+            Log.i(TAG,response.toString());
             responseString = response.body().string();
             response.body().close();
-
         }catch (Exception e){
             Log.e(TAG,"Exception: " + e);
         }

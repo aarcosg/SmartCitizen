@@ -23,6 +23,8 @@ import android.widget.Toast;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.util.List;
+
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.GoogleFitService;
 import us.idinfor.smartcitizen.HermesCitizenSyncUtils;
@@ -31,8 +33,8 @@ import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.asynctask.UploadDataHermesCitizenAsyncTask;
 import us.idinfor.smartcitizen.event.FitBucketsResultEvent;
 import us.idinfor.smartcitizen.event.FitDataSetsResultEvent;
-import us.idinfor.smartcitizen.model.ActivitySegmentFit;
-import us.idinfor.smartcitizen.model.LocationSampleFit;
+import us.idinfor.smartcitizen.model.fit.ActivitySegmentFit;
+import us.idinfor.smartcitizen.model.fit.LocationSampleFit;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
@@ -140,9 +142,19 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 String username = prefs.getString(Constants.PROPERTY_USER_NAME,"");
                 switch (result.getQueryType()){
                     case GoogleFitService.QUERY_LOCATIONS:
+                        /*List<List<LocationSampleFit>> locationsByDay =
+                                Utils.splitSamplesInDays(
+                                HermesCitizenSyncUtils.dataSetsToLocationSampleList(result.getDataSets()));
+                        for(List<LocationSampleFit> locations : locationsByDay){
+                            new UploadDataHermesCitizenAsyncTask<LocationSampleFit>(
+                                    context,
+                                    prefs.getString(Constants.PROPERTY_USER_NAME,""),
+                                    locations)
+                                    .execute();
+                        }*/
                         new UploadDataHermesCitizenAsyncTask<LocationSampleFit>(
                                 context,
-                                prefs.getString(Constants.PROPERTY_USER_NAME,""),
+                                username,
                                 HermesCitizenSyncUtils.dataSetsToLocationSampleList(result.getDataSets()))
                                 .execute();
                         break;
@@ -158,12 +170,22 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 String username = prefs.getString(Constants.PROPERTY_USER_NAME,"");
                 switch (result.getQueryType()){
                     case GoogleFitService.QUERY_ACTIVITIES:
-                        new UploadDataHermesCitizenAsyncTask<ActivitySegmentFit>(
+                        List<List<ActivitySegmentFit>> activitiesByDay =
+                                Utils.splitSamplesInDays(
+                                        HermesCitizenSyncUtils.bucketsToActivitySegmentList(result.getBuckets()));
+                        for(List<ActivitySegmentFit> activities : activitiesByDay){
+                            new UploadDataHermesCitizenAsyncTask<ActivitySegmentFit>(
+                                    context,
+                                    username,
+                                    activities)
+                                    .execute();
+                        }
+                        /*new UploadDataHermesCitizenAsyncTask<ActivitySegmentFit>(
                                 context,
                                 prefs.getString(Constants.PROPERTY_USER_NAME,""),
                                 HermesCitizenSyncUtils.bucketsToActivitySegmentList(result.getBuckets()))
                                 .execute();
-                        break;
+                        break;*/
                 }
             } else {
                 Toast.makeText(context, "Internet unavailable", Toast.LENGTH_LONG).show();

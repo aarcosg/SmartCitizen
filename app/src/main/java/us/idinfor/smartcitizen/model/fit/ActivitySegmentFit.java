@@ -1,7 +1,7 @@
-package us.idinfor.smartcitizen.model;
+package us.idinfor.smartcitizen.model.fit;
 
 
-public class ActivitySegmentFit {
+public class ActivitySegmentFit implements ISampleFit {
 
     String name;
     Long startTime;
@@ -24,7 +24,7 @@ public class ActivitySegmentFit {
         this.name = name;
     }
 
-    public long getStartTime() {
+    public Long getStartTime() {
         return startTime;
     }
 
@@ -32,7 +32,7 @@ public class ActivitySegmentFit {
         this.startTime = startTime;
     }
 
-    public long getEndTime() {
+    public Long getEndTime() {
         return endTime;
     }
 

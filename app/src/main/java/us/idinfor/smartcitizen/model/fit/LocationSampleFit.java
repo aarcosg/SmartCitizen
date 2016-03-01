@@ -1,7 +1,7 @@
-package us.idinfor.smartcitizen.model;
+package us.idinfor.smartcitizen.model.fit;
 
 
-public class LocationSampleFit {
+public class LocationSampleFit implements ISampleFit {
 
     Float latitude; // (degrees)
     Float longitude; // (degrees)
