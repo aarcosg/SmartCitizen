@@ -43,7 +43,6 @@ public class ActivitySegmentFit implements Parcelable {
         this.endTime = endTime;
     }
 
-
     @Override
     public int describeContents() {
         return 0;

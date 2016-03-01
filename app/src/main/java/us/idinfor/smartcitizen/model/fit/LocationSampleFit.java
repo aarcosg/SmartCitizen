@@ -4,7 +4,7 @@ package us.idinfor.smartcitizen.model.fit;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class LocationSampleFit implements Parcelable{
+public class LocationSampleFit implements Parcelable {
 
     Float latitude; // (degrees)
     Float longitude; // (degrees)
@@ -62,7 +62,6 @@ public class LocationSampleFit implements Parcelable{
     public void setEndTime(Long endTime) {
         this.endTime = endTime;
     }
-
 
     @Override
     public int describeContents() {
