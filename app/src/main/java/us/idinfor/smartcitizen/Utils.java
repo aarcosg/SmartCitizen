@@ -194,7 +194,7 @@ public class Utils {
             drawable = R.drawable.fitness_progress_bar_25;
         }else if(progress >= 25 && progress < 75){
             drawable = R.drawable.fitness_progress_bar_25_75;
-        }else if(progress >=75 && progress < 100){
+        }else if(progress >= 75 && progress < 100){
             drawable = R.drawable.fitness_progress_bar_75;
         }
         return ContextCompat.getDrawable(context,drawable);

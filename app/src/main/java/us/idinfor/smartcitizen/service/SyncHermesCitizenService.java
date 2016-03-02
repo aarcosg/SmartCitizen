@@ -163,7 +163,7 @@ public class SyncHermesCitizenService extends Service {
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.ASYNC)
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onFitDataResult(FitDataSetsResultEvent result){
         switch (result.getQueryType()){
             case GoogleFitService.QUERY_LOCATIONS_HERMES:
@@ -179,7 +179,7 @@ public class SyncHermesCitizenService extends Service {
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.ASYNC)
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onFitDataResult(FitBucketsResultEvent result){
         switch (result.getQueryType()){
             case GoogleFitService.QUERY_ACTIVITIES_HERMES:

@@ -63,6 +63,8 @@ public class Constants {
 
     public static final String ACTIVITY_SLEEP_PREFIX = "sleep";
 
+    public static final int SIGNUP_RESOLUTION_REQUEST = 100;
+
 
 
     /**

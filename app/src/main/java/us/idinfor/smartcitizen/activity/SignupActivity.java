@@ -16,60 +16,49 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
+import android.widget.Toast;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import us.idinfor.smartcitizen.Constants;
+import us.idinfor.smartcitizen.HermesCitizenApi;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
-import us.idinfor.smartcitizen.asynctask.UserLoginAsyncTask;
-
+import us.idinfor.smartcitizen.asynctask.UserRegisterAsyncTask;
 
 /**
- * A login screen that offers login via email
+ * A login screen that offers login via email/password.
  */
-public class LoginActivity extends BaseActivity {
+public class SignupActivity extends BaseActivity {
 
-    private static final String TAG = LoginActivity.class.getCanonicalName();
+    private static final String TAG = SignupActivity.class.getCanonicalName();
+    @Bind(R.id.signupProgressBar)
+    ProgressBar mSignupProgressBar;
+    @Bind(R.id.userEdit)
+    EditText mUserEdit;
+    @Bind(R.id.passwordEdit)
+    EditText mPasswordEdit;
+    @Bind(R.id.signupBtn)
+    Button mSignupBtn;
+    @Bind(R.id.signupForm)
+    ScrollView mSignupForm;
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private UserLoginAsyncTask mAuthTask = null;
+    private UserRegisterAsyncTask mAuthTask = null;
 
-    @Bind(R.id.loginProgressBar)
-    ProgressBar mLoginProgressBar;
-    @Bind(R.id.userEdit)
-    EditText mUserEdit;
-    @Bind(R.id.loginBtn)
-    Button mLoginBtn;
-    @Bind(R.id.signupBtn)
-    Button mSignupBtn;
-    @Bind(R.id.loginForm)
-    ScrollView mLoginForm;
 
     private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!Utils.checkPlayServices(this)) {
-            finish();
-        }
         prefs = Utils.getSharedPreferences(this);
-        if (!TextUtils.isEmpty(prefs.getString(Constants.PROPERTY_USER_NAME, ""))) {
-            MainActivity.launch(this);
-            finish();
-        }
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_signup);
         ButterKnife.bind(this);
-        buildActionBarToolbar(getString(R.string.title_activity_login), false);
-    }
-
-    @OnClick(R.id.signupBtn)
-    public void openSignup(){
-        SignupActivity.launch(this);
+        buildActionBarToolbar(getString(R.string.title_activity_signup), true);
     }
 
     /**
@@ -77,8 +66,8 @@ public class LoginActivity extends BaseActivity {
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    @OnClick(R.id.loginBtn)
-    public void attemptLogin() {
+    @OnClick(R.id.signupBtn)
+    public void attemptSignup() {
 
         if (mAuthTask != null) {
             return;
@@ -86,9 +75,11 @@ public class LoginActivity extends BaseActivity {
 
         // Reset errors.
         mUserEdit.setError(null);
+        mPasswordEdit.setError(null);
 
         // Store values at the time of the login attempt.
         final String username = mUserEdit.getText().toString();
+        final String password = mPasswordEdit.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -97,6 +88,22 @@ public class LoginActivity extends BaseActivity {
         if (TextUtils.isEmpty(username)) {
             mUserEdit.setError(getString(R.string.error_field_required));
             focusView = mUserEdit;
+            cancel = true;
+        } else if(!username.matches("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+                + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$")){
+            mUserEdit.setError(getString(R.string.error_email_pattern));
+            focusView = mUserEdit;
+            cancel = true;
+        }
+
+        // Check for a valid password
+        if (TextUtils.isEmpty(password)) {
+            mPasswordEdit.setError(getString(R.string.error_field_required));
+            focusView = mPasswordEdit;
+            cancel = true;
+        } else if(!password.matches("^[a-zA-Z0-9]*$")){
+            mPasswordEdit.setError(getString(R.string.error_password_pattern));
+            focusView = mPasswordEdit;
             cancel = true;
         }
 
@@ -108,20 +115,29 @@ public class LoginActivity extends BaseActivity {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginAsyncTask(username) {
+            mAuthTask = new UserRegisterAsyncTask(username,password) {
                 @Override
-                protected void onPostExecute(Boolean exists) {
+                protected void onPostExecute(Integer result) {
                     mAuthTask = null;
                     showProgress(false);
-                    if (exists) {
-                        prefs.edit()
-                                .putString(Constants.PROPERTY_USER_NAME, username)
-                                .apply();
-                        MainActivity.launch(LoginActivity.this);
-                        finish();
-                    } else {
-                        mUserEdit.setError(getString(R.string.error_user_not_found));
-                        mUserEdit.requestFocus();
+                    switch (result) {
+                        case HermesCitizenApi.RESPONSE_OK:
+                            Log.i(TAG,"User registered successfully");
+                            Toast.makeText(getApplicationContext(), "User signed up", Toast.LENGTH_LONG).show();
+                            prefs.edit()
+                                    .putString(Constants.PROPERTY_USER_NAME, username)
+                                    .apply();
+                            Intent returnIntent = new Intent();
+                            setResult(Activity.RESULT_OK,returnIntent);
+                            finish();
+                            break;
+                        case HermesCitizenApi.RESPONSE_ERROR_USER_NOT_REGISTERED:
+                            Log.e(TAG,"Error: User not registered");
+                            Toast.makeText(getApplicationContext(), "Error: User not registered", Toast.LENGTH_LONG).show();
+                            break;
+                        default:
+                            Log.e(TAG,"Unknown error");
+                            Toast.makeText(getApplicationContext(), "Unknown error", Toast.LENGTH_LONG).show();
                     }
                 }
 
@@ -132,19 +148,6 @@ public class LoginActivity extends BaseActivity {
                 }
             };
             mAuthTask.execute((Void) null);
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == Constants.SIGNUP_RESOLUTION_REQUEST){
-            if(resultCode == Activity.RESULT_OK){
-                Log.i(TAG,"@onActivityResult: Signup successful");
-                MainActivity.launch(this);
-                finish();
-            }else if(resultCode == Activity.RESULT_CANCELED){
-                Log.e(TAG,"@onActivityResult: Signup canceled");
-            }
         }
     }
 
@@ -159,37 +162,34 @@ public class LoginActivity extends BaseActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-            mLoginForm.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginForm.animate().setDuration(shortAnimTime).alpha(
+            mSignupForm.setVisibility(show ? View.GONE : View.VISIBLE);
+            mSignupForm.animate().setDuration(shortAnimTime).alpha(
                     show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    mLoginForm.setVisibility(show ? View.GONE : View.VISIBLE);
+                    mSignupForm.setVisibility(show ? View.GONE : View.VISIBLE);
                 }
             });
 
-            mLoginProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginProgressBar.animate().setDuration(shortAnimTime).alpha(
+            mSignupProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+            mSignupProgressBar.animate().setDuration(shortAnimTime).alpha(
                     show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    mLoginProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+                    mSignupProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
                 }
             });
         } else {
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
-            mLoginProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginForm.setVisibility(show ? View.GONE : View.VISIBLE);
+            mSignupProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+            mSignupForm.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
 
     public static void launch(Activity activity) {
-        Intent intent = new Intent(activity, LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        ActivityCompat.startActivity(activity, intent, null);
+        Intent intent = new Intent(activity, SignupActivity.class);
+        ActivityCompat.startActivityForResult(activity, intent, Constants.SIGNUP_RESOLUTION_REQUEST, null);
     }
 }
-
-
 
