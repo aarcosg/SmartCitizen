@@ -31,7 +31,7 @@ import java.util.Date;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.Constants;
-import us.idinfor.smartcitizen.GoogleFitService;
+import us.idinfor.smartcitizen.GoogleFitApi;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.event.FitDataSetsResultEvent;
@@ -92,7 +92,7 @@ public class LocationDetailsActivityFragment extends BaseGoogleFitFragment imple
                 Utils.getStartTimeRange(timeRange),
                 new Date().getTime(),
                 buildFitQuery(),
-                GoogleFitService.QUERY_DEFAULT);
+                GoogleFitApi.QUERY_DEFAULT);
     }
 
     @Subscribe

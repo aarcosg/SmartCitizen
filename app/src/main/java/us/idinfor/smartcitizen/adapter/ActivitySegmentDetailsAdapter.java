@@ -18,6 +18,7 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -80,7 +81,7 @@ public class ActivitySegmentDetailsAdapter extends RecyclerView.Adapter<Activity
         }
 
         // Start time
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
         holder.mStartTime.setText(dateFormat.format(new Date(activityDetails.getActivitySummary().getStartTime())));
 
         // Card background color

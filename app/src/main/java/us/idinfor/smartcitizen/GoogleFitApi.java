@@ -29,27 +29,25 @@ import us.idinfor.smartcitizen.event.FitBucketsResultEvent;
 import us.idinfor.smartcitizen.event.FitDataSetsResultEvent;
 import us.idinfor.smartcitizen.event.GoogleApiClientConnectedEvent;
 
-public class GoogleFitService implements GoogleApiClient.ConnectionCallbacks,
+public class GoogleFitApi implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private static final String TAG = GoogleFitService.class.getCanonicalName();
-    public static final String EXTRA_FAILED_STATUS_CODE = "extra_failed_status_code";
-    public static final String EXTRA_FAILED_INTENT = "extra_failed_intent";
+    private static final String TAG = GoogleFitApi.class.getCanonicalName();
     public static final int QUERY_DEFAULT = 0;
     public static final int QUERY_LOCATIONS_HERMES = 1;
     public static final int QUERY_ACTIVITIES_HERMES = 2;
     private GoogleApiClient mGoogleApiClient = null;
     private Context mContext;
-    private static GoogleFitService instance = null;
+    private static GoogleFitApi instance = null;
 
-    protected GoogleFitService(Context context){
+    protected GoogleFitApi(Context context){
         this.mContext = context;
         buildFitnessClient();
     }
 
-    public static GoogleFitService getInstance(Context context){
+    public static GoogleFitApi getInstance(Context context){
         if(instance == null){
-            instance = new GoogleFitService(context);
+            instance = new GoogleFitApi(context);
         }
         return instance;
     }

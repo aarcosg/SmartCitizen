@@ -1,7 +1,7 @@
-package us.idinfor.smartcitizen.model;
+package us.idinfor.smartcitizen.model.fit;
 
 
-public class HeartRateSummary {
+public class HeartRateSummaryFit {
 
     Float average;
     Float min;
@@ -9,10 +9,10 @@ public class HeartRateSummary {
     Long startTime;
     Long endTime;
 
-    public HeartRateSummary() {
+    public HeartRateSummaryFit() {
     }
 
-    public HeartRateSummary(Float average, Float min, Float max, Long startTime, Long endTime) {
+    public HeartRateSummaryFit(Float average, Float min, Float max, Long startTime, Long endTime) {
         this.average = average;
         this.min = min;
         this.max = max;

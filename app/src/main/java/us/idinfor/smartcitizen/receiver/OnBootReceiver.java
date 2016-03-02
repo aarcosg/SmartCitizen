@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
-import us.idinfor.smartcitizen.service.SyncHermesCitizenService;
+import us.idinfor.smartcitizen.hermes.HermesCitizenSyncService;
 
 public class OnBootReceiver extends WakefulBroadcastReceiver {
 
@@ -15,9 +15,7 @@ public class OnBootReceiver extends WakefulBroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Log.i(TAG, "onReceive");
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
-            //Start activity recognition
-            //ActivityRecognitionService.actionStartActivityRecognition(context.getApplicationContext());
-            SyncHermesCitizenService.startSync(context);
+            HermesCitizenSyncService.startSync(context);
         }
     }
 }

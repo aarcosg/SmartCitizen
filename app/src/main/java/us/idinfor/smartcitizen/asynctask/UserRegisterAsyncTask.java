@@ -3,7 +3,7 @@ package us.idinfor.smartcitizen.asynctask;
 
 import android.os.AsyncTask;
 
-import us.idinfor.smartcitizen.HermesCitizenApi;
+import us.idinfor.smartcitizen.hermes.HermesCitizenApi;
 
 public class UserRegisterAsyncTask extends AsyncTask<Void, Void, Integer> {
     private String email;

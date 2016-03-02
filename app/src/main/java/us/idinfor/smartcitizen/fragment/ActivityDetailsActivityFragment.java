@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.Constants;
-import us.idinfor.smartcitizen.GoogleFitService;
+import us.idinfor.smartcitizen.GoogleFitApi;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.adapter.ActivitySegmentDetailsAdapter;
@@ -87,8 +87,6 @@ public class ActivityDetailsActivityFragment extends BaseGoogleFitFragment {
     @Override
     protected DataReadRequest.Builder buildFitQuery(){
         DataReadRequest.Builder builder = new DataReadRequest.Builder()
-                //.read(DataType.TYPE_ACTIVITY_SEGMENT);
-                //.read(DataType.TYPE_LOCATION_SAMPLE);
                 .aggregate(DataType.TYPE_LOCATION_SAMPLE, DataType.AGGREGATE_LOCATION_BOUNDING_BOX)
                 .aggregate(DataType.TYPE_ACTIVITY_SEGMENT, DataType.AGGREGATE_ACTIVITY_SUMMARY)
                 .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
@@ -106,7 +104,7 @@ public class ActivityDetailsActivityFragment extends BaseGoogleFitFragment {
                 Utils.getStartTimeRange(timeRange),
                 new Date().getTime(),
                 buildFitQuery(),
-                GoogleFitService.QUERY_DEFAULT);
+                GoogleFitApi.QUERY_DEFAULT);
     }
 
     @Subscribe

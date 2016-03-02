@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -15,6 +14,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -60,10 +60,16 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        if (!Utils.checkPlayServices(this)) {
+            finish();
+        }
         prefs = Utils.getSharedPreferences(this);
+        if (TextUtils.isEmpty(prefs.getString(Constants.PROPERTY_USER_NAME, ""))) {
+            LoginActivity.launch(this);
+            finish();
+        }
+        setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        UDID = Settings.Secure.getString(getApplicationContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
         Toolbar toolbar = buildActionBarToolbar(getString(R.string.app_name),false);
 
@@ -128,15 +134,8 @@ public class MainActivity extends BaseActivity
     private void selectDrawerItem(int itemId) {
         Fragment fragment = null;
         switch (itemId) {
-            /*case R.id.navigation_home:
-                fragment = HomeFragment_old.newInstance();
-                break;
-            case R.id.navigation_location:
-                fragment = LocationFragment.newInstance();
-                break;*/
             case R.id.navigation_home:
                 fragment = FitnessFragment.newInstance();
-                //FitnessActivity.launch(this);
                 break;
             case R.id.navigation_settings:
                 SettingsActivity.launch(this);

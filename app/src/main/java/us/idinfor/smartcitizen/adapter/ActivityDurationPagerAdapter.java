@@ -68,7 +68,6 @@ public class ActivityDurationPagerAdapter extends PagerAdapter {
             mActivityDuration.setText(mContext.getString(R.string.duration_hour_min,hours,minutes));
         }
 
-
         container.addView(itemView);
 
         return itemView;

@@ -4,6 +4,7 @@ package us.idinfor.smartcitizen.model;
 import us.idinfor.smartcitizen.model.fit.ActivitySummaryFit;
 import us.idinfor.smartcitizen.model.fit.CaloriesExpendedFit;
 import us.idinfor.smartcitizen.model.fit.DistanceDeltaFit;
+import us.idinfor.smartcitizen.model.fit.HeartRateSummaryFit;
 import us.idinfor.smartcitizen.model.fit.LocationBoundingBoxFit;
 import us.idinfor.smartcitizen.model.fit.StepCountDeltaFit;
 
@@ -14,12 +15,12 @@ public class ActivityDetails {
     StepCountDeltaFit stepCountDelta;
     DistanceDeltaFit distanceDelta;
     CaloriesExpendedFit caloriesExpended;
-    HeartRateSummary heartRateSummary;
+    HeartRateSummaryFit heartRateSummary;
 
     public ActivityDetails() {
     }
 
-    public ActivityDetails(ActivitySummaryFit activitySummary, LocationBoundingBoxFit locationBoundingBox, StepCountDeltaFit stepCountDelta, DistanceDeltaFit distanceDelta, CaloriesExpendedFit caloriesExpended, HeartRateSummary heartRateSummary) {
+    public ActivityDetails(ActivitySummaryFit activitySummary, LocationBoundingBoxFit locationBoundingBox, StepCountDeltaFit stepCountDelta, DistanceDeltaFit distanceDelta, CaloriesExpendedFit caloriesExpended, HeartRateSummaryFit heartRateSummary) {
         this.activitySummary = activitySummary;
         this.locationBoundingBox = locationBoundingBox;
         this.stepCountDelta = stepCountDelta;
@@ -68,11 +69,11 @@ public class ActivityDetails {
         this.caloriesExpended = caloriesExpended;
     }
 
-    public HeartRateSummary getHeartRateSummary() {
+    public HeartRateSummaryFit getHeartRateSummary() {
         return heartRateSummary;
     }
 
-    public void setHeartRateSummary(HeartRateSummary heartRateSummary) {
+    public void setHeartRateSummary(HeartRateSummaryFit heartRateSummary) {
         this.heartRateSummary = heartRateSummary;
     }
 }

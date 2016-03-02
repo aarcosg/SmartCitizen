@@ -134,8 +134,6 @@
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_password_pattern">This password has forbidden chars</string>
     <string name="error_email_pattern">This email has forbidden chars</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
-    <string name="action_signup">Sign up</string>
+    <string name="signup">Sign up</string>
+    <string name="not_registered_signup_hint">Not registered? Sign up now</string>
 </resources>

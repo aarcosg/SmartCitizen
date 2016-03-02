@@ -13,7 +13,7 @@ import com.google.android.gms.fitness.request.DataReadRequest;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import us.idinfor.smartcitizen.GoogleFitService;
+import us.idinfor.smartcitizen.GoogleFitApi;
 import us.idinfor.smartcitizen.event.ConnectionResultEvent;
 
 public abstract class BaseGoogleFitFragment extends Fragment {
@@ -22,7 +22,7 @@ public abstract class BaseGoogleFitFragment extends Fragment {
     private static final String AUTH_PENDING = "auth_state_pending";
     private static final int REQUEST_OAUTH = 1;
     private boolean authInProgress = false;
-    protected GoogleFitService fitHelper;
+    protected GoogleFitApi fitHelper;
 
     protected abstract DataReadRequest.Builder buildFitQuery();
     protected abstract void queryGoogleFit(int timeRange);
@@ -33,7 +33,7 @@ public abstract class BaseGoogleFitFragment extends Fragment {
         if(savedInstanceState != null){
             authInProgress = savedInstanceState.getBoolean(AUTH_PENDING);
         }
-        fitHelper = GoogleFitService.getInstance(getActivity().getApplicationContext());
+        fitHelper = GoogleFitApi.getInstance(getActivity().getApplicationContext());
     }
 
     @Override

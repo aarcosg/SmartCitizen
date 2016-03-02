@@ -20,20 +20,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import org.greenrobot.eventbus.Subscribe;
-
-import java.util.ArrayList;
-
 import us.idinfor.smartcitizen.Constants;
-import us.idinfor.smartcitizen.GoogleFitService;
-import us.idinfor.smartcitizen.HermesCitizenSyncUtils;
+import us.idinfor.smartcitizen.GoogleFitApi;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
-import us.idinfor.smartcitizen.event.FitBucketsResultEvent;
-import us.idinfor.smartcitizen.event.FitDataSetsResultEvent;
-import us.idinfor.smartcitizen.model.fit.ActivitySegmentFit;
-import us.idinfor.smartcitizen.model.fit.LocationSampleFit;
-import us.idinfor.smartcitizen.service.SyncHermesCitizenService;
+import us.idinfor.smartcitizen.hermes.HermesCitizenSyncService;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
@@ -81,7 +72,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     boolean recordData = (boolean) newValue;
-                    GoogleFitService fitHelper = GoogleFitService.getInstance(context);
+                    GoogleFitApi fitHelper = GoogleFitApi.getInstance(context);
                     if(recordData){
                         fitHelper.subscribeFitnessData();
                         Toast.makeText(context, "Recording sensor data", Toast.LENGTH_LONG).show();
@@ -98,28 +89,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     boolean syncData = (boolean) newValue;
                     if(syncData){
-                        SyncHermesCitizenService.startSync(context);
+                        HermesCitizenSyncService.startSync(context);
                         Toast.makeText(context, "Sync with Hermes Citizen started", Toast.LENGTH_LONG).show();
                     }else{
-                        SyncHermesCitizenService.stopSync(context);
+                        HermesCitizenSyncService.stopSync(context);
                         Toast.makeText(context, "Sync with Hermes Citizen stopped", Toast.LENGTH_LONG).show();
                     }
-                    return true;
-                }
-            });
-            Preference sendLocationsPref = findPreference("upload_locations");
-            sendLocationsPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    HermesCitizenSyncUtils.queryLocationsFit(context);
-                    return true;
-                }
-            });
-            Preference sendActivitiesPref = findPreference("upload_activities");
-            sendActivitiesPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    HermesCitizenSyncUtils.queryActivitiesFit(context);
                     return true;
                 }
             });
@@ -136,85 +111,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 bar.setDisplayHomeAsUpEnabled(true);
             }
             return layout;
-        }
-
-        /*@Override
-        public void onStart() {
-            super.onStart();
-            EventBus.getDefault().register(this);
-        }
-
-        @Override
-        public void onStop() {
-            EventBus.getDefault().unregister(this);
-            super.onStop();
-        }*/
-
-        @Subscribe
-        public void onFitDataResult(FitDataSetsResultEvent result){
-            if (Utils.isInternetAvailable(context)) {
-                String username = prefs.getString(Constants.PROPERTY_USER_NAME,"");
-                switch (result.getQueryType()){
-                    case GoogleFitService.QUERY_LOCATIONS_HERMES:
-                        /*List<List<LocationSampleFit>> locationsByDay =
-                                Utils.splitSamplesInDays(
-                                HermesCitizenSyncUtils.dataSetsToLocationSampleList(result.getDataSets()));
-                        for(List<LocationSampleFit> locations : locationsByDay){
-                            new UploadDataHermesCitizenAsyncTask<LocationSampleFit>(
-                                    context,
-                                    prefs.getString(Constants.PROPERTY_USER_NAME,""),
-                                    locations)
-                                    .execute();
-                        }*/
-                        /*new UploadDataHermesCitizenAsyncTask<LocationSampleFit>(
-                                context,
-                                username,
-                                HermesCitizenSyncUtils.dataSetsToLocationSampleList(result.getDataSets()))
-                                .execute();
-                                */
-                        SyncHermesCitizenService.startActionUploadLocations(
-                                context,
-                                username,
-                                (ArrayList<LocationSampleFit>)HermesCitizenSyncUtils.dataSetsToLocationSampleList(result.getDataSets())
-                        );
-                        break;
-                }
-            } else {
-                Toast.makeText(context, "Internet unavailable", Toast.LENGTH_LONG).show();
-            }
-        }
-
-        @Subscribe
-        public void onFitDataResult(FitBucketsResultEvent result){
-            if (Utils.isInternetAvailable(context)) {
-                String username = prefs.getString(Constants.PROPERTY_USER_NAME,"");
-                switch (result.getQueryType()){
-                    case GoogleFitService.QUERY_ACTIVITIES_HERMES:
-                        /*List<List<ActivitySegmentFit>> activitiesByDay =
-                                Utils.splitSamplesInDays(
-                                        HermesCitizenSyncUtils.bucketsToActivitySegmentList(result.getBuckets()));
-                        for(List<ActivitySegmentFit> activities : activitiesByDay){
-                            new UploadDataHermesCitizenAsyncTask<ActivitySegmentFit>(
-                                    context,
-                                    username,
-                                    activities)
-                                    .execute();
-                        }*/
-                        /*new UploadDataHermesCitizenAsyncTask<ActivitySegmentFit>(
-                                context,
-                                prefs.getString(Constants.PROPERTY_USER_NAME,""),
-                                HermesCitizenSyncUtils.bucketsToActivitySegmentList(result.getBuckets()))
-                                .execute();
-                        break;*/
-                        SyncHermesCitizenService.startActionUploadActivities(
-                                context,
-                                username,
-                                (ArrayList<ActivitySegmentFit>)HermesCitizenSyncUtils.bucketsToActivitySegmentList(result.getBuckets())
-                        );
-                }
-            } else {
-                Toast.makeText(context, "Internet unavailable", Toast.LENGTH_LONG).show();
-            }
         }
     }
 

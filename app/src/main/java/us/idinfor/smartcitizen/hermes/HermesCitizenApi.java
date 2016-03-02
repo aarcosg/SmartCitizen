@@ -1,11 +1,10 @@
-package us.idinfor.smartcitizen;
+package us.idinfor.smartcitizen.hermes;
 
 
 import android.util.Log;
 
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -14,23 +13,17 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import us.idinfor.smartcitizen.json.JsonContext;
-import us.idinfor.smartcitizen.json.JsonContextList;
 import us.idinfor.smartcitizen.json.JsonListHermes;
-import us.idinfor.smartcitizen.model.Context;
 import us.idinfor.smartcitizen.model.fit.ActivitySegmentFit;
 import us.idinfor.smartcitizen.model.fit.LocationSampleFit;
 
 public class HermesCitizenApi {
 
     private static final String TAG = HermesCitizenApi.class.getCanonicalName();
-    private static final String HOST_URL = "http://10.141.0.50:8080/HermesWeb/webresources/hermes.citizen.";
-    //private static final String HOST_URL = "https://www.hermescitizen.us.es/HermesWeb/webresources/hermes.citizen.";
+    //private static final String HOST_URL = "http://10.141.0.50:8080/HermesWeb/webresources/hermes.citizen.";
+    private static final String HOST_URL = "https://www.hermescitizen.us.es/HermesWeb/webresources/hermes.citizen.";
     private static final String USER_ENDPOINT = HOST_URL + "person/existsUser/";
-    private static final String CONTEXT_ENDPOINT = HOST_URL + "context/create";
     private static final String CONTEXT_RANGE_ENDPOINT = HOST_URL + "context/createRange";
-    private static final String LOCATION_ENDPOINT = HOST_URL + "context/createLocation";
-    private static final String ACTIVITY_ENDPOINT = HOST_URL + "context/createActivity";
     private static final String REGISTER_USER_ENDPOINT = HOST_URL + "person/registerUser";
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
@@ -63,46 +56,6 @@ public class HermesCitizenApi {
         return Boolean.valueOf(responseString);
     }
 
-    public static Integer sendContexts(List<Context> contexts){
-        String responseString = "";
-        JsonContextList jsonContextList = new JsonContextList();
-        jsonContextList.setUser(contexts.get(0).getUser());
-        jsonContextList.setDeviceId(contexts.get(0).getDeviceId());
-        List<JsonContext> aux = new ArrayList<>(contexts.size());
-        for(us.idinfor.smartcitizen.model.Context c : contexts){
-            JsonContext jsonContext = new JsonContext(
-                    c.getActivity(),
-                    c.getLatitude(),
-                    c.getLongitude(),
-                    c.getTime().getTime());
-            aux.add(jsonContext);
-        }
-        jsonContextList.setContexts(aux);
-
-        String json = new Gson().toJson(jsonContextList, JsonContextList.class);
-
-        RequestBody formBody = RequestBody.create(JSON,json);
-        Request request = new Request.Builder()
-                .url(CONTEXT_ENDPOINT)
-                .post(formBody)
-                .build();
-        try{
-            Response response = client.newCall(request).execute();
-            Log.e(TAG,response.toString());
-            responseString = response.body().string();
-            response.body().close();
-
-        }catch (Exception e){
-            Log.e(TAG,"Exception: " + e);
-        }
-
-        try{
-            return Integer.valueOf(responseString);
-        }catch (NumberFormatException e){
-            return RESPONSE_ERROR_UNKNOWN;
-        }
-    }
-
 
     public static Integer uploadLocations(String username, List<LocationSampleFit> locations) {
         Log.i(TAG,"@uploadLocations");
@@ -113,7 +66,6 @@ public class HermesCitizenApi {
 
         RequestBody formBody = RequestBody.create(JSON,json);
         Request request = new Request.Builder()
-                //.url(CONTEXT_ENDPOINT)
                 .url(CONTEXT_RANGE_ENDPOINT)
                 .post(formBody)
                 .build();
@@ -143,7 +95,6 @@ public class HermesCitizenApi {
 
         RequestBody formBody = RequestBody.create(JSON,json);
         Request request = new Request.Builder()
-                //.url(CONTEXT_ENDPOINT)
                 .url(CONTEXT_RANGE_ENDPOINT)
                 .post(formBody)
                 .build();
@@ -188,19 +139,5 @@ public class HermesCitizenApi {
         }catch (NumberFormatException e){
             return RESPONSE_ERROR_UNKNOWN;
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> Integer uploadData(String username, List<T> items) {
-        Integer result = RESPONSE_ERROR_UNKNOWN;
-        if(items != null && !items.isEmpty()){
-            T item = items.get(0);
-            if(item instanceof LocationSampleFit) {
-                result = uploadLocations(username, (List<LocationSampleFit>) items);
-            } else if (item instanceof ActivitySegmentFit){
-                result = uploadActivities(username, (List<ActivitySegmentFit>) items);
-            }
-        }
-        return result;
     }
 }

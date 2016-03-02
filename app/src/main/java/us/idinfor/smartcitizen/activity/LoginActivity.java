@@ -54,15 +54,8 @@ public class LoginActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!Utils.checkPlayServices(this)) {
-            finish();
-        }
-        prefs = Utils.getSharedPreferences(this);
-        if (!TextUtils.isEmpty(prefs.getString(Constants.PROPERTY_USER_NAME, ""))) {
-            MainActivity.launch(this);
-            finish();
-        }
         setContentView(R.layout.activity_login);
+        prefs = Utils.getSharedPreferences(this);
         ButterKnife.bind(this);
         buildActionBarToolbar(getString(R.string.title_activity_login), false);
     }

@@ -1,9 +1,8 @@
-package us.idinfor.smartcitizen;
+package us.idinfor.smartcitizen.hermes;
 
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.google.android.gms.fitness.FitnessActivities;
 import com.google.android.gms.fitness.data.Bucket;
@@ -13,13 +12,14 @@ import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.request.DataReadRequest;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import us.idinfor.smartcitizen.Constants;
+import us.idinfor.smartcitizen.GoogleFitApi;
+import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.model.fit.ActivitySegmentFit;
 import us.idinfor.smartcitizen.model.fit.LocationSampleFit;
 
@@ -30,55 +30,36 @@ public class HermesCitizenSyncUtils {
 
     public static void queryLocationsFit(Context context){
         SharedPreferences prefs = Utils.getSharedPreferences(context);
-        GoogleFitService fitHelper = GoogleFitService.getInstance(context);
-        long startTime = prefs.getLong(Constants.PROPERTY_LAST_LOCATION_TIME_SENT,Utils.getStartTimeRange(Constants.RANGE_WEEK));
+        GoogleFitApi fitHelper = GoogleFitApi.getInstance(context);
+        long startTime = prefs.getLong(Constants.PROPERTY_LAST_LOCATION_TIME_SENT,Utils.getStartTimeRange(Constants.RANGE_DAY));
         long endTime = new Date().getTime();
         DataReadRequest.Builder builder = new DataReadRequest.Builder()
                 .read(DataType.TYPE_LOCATION_SAMPLE);
-        /*List<Pair<Long,Long>> ranges = Utils.splitTimeRangeInDays(startTime,endTime);
-        for(Pair<Long,Long> range : ranges){
-            fitHelper.queryFitnessData(
-                    range.first,
-                    range.second,
-                    builder,
-                    GoogleFitService.QUERY_LOCATIONS_HERMES);
-        }*/
         fitHelper.queryFitnessData(
                 startTime,
                 endTime,
                 builder,
-                GoogleFitService.QUERY_LOCATIONS_HERMES);
-        //prefs.edit().putLong(Constants.PROPERTY_LAST_LOCATION_TIME_SENT,endTime).apply();
+                GoogleFitApi.QUERY_LOCATIONS_HERMES);
     }
 
     public static void queryActivitiesFit(Context context){
         SharedPreferences prefs = Utils.getSharedPreferences(context);
-        GoogleFitService fitHelper = GoogleFitService.getInstance(context);
-        long startTime = prefs.getLong(Constants.PROPERTY_LAST_ACTIVITY_TIME_SENT,Utils.getStartTimeRange(Constants.RANGE_WEEK));
+        GoogleFitApi fitHelper = GoogleFitApi.getInstance(context);
+        long startTime = prefs.getLong(Constants.PROPERTY_LAST_ACTIVITY_TIME_SENT,Utils.getStartTimeRange(Constants.RANGE_DAY));
         long endTime = new Date().getTime();
         DataReadRequest.Builder builder = new DataReadRequest.Builder()
                 .aggregate(DataType.TYPE_ACTIVITY_SEGMENT,DataType.AGGREGATE_ACTIVITY_SUMMARY)
                 .bucketByActivitySegment(1,TimeUnit.MINUTES);
-        /*List<Pair<Long,Long>> ranges = Utils.splitTimeRangeInDays(startTime,endTime);
-        for(Pair<Long,Long> range : ranges){
-            fitHelper.queryFitnessData(
-                    range.first,
-                    range.second,
-                    builder,
-                    GoogleFitService.QUERY_ACTIVITIES_HERMES);
-        }*/
         fitHelper.queryFitnessData(
                 startTime,
                 endTime,
                 builder,
-                GoogleFitService.QUERY_ACTIVITIES_HERMES);
-
-        //prefs.edit().putLong(Constants.PROPERTY_LAST_ACTIVITY_TIME_SENT,endTime).apply();
+                GoogleFitApi.QUERY_ACTIVITIES_HERMES);
     }
 
     public static List<LocationSampleFit> dataSetsToLocationSampleList(List<DataSet> dataSets){
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT,Locale.getDefault());
-        /*for (DataSet dataSet : dataSets) {
+        /*SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT,Locale.getDefault());
+        for (DataSet dataSet : dataSets) {
             Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
             for (DataPoint dp : dataSet.getDataPoints()) {
                 Log.i(TAG, "Data point:");
@@ -97,6 +78,7 @@ public class HermesCitizenSyncUtils {
                 }
             }
         }*/
+
         List<LocationSampleFit> locations = null;
         for (DataSet dataSet : dataSets) {
             if (dataSet.getDataType().equals(DataType.TYPE_LOCATION_SAMPLE)) {
@@ -123,12 +105,12 @@ public class HermesCitizenSyncUtils {
                 LocationSampleFit next = locations.get(i+1);
                 current.setEndTime(next.getStartTime());
                 locations.set(i,current);
-                Log.i(TAG, "\tStart: " + dateFormat.format(current.getStartTime()));
+                /*Log.i(TAG, "\tStart: " + dateFormat.format(current.getStartTime()));
                 Log.i(TAG, "\tEnd: " + dateFormat.format(current.getEndTime()));
                 Log.i(TAG, "\tStartMillis: " + current.getStartTime());
                 Log.i(TAG, "\tEndMillis: " + current.getEndTime());
                 Log.i(TAG, "\tLatitude: " + current.getLatitude());
-                Log.i(TAG, "\tLongitude: " + current.getLongitude());
+                Log.i(TAG, "\tLongitude: " + current.getLongitude());*/
             }
             locations.get(locations.size() - 1).setEndTime(new Date().getTime());
         }
@@ -136,7 +118,7 @@ public class HermesCitizenSyncUtils {
     }
 
     public static List<ActivitySegmentFit> bucketsToActivitySegmentList(List<Bucket> buckets){
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
+        /*SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
         for (Bucket bucket : buckets) {
             for (DataSet dataSet : bucket.getDataSets()) {
                 Log.i(TAG, "Data returned for Data type: " + dataSet.getDataType().getName());
@@ -157,7 +139,7 @@ public class HermesCitizenSyncUtils {
                     }
                 }
             }
-        }
+        }*/
 
         List<ActivitySegmentFit> activities = activities = new ArrayList<>();
         for (Bucket bucket : buckets) {
@@ -177,18 +159,6 @@ public class HermesCitizenSyncUtils {
             }
         }
 
-        /*if(activities != null && !activities.isEmpty()){
-            for(int i = 0; i < locations.size() - 1 ; i++){
-                LocationSampleFit current = locations.get(i);
-                LocationSampleFit next = locations.get(i+1);
-                current.setEndTime(next.getStartTime());
-                locations.set(i,current);
-        }
-
-        for(ActivitySegmentFit activity : activities){
-
-        }*/
-
         if(!activities.isEmpty() && activities.size() > 1){
             ActivitySegmentFit lastActivity = activities.get(activities.size() - 1);
             if(lastActivity.getName().equals(FitnessActivities.UNKNOWN) ){
@@ -196,6 +166,7 @@ public class HermesCitizenSyncUtils {
                 activities.remove(activities.size() - 1);
             }
         }
+
         return activities;
     }
 }

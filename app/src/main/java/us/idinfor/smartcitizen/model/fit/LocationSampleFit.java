@@ -3,7 +3,7 @@ package us.idinfor.smartcitizen.model.fit;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class LocationSampleFit implements Parcelable, ISampleFit {
+public class LocationSampleFit implements Parcelable {
 
     Float latitude; // (degrees)
     Float longitude; // (degrees)

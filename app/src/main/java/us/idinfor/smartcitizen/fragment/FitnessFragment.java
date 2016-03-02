@@ -2,7 +2,6 @@ package us.idinfor.smartcitizen.fragment;
 
 
 import android.Manifest;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -45,7 +44,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import us.idinfor.smartcitizen.Constants;
-import us.idinfor.smartcitizen.GoogleFitService;
+import us.idinfor.smartcitizen.GoogleFitApi;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.activity.ActivityDetailsActivity;
@@ -54,10 +53,10 @@ import us.idinfor.smartcitizen.adapter.ActivityDurationPagerAdapter;
 import us.idinfor.smartcitizen.event.FitBucketsResultEvent;
 import us.idinfor.smartcitizen.event.GoogleApiClientConnectedEvent;
 import us.idinfor.smartcitizen.model.ActivityDetails;
-import us.idinfor.smartcitizen.model.HeartRateSummary;
 import us.idinfor.smartcitizen.model.fit.ActivitySummaryFit;
 import us.idinfor.smartcitizen.model.fit.CaloriesExpendedFit;
 import us.idinfor.smartcitizen.model.fit.DistanceDeltaFit;
+import us.idinfor.smartcitizen.model.fit.HeartRateSummaryFit;
 import us.idinfor.smartcitizen.model.fit.LocationBoundingBoxFit;
 import us.idinfor.smartcitizen.model.fit.StepCountDeltaFit;
 
@@ -97,9 +96,7 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
     @Bind(R.id.caloriesProgress)
     ProgressBar mCaloriesProgress;
 
-    private SharedPreferences prefs;
     private GoogleMap mMap;
-
     private PolygonOptions boundingBoxPolygon;
     private LatLng boundingBoxCenter;
     private LatLngBounds bounds;
@@ -121,7 +118,6 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        prefs = Utils.getSharedPreferences(getActivity());
     }
 
     @Override
@@ -197,7 +193,7 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
                 Utils.getStartTimeRange(timeRange),
                 new Date().getTime(),
                 buildFitQuery(),
-                GoogleFitService.QUERY_DEFAULT);
+                GoogleFitApi.QUERY_DEFAULT);
     }
 
     @Subscribe
@@ -292,7 +288,7 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
             if (dataSet.getDataType().equals(DataType.AGGREGATE_HEART_RATE_SUMMARY)) {
                 for (DataPoint dp : dataSet.getDataPoints()) {
                     if (dp.getDataType().equals(DataType.AGGREGATE_HEART_RATE_SUMMARY)) {
-                        HeartRateSummary heartRateSummary = new HeartRateSummary(
+                        HeartRateSummaryFit heartRateSummary = new HeartRateSummaryFit(
                                 dp.getValue(Field.FIELD_AVERAGE).asFloat(),
                                 dp.getValue(Field.FIELD_MIN).asFloat(),
                                 dp.getValue(Field.FIELD_MAX).asFloat(),
@@ -316,7 +312,7 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
             Double stepsGoal = Double.valueOf(getString(R.string.default_steps_goal));
             Integer stepsProgress = (int)(steps * 100 / stepsGoal);
             mStepsCounter.setText(steps.toString());
-            mStepsProgress.setProgressDrawable(Utils.getFitnessProgresBarDrawable(getActivity(),stepsProgress));
+            mStepsProgress.setProgressDrawable(Utils.getFitnessProgressBarDrawable(getActivity(),stepsProgress));
             mStepsProgress.setProgress(stepsProgress > 100 ? 100 : stepsProgress);
 
         }
@@ -326,7 +322,7 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
             Float distanceGoal = Float.valueOf(getString(R.string.default_distance_goal));
             Integer distanceProgress = (int)(distance * 100 / distanceGoal);
             mDistanceCounter.setText(df.format(distance));
-            mDistanceProgress.setProgressDrawable(Utils.getFitnessProgresBarDrawable(getActivity(),distanceProgress));
+            mDistanceProgress.setProgressDrawable(Utils.getFitnessProgressBarDrawable(getActivity(),distanceProgress));
             mDistanceProgress.setProgress(distanceProgress > 100 ? 100 : distanceProgress);
         }
 
@@ -335,7 +331,7 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
             Float caloriesGoal = Float.valueOf(getString(R.string.default_calories_goal));
             Integer caloriesProgress = (int)(calories * 100 / caloriesGoal);
             mCaloriesCounter.setText(df.format(calories));
-            mCaloriesProgress.setProgressDrawable(Utils.getFitnessProgresBarDrawable(getActivity(),caloriesProgress));
+            mCaloriesProgress.setProgressDrawable(Utils.getFitnessProgressBarDrawable(getActivity(),caloriesProgress));
             mCaloriesProgress.setProgress(caloriesProgress > 100 ? 100 : caloriesProgress);
 
         }

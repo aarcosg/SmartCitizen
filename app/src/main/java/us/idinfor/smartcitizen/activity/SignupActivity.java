@@ -22,14 +22,11 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import us.idinfor.smartcitizen.Constants;
-import us.idinfor.smartcitizen.HermesCitizenApi;
+import us.idinfor.smartcitizen.hermes.HermesCitizenApi;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.asynctask.UserRegisterAsyncTask;
 
-/**
- * A login screen that offers login via email/password.
- */
 public class SignupActivity extends BaseActivity {
 
     private static final String TAG = SignupActivity.class.getCanonicalName();
@@ -130,6 +127,10 @@ public class SignupActivity extends BaseActivity {
                             Intent returnIntent = new Intent();
                             setResult(Activity.RESULT_OK,returnIntent);
                             finish();
+                            break;
+                        case HermesCitizenApi.RESPONSE_ERROR_USER_EXISTS:
+                            Log.e(TAG,"Error: User already taken");
+                            Toast.makeText(getApplicationContext(), "Error: User already taken", Toast.LENGTH_LONG).show();
                             break;
                         case HermesCitizenApi.RESPONSE_ERROR_USER_NOT_REGISTERED:
                             Log.e(TAG,"Error: User not registered");

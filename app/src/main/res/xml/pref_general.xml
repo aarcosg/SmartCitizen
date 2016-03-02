@@ -1,9 +1,5 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-<!--    <SwitchPreference
-        android:key="activity_updates"
-        android:title="@string/pref_title_activity_recognition"
-        android:defaultValue="false" />-->
     <SwitchPreference
         android:key="record_data"
         android:title="@string/pref_title_record_data"
@@ -12,14 +8,6 @@
         android:key="sync_data_hermes"
         android:title="@string/pref_title_sync_data_hermes"
         android:defaultValue="false" />
-    <Preference
-        android:key="upload_locations"
-        android:title="@string/pref_title_upload_locations_hermes"
-        android:summary=""/>
-    <Preference
-        android:key="upload_activities"
-        android:title="@string/pref_title_upload_activities_hermes"
-        android:summary=""/>
     <Preference
         android:key="app_version"
         android:title="@string/pref_title_version"
