@@ -24,13 +24,12 @@ import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.asynctask.UserLoginAsyncTask;
 
-
 /**
- * A login screen that offers login via email
+ * A login screen that offers login via email/password.
  */
-public class LoginActivity extends BaseActivity {
+public class SignupActivity extends BaseActivity {
 
-    private static final String TAG = LoginActivity.class.getCanonicalName();
+    private static final String TAG = SignupActivity.class.getCanonicalName();
 
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -116,7 +115,7 @@ public class LoginActivity extends BaseActivity {
                         prefs.edit()
                                 .putString(Constants.PROPERTY_USER_NAME, username)
                                 .apply();
-                        MainActivity.launch(LoginActivity.this);
+                        //MainActivity.launch(LoginActivity.this);
                         finish();
                     } else {
                         mUserEdit.setError(getString(R.string.error_user_not_found));
@@ -171,11 +170,8 @@ public class LoginActivity extends BaseActivity {
     }
 
     public static void launch(Activity activity) {
-        Intent intent = new Intent(activity, LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        Intent intent = new Intent(activity, SignupActivity.class);
         ActivityCompat.startActivity(activity, intent, null);
     }
 }
-
-
 

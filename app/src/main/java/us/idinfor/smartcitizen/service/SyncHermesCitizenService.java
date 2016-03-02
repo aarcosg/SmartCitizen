@@ -163,7 +163,7 @@ public class SyncHermesCitizenService extends Service {
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.ASYNC)
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onFitDataResult(FitDataSetsResultEvent result){
         switch (result.getQueryType()){
             case GoogleFitService.QUERY_LOCATIONS_HERMES:
@@ -179,7 +179,7 @@ public class SyncHermesCitizenService extends Service {
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.ASYNC)
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onFitDataResult(FitBucketsResultEvent result){
         switch (result.getQueryType()){
             case GoogleFitService.QUERY_ACTIVITIES_HERMES:
@@ -201,7 +201,7 @@ public class SyncHermesCitizenService extends Service {
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, 1); // First time
-        long frequency = 1 * 60 * 1000;
+        long frequency = 1 * 30 * 1000;
 
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), frequency, getSyncPI(context));
 

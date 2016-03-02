@@ -4,6 +4,7 @@ package us.idinfor.smartcitizen;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.google.android.gms.fitness.FitnessActivities;
 import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
@@ -29,7 +30,7 @@ public class HermesCitizenSyncUtils {
     public static void queryLocationsFit(Context context){
         SharedPreferences prefs = Utils.getSharedPreferences(context);
         GoogleFitService fitHelper = GoogleFitService.getInstance(context);
-        long startTime = prefs.getLong(Constants.PROPERTY_LAST_LOCATION_TIME_SENT,Utils.getStartTimeRange(Constants.RANGE_WEEK));
+        long startTime = prefs.getLong(Constants.PROPERTY_LAST_LOCATION_TIME_SENT,Utils.getStartTimeRange(Constants.RANGE_MONTH));
         long endTime = new Date().getTime();
         DataReadRequest.Builder builder = new DataReadRequest.Builder()
                 .read(DataType.TYPE_LOCATION_SAMPLE);
@@ -121,9 +122,14 @@ public class HermesCitizenSyncUtils {
                 LocationSampleFit next = locations.get(i+1);
                 current.setEndTime(next.getStartTime());
                 locations.set(i,current);
-                //Log.i(TAG, "\tStart: " + dateFormat.format(current.getStartTime()));
-                //Log.i(TAG, "\tEnd: " + dateFormat.format(current.getEndTime()));
+                /*Log.i(TAG, "\tStart: " + dateFormat.format(current.getStartTime()));
+                Log.i(TAG, "\tEnd: " + dateFormat.format(current.getEndTime()));
+                Log.i(TAG, "\tStartMillis: " + current.getStartTime());
+                Log.i(TAG, "\tEndMillis: " + current.getEndTime());
+                Log.i(TAG, "\tLatitude: " + current.getLatitude());
+                Log.i(TAG, "\tLongitude: " + current.getLongitude());*/
             }
+            locations.get(locations.size() - 1).setEndTime(new Date().getTime());
         }
         return locations;
     }
@@ -167,6 +173,13 @@ public class HermesCitizenSyncUtils {
                         }
                     }
                 }
+            }
+        }
+        if(!activities.isEmpty() && activities.size() > 1){
+            ActivitySegmentFit lastActivity = activities.get(activities.size() - 1);
+            if(lastActivity.getName().equals(FitnessActivities.UNKNOWN) ){
+                activities.get(activities.size() - 2).setEndTime(lastActivity.getEndTime());
+                activities.remove(activities.size() - 1);
             }
         }
         return activities;

@@ -4,20 +4,21 @@ package us.idinfor.smartcitizen;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import us.idinfor.smartcitizen.json.JsonContext;
 import us.idinfor.smartcitizen.json.JsonContextList;
 import us.idinfor.smartcitizen.json.JsonListHermes;
-import us.idinfor.smartcitizen.model.fit.ActivitySegmentFit;
 import us.idinfor.smartcitizen.model.Context;
+import us.idinfor.smartcitizen.model.fit.ActivitySegmentFit;
 import us.idinfor.smartcitizen.model.fit.LocationSampleFit;
 
 public class HermesCitizenApi {
@@ -30,14 +31,21 @@ public class HermesCitizenApi {
     private static final String CONTEXT_RANGE_ENDPOINT = HOST_URL + "context/createRange";
     private static final String LOCATION_ENDPOINT = HOST_URL + "context/createLocation";
     private static final String ACTIVITY_ENDPOINT = HOST_URL + "context/createActivity";
+    private static final String REGISTER_USER_ENDPOINT = HOST_URL + "person/registerUser";
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     public static final int RESPONSE_ERROR_UNKNOWN = 0;
     public static final int RESPONSE_OK = 1;
     public static final int RESPONSE_ERROR_USER_NOT_FOUND = 2;
     public static final int RESPONSE_ERROR_DATA_NOT_UPLOADED = 3;
+    public static final int RESPONSE_ERROR_USER_EXISTS = 5;
+    public static final int RESPONSE_ERROR_USER_NOT_REGISTERED = 6;
 
-    private static final OkHttpClient client = new OkHttpClient();
+    private static final OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(15, TimeUnit.SECONDS)
+            .build();
 
     public static Boolean existsUser(String username){
         String responseString = "";
@@ -137,6 +145,33 @@ public class HermesCitizenApi {
         Request request = new Request.Builder()
                 //.url(CONTEXT_ENDPOINT)
                 .url(CONTEXT_RANGE_ENDPOINT)
+                .post(formBody)
+                .build();
+        try{
+            Response response = client.newCall(request).execute();
+            Log.i(TAG,response.toString());
+            responseString = response.body().string();
+            response.body().close();
+        }catch (Exception e){
+            Log.e(TAG,"Exception: " + e);
+        }
+
+        try{
+            return Integer.valueOf(responseString);
+        }catch (NumberFormatException e){
+            return RESPONSE_ERROR_UNKNOWN;
+        }
+    }
+
+    public static Integer registerUser(String email, String password) {
+        Log.i(TAG,"@registerUser");
+        String responseString = "";
+
+        String json = "{\"email\" : \"" + email +"\" , \"password\" : \"" + password + "\"}";
+
+        RequestBody formBody = RequestBody.create(JSON,json);
+        Request request = new Request.Builder()
+                .url(REGISTER_USER_ENDPOINT)
                 .post(formBody)
                 .build();
         try{
