@@ -201,7 +201,7 @@ public class SyncHermesCitizenService extends Service {
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MINUTE, 1); // First time
-        long frequency = 1 * 60 * 1000;
+        long frequency = 1 * 30 * 1000;
 
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), frequency, getSyncPI(context));
 
