@@ -195,7 +195,7 @@ public class HermesCitizenSyncService extends Service {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE, Constants.HERMES_SYNC_INTERVAL_IN_MINUTES); // First time
+        //calendar.add(Calendar.MINUTE, Constants.HERMES_SYNC_INTERVAL_IN_MINUTES); // First time
         long frequency = Constants.HERMES_SYNC_INTERVAL_IN_MINUTES * 60 * 1000;
 
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), frequency, getSyncPI(context));

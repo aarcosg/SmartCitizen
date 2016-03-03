@@ -1,13 +1,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <SwitchPreference
+    <!--<SwitchPreference
         android:key="record_data"
         android:title="@string/pref_title_record_data"
         android:defaultValue="false" />
     <SwitchPreference
         android:key="sync_data_hermes"
         android:title="@string/pref_title_sync_data_hermes"
-        android:defaultValue="false" />
+        android:defaultValue="false" />-->
     <Preference
         android:key="app_version"
         android:title="@string/pref_title_version"

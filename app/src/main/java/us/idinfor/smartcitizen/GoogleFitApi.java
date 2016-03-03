@@ -2,6 +2,7 @@ package us.idinfor.smartcitizen;
 
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -38,6 +39,7 @@ public class GoogleFitApi implements GoogleApiClient.ConnectionCallbacks,
     public static final int QUERY_ACTIVITIES_HERMES = 2;
     private GoogleApiClient mGoogleApiClient = null;
     private Context mContext;
+    private SharedPreferences prefs;
     private static GoogleFitApi instance = null;
 
     protected GoogleFitApi(Context context){
@@ -71,6 +73,7 @@ public class GoogleFitApi implements GoogleApiClient.ConnectionCallbacks,
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.i(TAG, "GoogleApiClient connected");
+        autoSubscribeFitnessData();
         EventBus.getDefault().post(new GoogleApiClientConnectedEvent());
     }
 
@@ -185,5 +188,15 @@ public class GoogleFitApi implements GoogleApiClient.ConnectionCallbacks,
         // the read request.
         Log.i(TAG,"History API read data");
         Fitness.HistoryApi.readData(mGoogleApiClient, request).setResultCallback(new DataReadResultCallback(queryType));
+    }
+
+    private void autoSubscribeFitnessData(){
+        if(prefs == null){
+            prefs = Utils.getSharedPreferences(mContext);
+        }
+        if(!prefs.getBoolean(Constants.PROPERTY_RECORD_DATA,false)){
+            subscribeFitnessData();
+            prefs.edit().putBoolean(Constants.PROPERTY_RECORD_DATA,true).apply();
+        }
     }
 }

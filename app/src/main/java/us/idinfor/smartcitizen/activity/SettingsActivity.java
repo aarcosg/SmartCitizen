@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -18,13 +17,10 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import us.idinfor.smartcitizen.Constants;
-import us.idinfor.smartcitizen.GoogleFitApi;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
-import us.idinfor.smartcitizen.hermes.HermesCitizenSyncService;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
@@ -67,7 +63,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             addPreferencesFromResource(R.xml.pref_general);
             setHasOptionsMenu(true);
             findPreference(Constants.PROPERTY_APP_VERSION).setSummary(version);
-            Preference recordDataPref = findPreference(Constants.PROPERTY_RECORD_DATA);
+            /*Preference recordDataPref = findPreference(Constants.PROPERTY_RECORD_DATA);
             recordDataPref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -97,7 +93,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     }
                     return true;
                 }
-            });
+            });*/
         }
 
         @Override

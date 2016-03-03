@@ -19,7 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.crashlytics.android.Crashlytics;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -27,6 +27,7 @@ import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.fragment.FitnessFragment;
+import us.idinfor.smartcitizen.hermes.HermesCitizenSyncService;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -50,10 +51,6 @@ public class MainActivity extends BaseActivity
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
 
-    private GoogleCloudMessaging mGCM;
-    private String mRegId;
-    private String UDID;
-
     private boolean mUserLearnedDrawer;
     private SharedPreferences prefs;
 
@@ -68,6 +65,13 @@ public class MainActivity extends BaseActivity
             LoginActivity.launch(this);
             finish();
         }
+
+        logFabricUser();
+
+        if(!Utils.isServiceRunning(this,HermesCitizenSyncService.class)){
+            HermesCitizenSyncService.startSync(this);
+        }
+
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
@@ -129,6 +133,10 @@ public class MainActivity extends BaseActivity
         if(mUserNameTV != null){
             mUserNameTV.setText(prefs.getString(Constants.PROPERTY_USER_NAME,getString(R.string.user)));
         }
+    }
+
+    private void logFabricUser() {
+        Crashlytics.setUserIdentifier(prefs.getString(Constants.PROPERTY_USER_NAME,getString(R.string.user)));
     }
 
     private void selectDrawerItem(int itemId) {
