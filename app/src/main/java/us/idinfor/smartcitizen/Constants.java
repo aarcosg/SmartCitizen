@@ -24,4 +24,6 @@ public class Constants {
     public static final int RANGE_WEEK = 1;
     public static final int RANGE_MONTH = 2;
     public static final int RANGE_YEAR = 3;
+
+    public static final String DEFAULT_PASSWORD = "123456";
 }

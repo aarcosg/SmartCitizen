@@ -29,14 +29,6 @@
             android:name=".activity.LoginActivity"
             android:label="@string/title_activity_login"/>
         <activity
-            android:name=".activity.SignupActivity"
-            android:label="@string/title_activity_signup"
-            android:parentActivityName=".activity.LoginActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="us.idinfor.smartcitizen.activity.LoginActivity" />
-        </activity>
-        <activity
             android:name=".activity.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".activity.MainActivity">
