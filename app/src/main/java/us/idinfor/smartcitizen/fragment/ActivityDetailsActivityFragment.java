@@ -223,6 +223,8 @@ public class ActivityDetailsActivityFragment extends BaseGoogleFitFragment {
     private void updateUI() {
         if(!activities.isEmpty()){
             Collections.reverse(activities);
+            adapter.clear();
+            adapter.addAll(activities);
             adapter.notifyDataSetChanged();
         }
         mProgressBar.setVisibility(View.GONE);
