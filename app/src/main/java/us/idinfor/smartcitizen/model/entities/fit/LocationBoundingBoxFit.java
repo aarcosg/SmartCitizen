@@ -1,4 +1,4 @@
-package us.idinfor.smartcitizen.model.fit;
+package us.idinfor.smartcitizen.model.entities.fit;
 
 
 import com.google.android.gms.maps.model.LatLng;

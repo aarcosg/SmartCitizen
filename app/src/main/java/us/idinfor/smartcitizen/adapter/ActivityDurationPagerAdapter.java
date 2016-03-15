@@ -14,7 +14,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
-import us.idinfor.smartcitizen.model.fit.ActivitySummaryFit;
+import us.idinfor.smartcitizen.model.entities.fit.ActivitySummaryFit;
 
 public class ActivityDurationPagerAdapter extends PagerAdapter {
 

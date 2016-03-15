@@ -25,8 +25,8 @@ import us.idinfor.smartcitizen.GoogleFitApi;
 import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.event.FitBucketsResultEvent;
 import us.idinfor.smartcitizen.event.FitDataSetsResultEvent;
-import us.idinfor.smartcitizen.model.fit.ActivitySegmentFit;
-import us.idinfor.smartcitizen.model.fit.LocationSampleFit;
+import us.idinfor.smartcitizen.model.entities.fit.ActivitySegmentFit;
+import us.idinfor.smartcitizen.model.entities.fit.LocationSampleFit;
 
 public class HermesCitizenSyncService extends Service {
 
@@ -126,18 +126,18 @@ public class HermesCitizenSyncService extends Service {
     }
 
     private void handleActionUploadLocations(String username, List<LocationSampleFit> items) {
-        handleApiResult(ACTION_UPLOAD_LOCATIONS, HermesCitizenApi.uploadLocations(username,items));
+        handleApiResult(ACTION_UPLOAD_LOCATIONS, HermesCitizenApi_old.uploadLocations(username,items));
     }
 
     private void handleActionUploadActivities(String username, List<ActivitySegmentFit> items) {
-        handleApiResult(ACTION_UPLOAD_ACTIVITIES, HermesCitizenApi.uploadActivities(username,items));
+        handleApiResult(ACTION_UPLOAD_ACTIVITIES, HermesCitizenApi_old.uploadActivities(username,items));
     }
 
     private void handleApiResult(String action, Integer result) {
         Log.i(TAG,"@handleApiResult");
         SharedPreferences prefs = Utils.getSharedPreferences(getApplicationContext());
         switch (result) {
-            case HermesCitizenApi.RESPONSE_OK:
+            case HermesCitizenApi_old.RESPONSE_OK:
                 Log.i(TAG,"Data uploaded successfully");
                 long endTime = new Date().getTime();
                 if (ACTION_UPLOAD_LOCATIONS.equals(action)) {
@@ -146,12 +146,12 @@ public class HermesCitizenSyncService extends Service {
                     prefs.edit().putLong(Constants.PROPERTY_LAST_ACTIVITY_TIME_SENT,endTime).apply();
                 }
                 break;
-            case HermesCitizenApi.RESPONSE_ERROR_USER_NOT_FOUND:
+            case HermesCitizenApi_old.RESPONSE_ERROR_USER_NOT_FOUND:
                 Log.e(TAG,"Error: User not found");
                 prefs.edit().remove(Constants.PROPERTY_USER_NAME).apply();
                 stopSelf();
                 break;
-            case HermesCitizenApi.RESPONSE_ERROR_DATA_NOT_UPLOADED:
+            case HermesCitizenApi_old.RESPONSE_ERROR_DATA_NOT_UPLOADED:
                 Log.e(TAG,"Error: Data not uploaded");
                 break;
             default:

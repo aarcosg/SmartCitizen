@@ -1,12 +1,12 @@
-package us.idinfor.smartcitizen.model;
+package us.idinfor.smartcitizen.model.entities;
 
 
-import us.idinfor.smartcitizen.model.fit.ActivitySummaryFit;
-import us.idinfor.smartcitizen.model.fit.CaloriesExpendedFit;
-import us.idinfor.smartcitizen.model.fit.DistanceDeltaFit;
-import us.idinfor.smartcitizen.model.fit.HeartRateSummaryFit;
-import us.idinfor.smartcitizen.model.fit.LocationBoundingBoxFit;
-import us.idinfor.smartcitizen.model.fit.StepCountDeltaFit;
+import us.idinfor.smartcitizen.model.entities.fit.ActivitySummaryFit;
+import us.idinfor.smartcitizen.model.entities.fit.CaloriesExpendedFit;
+import us.idinfor.smartcitizen.model.entities.fit.DistanceDeltaFit;
+import us.idinfor.smartcitizen.model.entities.fit.HeartRateSummaryFit;
+import us.idinfor.smartcitizen.model.entities.fit.LocationBoundingBoxFit;
+import us.idinfor.smartcitizen.model.entities.fit.StepCountDeltaFit;
 
 public class ActivityDetails {
 

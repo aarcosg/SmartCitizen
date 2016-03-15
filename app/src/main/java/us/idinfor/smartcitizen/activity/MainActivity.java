@@ -2,7 +2,6 @@ package us.idinfor.smartcitizen.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,9 +20,8 @@ import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
 
-import javax.inject.Inject;
-
 import butterknife.Bind;
+import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
@@ -46,9 +44,6 @@ public class MainActivity extends BaseActivity
     DrawerLayout mDrawerLayout;
     TextView mUserNameTV;
 
-    @Inject
-    SharedPreferences prefs;
-
     private final Handler mDrawerActionHandler = new Handler();
     private ActionBarDrawerToggle mDrawerToggle;
     private int mNavItemId;
@@ -56,8 +51,6 @@ public class MainActivity extends BaseActivity
     private CharSequence mTitle;
 
     private boolean mUserLearnedDrawer;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,14 +64,14 @@ public class MainActivity extends BaseActivity
             finish();
         }
 
-        logFabricUser();
+        //logFabricUser();
 
         if(!Utils.isServiceRunning(this,HermesCitizenSyncService.class)){
             HermesCitizenSyncService.startSync(this);
         }
 
         setContentView(R.layout.activity_main);
-
+        ButterKnife.bind(this);
         buildActionBarToolbar(getString(R.string.app_name),false);
 
         mTitle = mDrawerTitle = getTitle();
@@ -137,6 +130,12 @@ public class MainActivity extends BaseActivity
         if(mUserNameTV != null){
             mUserNameTV.setText(prefs.getString(Constants.PROPERTY_USER_NAME,getString(R.string.user)));
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ButterKnife.unbind(this);
     }
 
     private void logFabricUser() {

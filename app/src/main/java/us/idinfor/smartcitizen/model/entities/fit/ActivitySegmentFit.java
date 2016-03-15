@@ -1,4 +1,4 @@
-package us.idinfor.smartcitizen.model.fit;
+package us.idinfor.smartcitizen.model.entities.fit;
 
 import android.os.Parcel;
 import android.os.Parcelable;

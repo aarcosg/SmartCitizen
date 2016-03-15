@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Singleton;
+import javax.inject.Named;
 
 import dagger.Module;
 import dagger.Provides;
@@ -15,8 +15,8 @@ import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import us.idinfor.smartcitizen.di.qualifiers.Named;
-import us.idinfor.smartcitizen.hermes.HermesCitizenApiService;
+import us.idinfor.smartcitizen.di.scopes.PerApp;
+import us.idinfor.smartcitizen.hermes.HermesCitizenApi;
 
 @Module
 public class NetworkModule {
@@ -25,32 +25,31 @@ public class NetworkModule {
     private final static long SECONDS_TIMEOUT = 20;
 
     @Provides
-    @Singleton
+    @PerApp
     Cache provideOkHttpCache(Context context) {
         int cacheSize = 10 * 1024 * 1024; // 10 MiB
         return new Cache(context.getCacheDir(), cacheSize);
     }
 
     @Provides
-    @Singleton
+    @PerApp
     OkHttpClient provideOkHttpClient(Cache cache) {
-        OkHttpClient client = new OkHttpClient.Builder()
+        return new OkHttpClient.Builder()
                 .connectTimeout(SECONDS_TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(SECONDS_TIMEOUT, TimeUnit.SECONDS)
                 .writeTimeout(SECONDS_TIMEOUT, TimeUnit.SECONDS)
                 .cache(cache)
                 .build();
-        return client;
     }
 
     @Provides
-    @Singleton
+    @PerApp
     Gson provideGson() {
         return new Gson();
     }
 
     @Provides
-    @Singleton
+    @PerApp
     Retrofit.Builder provideRetrofit(Gson gson, OkHttpClient okHttpClient) {
         return new Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create(gson))
@@ -60,18 +59,18 @@ public class NetworkModule {
 
     @Named(NAME_RETROFIT_HERMESCITIZEN)
     @Provides
-    @Singleton
-    public Retrofit provideHermesCitizenRetrofit(Retrofit.Builder builder) {
+    @PerApp
+    Retrofit provideHermesCitizenRetrofit(Retrofit.Builder builder) {
         return builder
-                .baseUrl(HermesCitizenApiService.SERVICE_ENDPOINT)
+                .baseUrl(HermesCitizenApi.SERVICE_ENDPOINT)
                 .build();
     }
 
     @Provides
-    @Singleton
-    HermesCitizenApiService provideHermesCitizenApiService(
+    @PerApp
+    HermesCitizenApi provideHermesCitizenApi(
             @Named(NAME_RETROFIT_HERMESCITIZEN) Retrofit retrofit) {
-        return retrofit.create(HermesCitizenApiService.class);
+        return retrofit.create(HermesCitizenApi.class);
     }
 
 }

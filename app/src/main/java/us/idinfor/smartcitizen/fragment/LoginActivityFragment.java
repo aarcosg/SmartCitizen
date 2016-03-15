@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,17 +22,21 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
+import javax.inject.Inject;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
+import us.idinfor.smartcitizen.SmartCitizenApplication;
 import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.activity.MainActivity;
 import us.idinfor.smartcitizen.asynctask.UserLoginOrRegisterAsyncTask;
 import us.idinfor.smartcitizen.hermes.HermesCitizenApi;
+import us.idinfor.smartcitizen.hermes.HermesCitizenApi_old;
 
-public class LoginActivityFragment extends Fragment implements GoogleApiClient.OnConnectionFailedListener {
+public class LoginActivityFragment extends BaseFragment implements GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = LoginActivityFragment.class.getCanonicalName();
     private static final int REQUEST_SIGN_IN = 2001;
@@ -46,6 +49,9 @@ public class LoginActivityFragment extends Fragment implements GoogleApiClient.O
     @Bind(R.id.signinBtn)
     SignInButton mSigninBtn;
 
+    @Inject
+    HermesCitizenApi mHermesCitizenApi;
+
     private ProgressDialog mProgressDialog;
     private GoogleApiClient mGoogleApiClient;
     private GoogleSignInOptions mGoogleSignInOptions;
@@ -53,6 +59,8 @@ public class LoginActivityFragment extends Fragment implements GoogleApiClient.O
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        this.initializeInjector();
 
         mGoogleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -62,6 +70,11 @@ public class LoginActivityFragment extends Fragment implements GoogleApiClient.O
                 .enableAutoManage(getActivity() /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, mGoogleSignInOptions)
                 .build();
+    }
+
+    private void initializeInjector() {
+        ((SmartCitizenApplication)getActivity().getApplication())
+                .getNetworkComponent().inject(this);
     }
 
     @Override
@@ -150,7 +163,7 @@ public class LoginActivityFragment extends Fragment implements GoogleApiClient.O
                 mAuthTask = null;
                 hideProgressDialog();
                 switch (result) {
-                    case HermesCitizenApi.RESPONSE_OK:
+                    case HermesCitizenApi_old.RESPONSE_OK:
                         Log.i(TAG, "User registered or logged successfully");
                         Toast.makeText(getActivity(), "User signed up", Toast.LENGTH_LONG).show();
                         SharedPreferences prefs = Utils.getSharedPreferences(getActivity());
@@ -160,13 +173,13 @@ public class LoginActivityFragment extends Fragment implements GoogleApiClient.O
                         MainActivity.launch(getActivity());
                         getActivity().finish();
                         break;
-                    case HermesCitizenApi.RESPONSE_ERROR_USER_EXISTS:
+                    case HermesCitizenApi_old.RESPONSE_ERROR_USER_EXISTS:
                         Log.e(TAG, "Error: User already taken");
                         Toast.makeText(getActivity(), "Error: User already taken", Toast.LENGTH_LONG).show();
                         signOut();
                         revokeAccess();
                         break;
-                    case HermesCitizenApi.RESPONSE_ERROR_USER_NOT_REGISTERED:
+                    case HermesCitizenApi_old.RESPONSE_ERROR_USER_NOT_REGISTERED:
                         Log.e(TAG, "Error: User not registered");
                         Toast.makeText(getActivity(), "Error: User not registered", Toast.LENGTH_LONG).show();
                         signOut();

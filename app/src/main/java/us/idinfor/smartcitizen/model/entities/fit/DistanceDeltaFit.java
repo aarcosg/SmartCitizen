@@ -1,4 +1,4 @@
-package us.idinfor.smartcitizen.model.fit;
+package us.idinfor.smartcitizen.model.entities.fit;
 
 
 public class DistanceDeltaFit {
