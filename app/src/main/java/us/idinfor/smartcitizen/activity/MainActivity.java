@@ -21,8 +21,9 @@ import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
 
+import javax.inject.Inject;
+
 import butterknife.Bind;
-import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
@@ -45,6 +46,9 @@ public class MainActivity extends BaseActivity
     DrawerLayout mDrawerLayout;
     TextView mUserNameTV;
 
+    @Inject
+    SharedPreferences prefs;
+
     private final Handler mDrawerActionHandler = new Handler();
     private ActionBarDrawerToggle mDrawerToggle;
     private int mNavItemId;
@@ -52,7 +56,8 @@ public class MainActivity extends BaseActivity
     private CharSequence mTitle;
 
     private boolean mUserLearnedDrawer;
-    private SharedPreferences prefs;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +65,7 @@ public class MainActivity extends BaseActivity
         if (!Utils.checkPlayServices(this)) {
             finish();
         }
-        prefs = Utils.getSharedPreferences(this);
+
         if (TextUtils.isEmpty(prefs.getString(Constants.PROPERTY_USER_NAME, ""))) {
             LoginActivity.launch(this);
             finish();
@@ -73,9 +78,8 @@ public class MainActivity extends BaseActivity
         }
 
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
 
-        Toolbar toolbar = buildActionBarToolbar(getString(R.string.app_name),false);
+        buildActionBarToolbar(getString(R.string.app_name),false);
 
         mTitle = mDrawerTitle = getTitle();
 
@@ -97,7 +101,7 @@ public class MainActivity extends BaseActivity
 
         // set up the hamburger icon to open and close the drawer
         mDrawerToggle = new ActionBarDrawerToggle(
-                this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
+                this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
@@ -204,12 +208,6 @@ public class MainActivity extends BaseActivity
     protected void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(NAV_ITEM_ID, mNavItemId);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        ButterKnife.unbind(this);
     }
 
     public static void launch(Activity activity) {

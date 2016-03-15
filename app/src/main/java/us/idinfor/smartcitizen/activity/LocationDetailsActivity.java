@@ -10,7 +10,6 @@ import android.support.v7.widget.Toolbar;
 import org.greenrobot.eventbus.EventBus;
 
 import butterknife.Bind;
-import butterknife.ButterKnife;
 import butterknife.OnItemSelected;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.event.TimeRangeSelectedEvent;
@@ -28,7 +27,6 @@ public class LocationDetailsActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_details);
-        ButterKnife.bind(this);
         setSupportActionBar(mToolbar);
         if(getSupportActionBar() != null){
             getSupportActionBar().setDisplayShowTitleEnabled(false);

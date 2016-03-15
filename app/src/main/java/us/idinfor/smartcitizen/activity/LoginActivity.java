@@ -8,9 +8,6 @@ import android.support.v4.app.ActivityCompat;
 import us.idinfor.smartcitizen.R;
 
 
-/**
- * A login screen that offers login via email
- */
 public class LoginActivity extends BaseActivity {
 
     private static final String TAG = LoginActivity.class.getCanonicalName();
