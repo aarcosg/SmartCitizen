@@ -14,27 +14,30 @@ import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import dagger.Lazy;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
-import us.idinfor.smartcitizen.SmartCitizenApplication;
-import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.activity.MainActivity;
 import us.idinfor.smartcitizen.asynctask.UserLoginOrRegisterAsyncTask;
+import us.idinfor.smartcitizen.di.components.DaggerGoogleApiClientComponent;
+import us.idinfor.smartcitizen.di.components.GoogleApiClientComponent;
+import us.idinfor.smartcitizen.di.modules.GoogleApiClientModule;
 import us.idinfor.smartcitizen.hermes.HermesCitizenApi;
 import us.idinfor.smartcitizen.hermes.HermesCitizenApi_old;
+import us.idinfor.smartcitizen.hermes.User;
 
 public class LoginActivityFragment extends BaseFragment implements GoogleApiClient.OnConnectionFailedListener {
 
@@ -47,43 +50,43 @@ public class LoginActivityFragment extends BaseFragment implements GoogleApiClie
     private UserLoginOrRegisterAsyncTask mAuthTask = null;
 
     @Bind(R.id.signinBtn)
-    SignInButton mSigninBtn;
+    SignInButton mSignInBtn;
 
     @Inject
+    @Named(GoogleApiClientModule.NAME_GOOGLEAPICLIENT_SIGNIN)
+    GoogleApiClient mGoogleApiClient;
+    @Inject
     HermesCitizenApi mHermesCitizenApi;
+    @Inject
+    Lazy<SharedPreferences> prefs;
 
     private ProgressDialog mProgressDialog;
-    private GoogleApiClient mGoogleApiClient;
-    private GoogleSignInOptions mGoogleSignInOptions;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        this.initializeInjector();
-
-        mGoogleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                .enableAutoManage(getActivity() /* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, mGoogleSignInOptions)
-                .build();
+        initDependencies();
     }
 
-    private void initializeInjector() {
-        ((SmartCitizenApplication)getActivity().getApplication())
-                .getNetworkComponent().inject(this);
+    private void initDependencies() {
+        GoogleApiClientComponent googleApiClientComponent = DaggerGoogleApiClientComponent
+                .builder()
+                .applicationComponent(getBaseActivity().getApplicationComponent())
+                .baseActivityModule(getBaseActivity().getBaseActivityModule())
+                .googleApiClientModule(new GoogleApiClientModule(this,null))
+                .build();
+        injectComponent(googleApiClientComponent);
+    }
+
+    private void injectComponent(GoogleApiClientComponent googleApiClientComponent) {
+        googleApiClientComponent.inject(this);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
         ButterKnife.bind(this, view);
-        mSigninBtn.setSize(SignInButton.SIZE_WIDE);
-        mSigninBtn.setColorScheme(SignInButton.COLOR_LIGHT);
-        mSigninBtn.setScopes(mGoogleSignInOptions.getScopeArray());
+        customizeSignInBtn();
         return view;
     }
 
@@ -106,28 +109,23 @@ public class LoginActivityFragment extends BaseFragment implements GoogleApiClie
         startActivityForResult(signInIntent, REQUEST_SIGN_IN);
     }
 
+    private void customizeSignInBtn(){
+        mSignInBtn.setSize(SignInButton.SIZE_WIDE);
+        mSignInBtn.setColorScheme(SignInButton.COLOR_LIGHT);
+    }
+
     private void signOut() {
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
-                new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(Status status) {
-                        if(status.isSuccess()) {
-                            Log.d(TAG,"User signed out from Google");
-                        }
-                    }
-                });
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(status -> {
+           if(status.isSuccess())
+               Log.d(TAG,"User signed out from Google");
+        });
     }
 
     private void revokeAccess() {
-        Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
-                new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(Status status) {
-                        if(status.isSuccess()) {
-                            Log.d(TAG,"Revoked Google access");
-                        }
-                    }
-                });
+        Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(status -> {
+            if(status.isSuccess())
+                Log.d(TAG,"Revoked Google access");
+        });
     }
 
     @Override
@@ -157,51 +155,69 @@ public class LoginActivityFragment extends BaseFragment implements GoogleApiClie
     }
 
     private void loginOrRegisterUserInHermes(final String email) {
-        mAuthTask = new UserLoginOrRegisterAsyncTask(email, Constants.DEFAULT_PASSWORD) {
-            @Override
-            protected void onPostExecute(Integer result) {
-                mAuthTask = null;
-                hideProgressDialog();
-                switch (result) {
-                    case HermesCitizenApi_old.RESPONSE_OK:
-                        Log.i(TAG, "User registered or logged successfully");
-                        Toast.makeText(getActivity(), "User signed up", Toast.LENGTH_LONG).show();
-                        SharedPreferences prefs = Utils.getSharedPreferences(getActivity());
-                        prefs.edit()
-                                .putString(Constants.PROPERTY_USER_NAME, email)
-                                .apply();
-                        MainActivity.launch(getActivity());
-                        getActivity().finish();
-                        break;
-                    case HermesCitizenApi_old.RESPONSE_ERROR_USER_EXISTS:
-                        Log.e(TAG, "Error: User already taken");
-                        Toast.makeText(getActivity(), "Error: User already taken", Toast.LENGTH_LONG).show();
-                        signOut();
-                        revokeAccess();
-                        break;
-                    case HermesCitizenApi_old.RESPONSE_ERROR_USER_NOT_REGISTERED:
-                        Log.e(TAG, "Error: User not registered");
-                        Toast.makeText(getActivity(), "Error: User not registered", Toast.LENGTH_LONG).show();
-                        signOut();
-                        revokeAccess();
-                        break;
-                    default:
-                        Log.e(TAG, "Unknown error");
-                        Toast.makeText(getActivity(), "Unknown error", Toast.LENGTH_LONG).show();
-                        signOut();
-                        revokeAccess();
-                }
-            }
-
-            @Override
-            protected void onCancelled() {
-                mAuthTask = null;
-                hideProgressDialog();
-            }
-
-        };
         showProgressDialog();
-        mAuthTask.execute((Void) null);
+        mHermesCitizenApi.existsUser(email)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(booleanResponse -> {
+                    if(booleanResponse.body()) {
+                        // User exists
+                        doLoginUser(email);
+                    }else{
+                        mHermesCitizenApi.registerUser(
+                                new User(email, Constants.DEFAULT_PASSWORD))
+                                .doOnNext(integerResponse -> {
+                                    doRegisterUser(integerResponse.body(),email);
+                                })
+                                .doOnError(throwable -> {
+                                    Toast.makeText(getContext(),throwable.getLocalizedMessage(),Toast.LENGTH_LONG).show();
+                                })
+                                .doOnTerminate(() -> hideProgressDialog())
+                                .subscribe();
+                    }
+                })
+                .doOnError(throwable -> {
+                    Toast.makeText(getContext(),throwable.getLocalizedMessage(),Toast.LENGTH_LONG).show();
+                })
+                .doOnTerminate(() -> hideProgressDialog())
+                .subscribe();
+    }
+
+    private void doLoginUser(String email){
+        Log.i(TAG, "User registered or logged successfully");
+        Toast.makeText(getContext(), "User signed up", Toast.LENGTH_LONG).show();
+        prefs.get()
+                .edit()
+                .putString(Constants.PROPERTY_USER_NAME, email)
+                .commit();
+        MainActivity.launch(getActivity());
+        hideProgressDialog();
+        getActivity().finish();
+    }
+
+    private void doRegisterUser(Integer result, String email){
+        switch (result) {
+            case HermesCitizenApi_old.RESPONSE_OK:
+                doLoginUser(email);
+                break;
+            case HermesCitizenApi_old.RESPONSE_ERROR_USER_EXISTS:
+                Log.e(TAG, "Error: User already taken");
+                Toast.makeText(getActivity(), "Error: User already taken", Toast.LENGTH_LONG).show();
+                signOut();
+                revokeAccess();
+                break;
+            case HermesCitizenApi_old.RESPONSE_ERROR_USER_NOT_REGISTERED:
+                Log.e(TAG, "Error: User not registered");
+                Toast.makeText(getActivity(), "Error: User not registered", Toast.LENGTH_LONG).show();
+                signOut();
+                revokeAccess();
+                break;
+            default:
+                Log.e(TAG, "Unknown error");
+                Toast.makeText(getActivity(), "Unknown error", Toast.LENGTH_LONG).show();
+                signOut();
+                revokeAccess();
+        }
     }
     
     private void showProgressDialog() {
@@ -215,7 +231,9 @@ public class LoginActivityFragment extends BaseFragment implements GoogleApiClie
 
     private void hideProgressDialog() {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.hide();
+            mProgressDialog.dismiss();
         }
     }
+
+
 }

@@ -21,7 +21,7 @@ import us.idinfor.smartcitizen.hermes.HermesCitizenApi;
 @Module
 public class NetworkModule {
 
-    private final static String NAME_RETROFIT_HERMESCITIZEN = "NAME_RETROFIT_HERMESCITIZEN";
+    public final static String NAME_RETROFIT_HERMESCITIZEN = "NAME_RETROFIT_HERMESCITIZEN";
     private final static long SECONDS_TIMEOUT = 20;
 
     @Provides

@@ -1,9 +1,7 @@
 package us.idinfor.smartcitizen.hermes;
 
-import java.util.List;
-
 import retrofit2.Response;
-import retrofit2.http.Field;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
@@ -20,12 +18,12 @@ public interface HermesCitizenApi {
     Observable<Response<Boolean>> existsUser(@Path("userEmail") String userEmail);
 
     @POST("hermes.citizen.person/registerUser")
-    Observable<Response<Integer>> registerUser(@Field("email") String userEmail, @Field("password") String password);
+    Observable<Response<Integer>> registerUser(@Body User user);
 
     @POST("hermes.citizen.context/createRange")
-    Observable<Response<Integer>> uploadLocations(@Field("user") String userEmail, @Field("items") List<LocationSampleFit> items);
+    Observable<Response<Integer>> uploadLocations(@Body ItemsList<LocationSampleFit> list);
 
     @POST("hermes.citizen.context/createRange")
-    Observable<Response<Integer>> uploadActivities(@Field("user") String userEmail, @Field("items") List<ActivitySegmentFit> items);
+    Observable<Response<Integer>> uploadActivities(@Body ItemsList<ActivitySegmentFit> list);
 
 }

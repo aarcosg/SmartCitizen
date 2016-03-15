@@ -1,12 +1,10 @@
 package us.idinfor.smartcitizen.di.components;
 
 import dagger.Component;
-import us.idinfor.smartcitizen.activity.LoginActivity;
-import us.idinfor.smartcitizen.activity.MainActivity;
-import us.idinfor.smartcitizen.di.modules.ApplicationModule;
 import us.idinfor.smartcitizen.di.modules.BaseActivityModule;
 import us.idinfor.smartcitizen.di.modules.GoogleApiClientModule;
 import us.idinfor.smartcitizen.di.scopes.PerActivity;
+import us.idinfor.smartcitizen.fragment.LoginActivityFragment;
 
 @PerActivity
 @Component(
@@ -15,8 +13,8 @@ import us.idinfor.smartcitizen.di.scopes.PerActivity;
 )
 public interface GoogleApiClientComponent extends BaseActivityComponent {
 
-    void inject(GoogleApiClientBaseActivity googleApiClientBaseActivity);
+    //void inject(GoogleApiClientBaseActivity googleApiClientBaseActivity);
 
-    void inject(LoginActivity loginActivity);
+    void inject(LoginActivityFragment loginActivityFragment);
 
 }

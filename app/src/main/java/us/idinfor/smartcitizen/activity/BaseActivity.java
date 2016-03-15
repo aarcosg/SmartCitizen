@@ -1,7 +1,5 @@
 package us.idinfor.smartcitizen.activity;
 
-import android.databinding.DataBindingUtil;
-import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -12,55 +10,55 @@ import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.SmartCitizenApplication;
 import us.idinfor.smartcitizen.di.components.ApplicationComponent;
 import us.idinfor.smartcitizen.di.components.BaseActivityComponent;
+import us.idinfor.smartcitizen.di.components.DaggerBaseActivityComponent;
 import us.idinfor.smartcitizen.di.modules.BaseActivityModule;
 
 
 public abstract class BaseActivity extends AppCompatActivity {
 
-    Toolbar mActionBarToolbar;
+    protected Toolbar mActionBarToolbar;
 
     private final CompositeSubscription mCompositeSubscription = new CompositeSubscription();
-    private ViewDataBinding mBinding;
     private BaseActivityComponent mBaseActivityComponent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        initDependencies();
         super.onCreate(savedInstanceState);
-
-        int layoutResourceId = getLayoutResourceId();
-
-        mBinding = DataBindingUtil.setContentView(this, layoutResourceId);
+        initDependencies();
     }
 
     private void initDependencies() {
-        mBaseActivityComponent = DaggerBaseActivityComponent
-                .builder()
-                .nearbooksApplicationComponent(getNearbooksApplicationComponent())
-                .baseActivityModule(new BaseActivityModule(this))
+        mBaseActivityComponent = DaggerBaseActivityComponent.builder()
+                .applicationComponent(getApplicationComponent())
+                .baseActivityModule(getBaseActivityModule())
                 .build();
-        injectComponent(mBaseActivityComponent);
+        injectComponent(getBaseActivityComponent());
     }
 
     @Override
     protected void onDestroy() {
         unSubscribeFromActivity();
-
         super.onDestroy();
     }
-
-    protected abstract int getLayoutResourceId();
 
     protected int getToolbarId() {
         return R.id.toolbar;
     }
 
-    protected <T extends ViewDataBinding> T getBinding(Class<T> clazz) {
-        return clazz.cast(mBinding);
+    public ApplicationComponent getApplicationComponent(){
+        return SmartCitizenApplication.getApplicationComponent();
     }
 
     protected void injectComponent(BaseActivityComponent baseActivityComponent) {
         baseActivityComponent.inject(this);
+    }
+
+    public BaseActivityComponent getBaseActivityComponent() {
+        return mBaseActivityComponent;
+    }
+
+    public BaseActivityModule getBaseActivityModule() {
+        return new BaseActivityModule(this);
     }
 
     protected void subscribeToActivity(Subscription subscription) {
@@ -69,14 +67,6 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected void unSubscribeFromActivity() {
         mCompositeSubscription.clear();
-    }
-
-    public BaseActivityComponent getBaseActivityComponent() {
-        return mBaseActivityComponent;
-    }
-
-    protected BaseActivityModule getBaseActivityModule() {
-        return new BaseActivityModule(this);
     }
 
     protected Toolbar buildActionBarToolbar(String title, boolean upEnabled) {

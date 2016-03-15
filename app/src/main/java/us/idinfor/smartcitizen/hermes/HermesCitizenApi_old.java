@@ -13,7 +13,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import us.idinfor.smartcitizen.json.JsonListHermes;
 import us.idinfor.smartcitizen.model.entities.fit.ActivitySegmentFit;
 import us.idinfor.smartcitizen.model.entities.fit.LocationSampleFit;
 
@@ -61,8 +60,8 @@ public class HermesCitizenApi_old {
         Log.i(TAG,"@uploadLocations");
         String responseString = "";
 
-        JsonListHermes<LocationSampleFit> jsonList = new JsonListHermes<LocationSampleFit>(username,locations);
-        String json = new Gson().toJson(jsonList, JsonListHermes.class);
+        ItemsList<LocationSampleFit> jsonList = new ItemsList<LocationSampleFit>(username,locations);
+        String json = new Gson().toJson(jsonList, ItemsList.class);
 
         RequestBody formBody = RequestBody.create(JSON,json);
         Request request = new Request.Builder()
@@ -90,8 +89,8 @@ public class HermesCitizenApi_old {
         Log.i(TAG,"@uploadActivities");
         String responseString = "";
 
-        JsonListHermes<ActivitySegmentFit> jsonList = new JsonListHermes<ActivitySegmentFit>(username,activities);
-        String json = new Gson().toJson(jsonList, JsonListHermes.class);
+        ItemsList<ActivitySegmentFit> jsonList = new ItemsList<ActivitySegmentFit>(username,activities);
+        String json = new Gson().toJson(jsonList, ItemsList.class);
 
         RequestBody formBody = RequestBody.create(JSON,json);
         Request request = new Request.Builder()

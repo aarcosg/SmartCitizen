@@ -2,6 +2,7 @@ package us.idinfor.smartcitizen.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,11 +21,14 @@ import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
 
+import javax.inject.Inject;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
+import us.idinfor.smartcitizen.di.components.BaseActivityComponent;
 import us.idinfor.smartcitizen.fragment.FitnessFragment;
 import us.idinfor.smartcitizen.hermes.HermesCitizenSyncService;
 
@@ -43,6 +47,9 @@ public class MainActivity extends BaseActivity
     @Bind(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
     TextView mUserNameTV;
+
+    @Inject
+    protected SharedPreferences prefs;
 
     private final Handler mDrawerActionHandler = new Handler();
     private ActionBarDrawerToggle mDrawerToggle;
@@ -136,6 +143,12 @@ public class MainActivity extends BaseActivity
     protected void onDestroy() {
         super.onDestroy();
         ButterKnife.unbind(this);
+    }
+
+    @Override
+    protected void injectComponent(BaseActivityComponent baseActivityComponent) {
+        super.injectComponent(baseActivityComponent);
+        baseActivityComponent.inject(this);
     }
 
     private void logFabricUser() {

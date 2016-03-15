@@ -1,17 +1,17 @@
-package us.idinfor.smartcitizen.json;
+package us.idinfor.smartcitizen.hermes;
 
 
 import java.util.List;
 
-public class JsonListHermes<T> {
+public class ItemsList<T> {
 
     String user;
     List<T> items;
 
-    public JsonListHermes() {
+    public ItemsList() {
     }
 
-    public JsonListHermes(String user, List<T> items) {
+    public ItemsList(String user, List<T> items) {
         this.user = user;
         this.items = items;
     }
