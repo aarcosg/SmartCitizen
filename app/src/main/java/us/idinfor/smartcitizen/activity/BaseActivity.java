@@ -8,31 +8,23 @@ import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.SmartCitizenApplication;
+import us.idinfor.smartcitizen.di.components.ActivityComponent;
 import us.idinfor.smartcitizen.di.components.ApplicationComponent;
-import us.idinfor.smartcitizen.di.components.BaseActivityComponent;
-import us.idinfor.smartcitizen.di.components.DaggerBaseActivityComponent;
-import us.idinfor.smartcitizen.di.modules.BaseActivityModule;
+import us.idinfor.smartcitizen.di.components.DaggerActivityComponent;
 
 
 public abstract class BaseActivity extends AppCompatActivity {
 
-    protected Toolbar mActionBarToolbar;
-
     private final CompositeSubscription mCompositeSubscription = new CompositeSubscription();
-    private BaseActivityComponent mBaseActivityComponent;
+    private ActivityComponent mActivityComponent;
+
+    protected Toolbar mActionBarToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initDependencies();
-    }
-
-    private void initDependencies() {
-        mBaseActivityComponent = DaggerBaseActivityComponent.builder()
-                .applicationComponent(getApplicationComponent())
-                .baseActivityModule(getBaseActivityModule())
-                .build();
-        injectComponent(getBaseActivityComponent());
+        injectActivityComponent();
     }
 
     @Override
@@ -41,24 +33,20 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    protected int getToolbarId() {
-        return R.id.toolbar;
+    private void initDependencies() {
+        mActivityComponent = DaggerActivityComponent.builder()
+                .applicationComponent(getApplicationComponent())
+                .build();
     }
+
+    protected abstract void injectActivityComponent();
 
     public ApplicationComponent getApplicationComponent(){
-        return SmartCitizenApplication.getApplicationComponent();
+        return SmartCitizenApplication.get(this).getApplicationComponent();
     }
 
-    protected void injectComponent(BaseActivityComponent baseActivityComponent) {
-        baseActivityComponent.inject(this);
-    }
-
-    public BaseActivityComponent getBaseActivityComponent() {
-        return mBaseActivityComponent;
-    }
-
-    public BaseActivityModule getBaseActivityModule() {
-        return new BaseActivityModule(this);
+    public ActivityComponent getActivityComponent() {
+        return mActivityComponent;
     }
 
     protected void subscribeToActivity(Subscription subscription) {
@@ -66,7 +54,11 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void unSubscribeFromActivity() {
-        mCompositeSubscription.clear();
+        mCompositeSubscription.unsubscribe();
+    }
+
+    protected int getToolbarId() {
+        return R.id.toolbar;
     }
 
     protected Toolbar buildActionBarToolbar(String title, boolean upEnabled) {
@@ -74,7 +66,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             mActionBarToolbar = (Toolbar) findViewById(getToolbarId());
             if (mActionBarToolbar != null) {
                 setSupportActionBar(mActionBarToolbar);
-                if(getSupportActionBar()!=null){
+                if(getSupportActionBar()!= null){
                     getSupportActionBar().setDisplayHomeAsUpEnabled(upEnabled);
                     if(title != null){
                         getSupportActionBar().setTitle(title);
@@ -84,5 +76,4 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
         return mActionBarToolbar;
     }
-
 }

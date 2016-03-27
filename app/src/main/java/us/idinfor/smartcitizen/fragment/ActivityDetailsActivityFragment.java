@@ -20,15 +20,12 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.Constants;
-import us.idinfor.smartcitizen.GoogleFitApi;
 import us.idinfor.smartcitizen.R;
-import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.adapter.ActivitySegmentDetailsAdapter;
 import us.idinfor.smartcitizen.event.FitBucketsResultEvent;
 import us.idinfor.smartcitizen.event.GoogleApiClientConnectedEvent;
@@ -40,7 +37,7 @@ import us.idinfor.smartcitizen.model.entities.fit.LocationBoundingBoxFit;
 import us.idinfor.smartcitizen.model.entities.fit.StepCountDeltaFit;
 
 
-public class ActivityDetailsActivityFragment extends BaseGoogleFitFragment {
+public class ActivityDetailsActivityFragment extends BaseFragment {
 
     private static final String TAG = ActivityDetailsActivityFragment.class.getCanonicalName();
 
@@ -73,9 +70,9 @@ public class ActivityDetailsActivityFragment extends BaseGoogleFitFragment {
     @Override
     public void onResume() {
         super.onResume();
-        if(fitHelper.getGoogleApiClient().isConnected()){
+        /*if(fitHelper.getGoogleApiClient().isConnected()){
             queryGoogleFit(Constants.RANGE_DAY);
-        }
+        }*/
     }
 
     @Override
@@ -84,7 +81,7 @@ public class ActivityDetailsActivityFragment extends BaseGoogleFitFragment {
         ButterKnife.unbind(this);
     }
 
-    @Override
+
     protected DataReadRequest.Builder buildFitQuery(){
         DataReadRequest.Builder builder = new DataReadRequest.Builder()
                 .aggregate(DataType.TYPE_LOCATION_SAMPLE, DataType.AGGREGATE_LOCATION_BOUNDING_BOX)
@@ -97,14 +94,13 @@ public class ActivityDetailsActivityFragment extends BaseGoogleFitFragment {
         return builder;
     }
 
-    @Override
     protected void queryGoogleFit(int timeRange) {
-        mProgressBar.setVisibility(View.VISIBLE);
+        /*mProgressBar.setVisibility(View.VISIBLE);
         fitHelper.queryFitnessData(
                 Utils.getStartTimeRange(timeRange),
                 new Date().getTime(),
                 buildFitQuery(),
-                GoogleFitApi.QUERY_DEFAULT);
+                GoogleFitApi.QUERY_DEFAULT);*/
     }
 
     @Subscribe
@@ -228,5 +224,10 @@ public class ActivityDetailsActivityFragment extends BaseGoogleFitFragment {
             adapter.notifyDataSetChanged();
         }
         mProgressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    protected void injectActivityComponent() {
+        getBaseActivity().getActivityComponent().inject(this);
     }
 }

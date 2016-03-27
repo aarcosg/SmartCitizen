@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+//apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'io.fabric'
 apply plugin: 'me.tatarka.retrolambda'
@@ -106,6 +107,12 @@ dependencies {
     compile 'com.squareup.retrofit2:adapter-rxjava:2.0.0-beta4'
 
     //RxJava
-    compile 'io.reactivex:rxandroid:1.0.1'
-    compile 'io.reactivex:rxjava:1.0.14'
+    compile 'io.reactivex:rxjava:1.1.2'
+    compile 'io.reactivex:rxandroid:1.1.0'
+
+    //RxFit
+    compile 'com.patloew.rxfit:rxfit:1.2.0'
+
+    //RxGoogleMaps
+    compile 'com.sdoward:rxgooglemaps:0.2@aar'
 }

@@ -19,6 +19,11 @@ public class LoginActivity extends BaseActivity {
         buildActionBarToolbar(getString(R.string.title_activity_login), false);
     }
 
+    @Override
+    protected void injectActivityComponent() {
+        getActivityComponent().inject(this);
+    }
+
     public static void launch(Activity activity) {
         Intent intent = new Intent(activity, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

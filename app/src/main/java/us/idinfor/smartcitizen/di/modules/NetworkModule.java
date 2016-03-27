@@ -15,8 +15,8 @@ import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import us.idinfor.smartcitizen.data.api.hermes.HermesCitizenApi;
 import us.idinfor.smartcitizen.di.scopes.PerApp;
-import us.idinfor.smartcitizen.hermes.HermesCitizenApi;
 
 @Module
 public class NetworkModule {

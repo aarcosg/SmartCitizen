@@ -1,4 +1,4 @@
-package us.idinfor.smartcitizen.hermes;
+package us.idinfor.smartcitizen.data.api.hermes;
 
 import retrofit2.Response;
 import retrofit2.http.Body;
@@ -6,12 +6,20 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import rx.Observable;
+import us.idinfor.smartcitizen.hermes.ItemsList;
+import us.idinfor.smartcitizen.hermes.User;
 import us.idinfor.smartcitizen.model.entities.fit.ActivitySegmentFit;
 import us.idinfor.smartcitizen.model.entities.fit.LocationSampleFit;
 
 public interface HermesCitizenApi {
 
     //String SERVICE_ENDPOINT = "http://10.141.0.50:8080/HermesWeb/webresources/hermes.citizen.";
+    int RESPONSE_ERROR_UNKNOWN = 0;
+    int RESPONSE_OK = 1;
+    int RESPONSE_ERROR_USER_NOT_FOUND = 2;
+    int RESPONSE_ERROR_DATA_NOT_UPLOADED = 3;
+    int RESPONSE_ERROR_USER_EXISTS = 5;
+    int RESPONSE_ERROR_USER_NOT_REGISTERED = 6;
     String SERVICE_ENDPOINT = "https://www.hermescitizen.us.es/HermesWeb/webresources/";
 
     @GET("hermes.citizen.person/existsUser/{userEmail}")

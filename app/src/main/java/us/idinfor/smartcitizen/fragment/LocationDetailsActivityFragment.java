@@ -26,19 +26,16 @@ import com.google.maps.android.heatmaps.HeatmapTileProvider;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.Constants;
-import us.idinfor.smartcitizen.GoogleFitApi;
 import us.idinfor.smartcitizen.R;
-import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.event.FitDataSetsResultEvent;
 import us.idinfor.smartcitizen.event.GoogleApiClientConnectedEvent;
 import us.idinfor.smartcitizen.event.TimeRangeSelectedEvent;
 
-public class LocationDetailsActivityFragment extends BaseGoogleFitFragment implements OnMapReadyCallback {
+public class LocationDetailsActivityFragment extends BaseFragment implements OnMapReadyCallback {
 
     private static final String TAG = LocationDetailsActivityFragment.class.getCanonicalName();
 
@@ -78,21 +75,19 @@ public class LocationDetailsActivityFragment extends BaseGoogleFitFragment imple
         }
     }
 
-    @Override
     protected DataReadRequest.Builder buildFitQuery(){
         DataReadRequest.Builder builder = new DataReadRequest.Builder()
                 .read(DataType.TYPE_LOCATION_SAMPLE);
         return builder;
     }
 
-    @Override
     protected void queryGoogleFit(int timeRange) {
-        mProgressBar.setVisibility(View.VISIBLE);
+       /* mProgressBar.setVisibility(View.VISIBLE);
         fitHelper.queryFitnessData(
                 Utils.getStartTimeRange(timeRange),
                 new Date().getTime(),
                 buildFitQuery(),
-                GoogleFitApi.QUERY_DEFAULT);
+                GoogleFitApi.QUERY_DEFAULT);*/
     }
 
     @Subscribe
@@ -141,4 +136,8 @@ public class LocationDetailsActivityFragment extends BaseGoogleFitFragment imple
         mProgressBar.setVisibility(View.GONE);
     }
 
+    @Override
+    protected void injectActivityComponent() {
+        getBaseActivity().getActivityComponent().inject(this);
+    }
 }

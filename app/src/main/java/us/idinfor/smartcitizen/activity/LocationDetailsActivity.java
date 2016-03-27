@@ -34,6 +34,11 @@ public class LocationDetailsActivity extends BaseActivity {
         }
     }
 
+    @Override
+    protected void injectActivityComponent() {
+        getActivityComponent().inject(this);
+    }
+
     @OnItemSelected(R.id.toolbarSpinner)
     public void timeRangeSelected(int position){
         EventBus.getDefault().post(new TimeRangeSelectedEvent(position));

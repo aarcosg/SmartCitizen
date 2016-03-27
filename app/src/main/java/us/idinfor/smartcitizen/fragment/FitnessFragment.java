@@ -5,10 +5,11 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,8 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
@@ -23,15 +26,15 @@ import com.google.android.gms.fitness.data.Field;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.maps.android.SphericalUtil;
+import com.patloew.rxfit.RxFit;
+import com.patloew.rxfit.StatusException;
+import com.sdoward.rxgooglemap.MapObservableProvider;
 import com.viewpagerindicator.CirclePageIndicator;
-
-import org.greenrobot.eventbus.Subscribe;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -43,15 +46,15 @@ import java.util.concurrent.TimeUnit;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import us.idinfor.smartcitizen.Constants;
-import us.idinfor.smartcitizen.GoogleFitApi;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.activity.ActivityDetailsActivity;
 import us.idinfor.smartcitizen.activity.LocationDetailsActivity;
 import us.idinfor.smartcitizen.adapter.ActivityDurationPagerAdapter;
-import us.idinfor.smartcitizen.event.FitBucketsResultEvent;
-import us.idinfor.smartcitizen.event.GoogleApiClientConnectedEvent;
 import us.idinfor.smartcitizen.model.entities.ActivityDetails;
 import us.idinfor.smartcitizen.model.entities.fit.ActivitySummaryFit;
 import us.idinfor.smartcitizen.model.entities.fit.CaloriesExpendedFit;
@@ -60,12 +63,7 @@ import us.idinfor.smartcitizen.model.entities.fit.HeartRateSummaryFit;
 import us.idinfor.smartcitizen.model.entities.fit.LocationBoundingBoxFit;
 import us.idinfor.smartcitizen.model.entities.fit.StepCountDeltaFit;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link FitnessFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReadyCallback {
+public class FitnessFragment extends BaseFragment {
 
     private static final String TAG = FitnessFragment.class.getCanonicalName();
 
@@ -97,12 +95,14 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
     ProgressBar mCaloriesProgress;
 
     private GoogleMap mMap;
-    private PolygonOptions boundingBoxPolygon;
-    private LatLng boundingBoxCenter;
-    private LatLngBounds bounds;
+    private PolygonOptions mBoundingBoxPolygon;
+    private LatLngBounds mBounds;
 
-    List<ActivitySummaryFit> activities = new ArrayList<>();
-    private ActivityDetails activityDetails;
+    private SupportMapFragment mMapFragment;
+    private MapObservableProvider mMapObservableProvider;
+
+    private List<ActivitySummaryFit> mActivitiesSummary = new ArrayList<>();
+    private ActivityDetails mActivityDetails;
 
     public static FitnessFragment newInstance() {
         FitnessFragment fragment = new FitnessFragment();
@@ -121,6 +121,11 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
     }
 
     @Override
+    protected void injectActivityComponent() {
+        getBaseActivity().getActivityComponent().inject(this);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_fitness, container, false);
@@ -130,10 +135,23 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
                 System.currentTimeMillis(),
                 DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_ABBREV_MONTH));
 
-        if (mMap == null) {
-            SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-            mapFragment.getMapAsync(FitnessFragment.this);
-        }
+        mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        mMapObservableProvider = new MapObservableProvider(mMapFragment);
+        subscribeToFragment(mMapObservableProvider.getMapReadyObservable()
+                .subscribe(googleMap -> {
+                    mMap = googleMap;
+                    mMap.getUiSettings().setAllGesturesEnabled(false);
+                    mMap.getUiSettings().setZoomControlsEnabled(true);
+                    if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                        mMap.setMyLocationEnabled(true);
+                    }
+                    if (mBoundingBoxPolygon != null && mBounds != null){
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(mBounds, 12));
+                        mMap.moveCamera(CameraUpdateFactory.zoomOut());
+                        mMap.addPolygon(mBoundingBoxPolygon);
+                    }
+                })
+        );
 
         return view;
     }
@@ -141,9 +159,7 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
     @Override
     public void onResume() {
         super.onResume();
-        if (fitHelper.getGoogleApiClient().isConnected()) {
-            queryGoogleFit(Constants.RANGE_DAY);
-        }
+        queryGoogleFit(Constants.RANGE_DAY);
     }
 
     @Override
@@ -163,49 +179,59 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
     }
 
 
-    @Override
-    public void onMapReady(GoogleMap map) {
-        mMap = map;
-        mMap.getUiSettings().setAllGesturesEnabled(false);
-        mMap.getUiSettings().setZoomControlsEnabled(true);
-        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            mMap.setMyLocationEnabled(true);
-        }
-    }
-
-    @Override
-    protected DataReadRequest.Builder buildFitQuery() {
+    private DataReadRequest.Builder buildFitDataReadRequest() {
         DataReadRequest.Builder builder = new DataReadRequest.Builder()
                 .aggregate(DataType.TYPE_LOCATION_SAMPLE, DataType.AGGREGATE_LOCATION_BOUNDING_BOX)
                 .aggregate(DataType.TYPE_ACTIVITY_SEGMENT, DataType.AGGREGATE_ACTIVITY_SUMMARY)
                 .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
                 .aggregate(DataType.TYPE_HEART_RATE_BPM, DataType.AGGREGATE_HEART_RATE_SUMMARY)
                 .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
-                .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA)
-                .bucketByTime(1, TimeUnit.DAYS);
+                .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA);
         return builder;
     }
 
-    @Override
-    protected void queryGoogleFit(int timeRange) {
+    private void queryGoogleFit(int timeRange) {
         mProgressBar.setVisibility(View.VISIBLE);
-        fitHelper.queryFitnessData(
-                Utils.getStartTimeRange(timeRange),
-                new Date().getTime(),
-                buildFitQuery(),
-                GoogleFitApi.QUERY_DEFAULT);
+        DataReadRequest.Builder dataReadRequestBuilder = buildFitDataReadRequest();
+
+        dataReadRequestBuilder.setTimeRange(Utils.getStartTimeRange(timeRange),new Date().getTime(),TimeUnit.MILLISECONDS);
+        dataReadRequestBuilder.bucketByTime(1, TimeUnit.DAYS);
+
+        DataReadRequest dataReadRequest = dataReadRequestBuilder.build();
+        DataReadRequest dataReadRequestServer = dataReadRequestBuilder.enableServerQueries().build();
+
+        mActivityDetails = new ActivityDetails();
+
+        subscribeToFragment(RxFit.History.read(dataReadRequestServer)
+                .doOnError(throwable -> {
+                    if(throwable instanceof StatusException && ((StatusException)throwable).getStatus().getStatusCode() == CommonStatusCodes.TIMEOUT) {
+                        Log.e(TAG, "Timeout on server query request");
+                    }
+                })
+                .compose(new RxFit.OnExceptionResumeNext.Single<>(RxFit.History.read(dataReadRequest)))
+                .flatMapObservable(dataReadResult -> Observable.from(dataReadResult.getBuckets()))
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(bucket -> {
+                    processFitBucket(bucket);
+                }, e -> {
+                    mProgressBar.setVisibility(View.GONE);
+                    Log.e(TAG, "Error reading fitness data", e);
+                    Snackbar.make(mProgressBar.getRootView(), "Error getting Fit data", Snackbar.LENGTH_INDEFINITE)
+                            .setAction("Retry", v -> queryGoogleFit(timeRange))
+                            .show();
+
+                }, () -> {
+                    mProgressBar.setVisibility(View.GONE);
+                    updateUI();
+                })
+        );
     }
 
-    @Subscribe
-    public void onEvent(GoogleApiClientConnectedEvent event) {
-        queryGoogleFit(Constants.RANGE_DAY);
-    }
-
-    @Subscribe
-    public void onEvent(FitBucketsResultEvent event) {
-        activityDetails = new ActivityDetails();
+    public void processFitBucket(Bucket bucket) {
+        mActivityDetails = new ActivityDetails();
         // Single bucket expected
-        for (DataSet dataSet : event.getBuckets().get(0).getDataSets()) {
+        for (DataSet dataSet : bucket.getDataSets()) {
             if (dataSet.getDataType().equals(DataType.AGGREGATE_STEP_COUNT_DELTA)) {
                 for (DataPoint dp : dataSet.getDataPoints()) {
                     if (dp.getDataType().equals(DataType.AGGREGATE_STEP_COUNT_DELTA)) {
@@ -214,7 +240,7 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
                                 dp.getStartTime(TimeUnit.MILLISECONDS),
                                 dp.getEndTime(TimeUnit.MILLISECONDS)
                         );
-                        activityDetails.setStepCountDelta(stepCount);
+                        mActivityDetails.setStepCountDelta(stepCount);
                     }
                 }
             }
@@ -226,7 +252,7 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
                                 dp.getStartTime(TimeUnit.MILLISECONDS),
                                 dp.getEndTime(TimeUnit.MILLISECONDS)
                         );
-                        activityDetails.setDistanceDelta(distanceDelta);
+                        mActivityDetails.setDistanceDelta(distanceDelta);
                     }
                 }
             }
@@ -238,15 +264,15 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
                                 dp.getStartTime(TimeUnit.MILLISECONDS),
                                 dp.getEndTime(TimeUnit.MILLISECONDS)
                         );
-                        activityDetails.setCaloriesExpended(caloriesExpended);
+                        mActivityDetails.setCaloriesExpended(caloriesExpended);
                     }
                 }
             }
             if (dataSet.getDataType().equals(DataType.AGGREGATE_ACTIVITY_SUMMARY)) {
-                if (activities == null) {
-                    activities = new ArrayList<ActivitySummaryFit>();
+                if (mActivitiesSummary == null) {
+                    mActivitiesSummary = new ArrayList<ActivitySummaryFit>();
                 } else {
-                    activities.clear();
+                    mActivitiesSummary.clear();
                 }
                 for (DataPoint dp : dataSet.getDataPoints()) {
                     if (dp.getDataType().equals(DataType.AGGREGATE_ACTIVITY_SUMMARY)) {
@@ -257,7 +283,7 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
                                 dp.getStartTime(TimeUnit.MILLISECONDS),
                                 dp.getEndTime(TimeUnit.MILLISECONDS)
                         );
-                        activities.add(activity);
+                        mActivitiesSummary.add(activity);
                     }
                 }
             }
@@ -280,7 +306,7 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
                                 dp.getStartTime(TimeUnit.MILLISECONDS),
                                 dp.getEndTime(TimeUnit.MILLISECONDS)
                         );
-                        activityDetails.setLocationBoundingBox(locationBoundingBox);
+                        mActivityDetails.setLocationBoundingBox(locationBoundingBox);
                     }
                 }
 
@@ -295,7 +321,7 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
                                 dp.getStartTime(TimeUnit.MILLISECONDS),
                                 dp.getEndTime(TimeUnit.MILLISECONDS)
                         );
-                        activityDetails.setHeartRateSummary(heartRateSummary);
+                        mActivityDetails.setHeartRateSummary(heartRateSummary);
                     }
                 }
             }
@@ -307,8 +333,8 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
         NumberFormat df = DecimalFormat.getInstance();
         df.setMaximumFractionDigits(2);
 
-        if (activityDetails.getStepCountDelta() != null) {
-            Integer steps = activityDetails.getStepCountDelta().getSteps();
+        if (mActivityDetails.getStepCountDelta() != null) {
+            Integer steps = mActivityDetails.getStepCountDelta().getSteps();
             Double stepsGoal = Double.valueOf(getString(R.string.default_steps_goal));
             Integer stepsProgress = (int)(steps * 100 / stepsGoal);
             mStepsCounter.setText(steps.toString());
@@ -317,8 +343,8 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
 
         }
 
-        if (activityDetails.getDistanceDelta() != null) {
-            Float distance = activityDetails.getDistanceDelta().getDistance();
+        if (mActivityDetails.getDistanceDelta() != null) {
+            Float distance = mActivityDetails.getDistanceDelta().getDistance();
             Float distanceGoal = Float.valueOf(getString(R.string.default_distance_goal));
             Integer distanceProgress = (int)(distance * 100 / distanceGoal);
             mDistanceCounter.setText(df.format(distance));
@@ -326,8 +352,8 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
             mDistanceProgress.setProgress(distanceProgress > 100 ? 100 : distanceProgress);
         }
 
-        if (activityDetails.getCaloriesExpended() != null) {
-            Float calories = activityDetails.getCaloriesExpended().getCalories();
+        if (mActivityDetails.getCaloriesExpended() != null) {
+            Float calories = mActivityDetails.getCaloriesExpended().getCalories();
             Float caloriesGoal = Float.valueOf(getString(R.string.default_calories_goal));
             Integer caloriesProgress = (int)(calories * 100 / caloriesGoal);
             mCaloriesCounter.setText(df.format(calories));
@@ -336,36 +362,36 @@ public class FitnessFragment extends BaseGoogleFitFragment implements OnMapReady
 
         }
 
-        if (activities != null && !activities.isEmpty()) {
-            mTimePager.setAdapter(new ActivityDurationPagerAdapter(this.getContext(), activities));
+        if (mActivitiesSummary != null && !mActivitiesSummary.isEmpty()) {
+            mTimePager.setAdapter(new ActivityDurationPagerAdapter(this.getContext(), mActivitiesSummary));
             mTimePagerIndicator.setViewPager(mTimePager);
         }
 
-        if (activityDetails.getHeartRateSummary() != null) {
-            mHeartRateCounter.setText(Integer.valueOf(activityDetails.getHeartRateSummary().getAverage().intValue()).toString());
+        if (mActivityDetails.getHeartRateSummary() != null) {
+            mHeartRateCounter.setText(Integer.valueOf(mActivityDetails.getHeartRateSummary().getAverage().intValue()).toString());
         }
 
-        if (activityDetails.getLocationBoundingBox() != null) {
-            boundingBoxPolygon = new PolygonOptions()
-                    .add(activityDetails.getLocationBoundingBox().getLocationNE(), //ne
-                            new LatLng(activityDetails.getLocationBoundingBox().getLatitudeNE(), activityDetails.getLocationBoundingBox().getLongitudeSW()),
-                            activityDetails.getLocationBoundingBox().getLocationSW(), //sw
-                            new LatLng(activityDetails.getLocationBoundingBox().getLatitudeSW(), activityDetails.getLocationBoundingBox().getLongitudeNE()))
+        if (mActivityDetails.getLocationBoundingBox() != null) {
+            mBoundingBoxPolygon = new PolygonOptions()
+                    .add(mActivityDetails.getLocationBoundingBox().getLocationNE(), //ne
+                            new LatLng(mActivityDetails.getLocationBoundingBox().getLatitudeNE(), mActivityDetails.getLocationBoundingBox().getLongitudeSW()),
+                            mActivityDetails.getLocationBoundingBox().getLocationSW(), //sw
+                            new LatLng(mActivityDetails.getLocationBoundingBox().getLatitudeSW(), mActivityDetails.getLocationBoundingBox().getLongitudeNE()))
                     .strokeColor(Color.argb(180, 0, 150, 136))
                     .fillColor(Color.argb(110, 0, 150, 136))
                     .strokeWidth(5)
                     .geodesic(true);
 
             LatLngBounds.Builder boundsBuilder = LatLngBounds.builder();
-            for (LatLng point : boundingBoxPolygon.getPoints()) {
+            for (LatLng point : mBoundingBoxPolygon.getPoints()) {
                 boundsBuilder.include(point);
             }
-            bounds = boundsBuilder.build();
-            boundingBoxCenter = SphericalUtil.interpolate(activityDetails.getLocationBoundingBox().getLocationSW(), activityDetails.getLocationBoundingBox().getLocationNE(), 0.5);
+            mBounds = boundsBuilder.build();
+            SphericalUtil.interpolate(mActivityDetails.getLocationBoundingBox().getLocationSW(), mActivityDetails.getLocationBoundingBox().getLocationNE(), 0.5);
             if (mMap != null) {
-                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 12));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(mBounds, 12));
                 mMap.moveCamera(CameraUpdateFactory.zoomOut());
-                mMap.addPolygon(boundingBoxPolygon);
+                mMap.addPolygon(mBoundingBoxPolygon);
             }
         }
         mProgressBar.setVisibility(View.GONE);

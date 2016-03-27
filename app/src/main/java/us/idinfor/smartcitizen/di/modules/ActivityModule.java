@@ -6,11 +6,11 @@ import us.idinfor.smartcitizen.activity.BaseActivity;
 import us.idinfor.smartcitizen.di.scopes.PerActivity;
 
 @Module
-public class BaseActivityModule {
+public class ActivityModule {
 
     private final BaseActivity baseActivity;
 
-    public BaseActivityModule(BaseActivity baseActivity) {
+    public ActivityModule(BaseActivity baseActivity) {
       this.baseActivity = baseActivity;
     }
 

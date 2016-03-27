@@ -28,9 +28,8 @@ import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
-import us.idinfor.smartcitizen.di.components.BaseActivityComponent;
 import us.idinfor.smartcitizen.fragment.FitnessFragment;
-import us.idinfor.smartcitizen.hermes.HermesCitizenSyncService;
+import us.idinfor.smartcitizen.data.api.hermes.HermesCitizenSyncService;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -71,10 +70,9 @@ public class MainActivity extends BaseActivity
             finish();
         }
 
-        //logFabricUser();
-
         if(!Utils.isServiceRunning(this,HermesCitizenSyncService.class)){
-            HermesCitizenSyncService.startSync(this);
+            //FIXME
+            //HermesCitizenSyncService.startSync(this);
         }
 
         setContentView(R.layout.activity_main);
@@ -146,9 +144,8 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
-    protected void injectComponent(BaseActivityComponent baseActivityComponent) {
-        super.injectComponent(baseActivityComponent);
-        baseActivityComponent.inject(this);
+    protected void injectActivityComponent() {
+        getActivityComponent().inject(this);
     }
 
     private void logFabricUser() {

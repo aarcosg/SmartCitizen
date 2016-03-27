@@ -1,4 +1,4 @@
-package us.idinfor.smartcitizen.hermes;
+package us.idinfor.smartcitizen.data.api.hermes;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -25,6 +25,7 @@ import us.idinfor.smartcitizen.GoogleFitApi;
 import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.event.FitBucketsResultEvent;
 import us.idinfor.smartcitizen.event.FitDataSetsResultEvent;
+import us.idinfor.smartcitizen.hermes.HermesCitizenApi_old;
 import us.idinfor.smartcitizen.model.entities.fit.ActivitySegmentFit;
 import us.idinfor.smartcitizen.model.entities.fit.LocationSampleFit;
 

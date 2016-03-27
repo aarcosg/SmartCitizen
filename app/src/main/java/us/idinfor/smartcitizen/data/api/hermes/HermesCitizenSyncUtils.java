@@ -1,8 +1,7 @@
-package us.idinfor.smartcitizen.hermes;
+package us.idinfor.smartcitizen.data.api.hermes;
 
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
 import com.google.android.gms.fitness.FitnessActivities;
 import com.google.android.gms.fitness.data.Bucket;
@@ -10,16 +9,12 @@ import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
-import com.google.android.gms.fitness.request.DataReadRequest;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import us.idinfor.smartcitizen.Constants;
-import us.idinfor.smartcitizen.GoogleFitApi;
-import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.model.entities.fit.ActivitySegmentFit;
 import us.idinfor.smartcitizen.model.entities.fit.LocationSampleFit;
 
@@ -29,7 +24,7 @@ public class HermesCitizenSyncUtils {
     private static final String DATE_FORMAT = "yyyy.MM.dd HH:mm:ss";
 
     public static void queryLocationsFit(Context context){
-        SharedPreferences prefs = Utils.getSharedPreferences(context);
+        /*SharedPreferences prefs = Utils.getSharedPreferences(context);
         GoogleFitApi fitHelper = GoogleFitApi.getInstance(context);
         long startTime = prefs.getLong(Constants.PROPERTY_LAST_LOCATION_TIME_SENT,Utils.getStartTimeRange(Constants.RANGE_DAY));
         long endTime = new Date().getTime();
@@ -39,11 +34,11 @@ public class HermesCitizenSyncUtils {
                 startTime,
                 endTime,
                 builder,
-                GoogleFitApi.QUERY_LOCATIONS_HERMES);
+                GoogleFitApi.QUERY_LOCATIONS_HERMES);*/
     }
 
     public static void queryActivitiesFit(Context context){
-        SharedPreferences prefs = Utils.getSharedPreferences(context);
+        /*SharedPreferences prefs = Utils.getSharedPreferences(context);
         GoogleFitApi fitHelper = GoogleFitApi.getInstance(context);
         long startTime = prefs.getLong(Constants.PROPERTY_LAST_ACTIVITY_TIME_SENT,Utils.getStartTimeRange(Constants.RANGE_DAY));
         long endTime = new Date().getTime();
@@ -54,7 +49,7 @@ public class HermesCitizenSyncUtils {
                 startTime,
                 endTime,
                 builder,
-                GoogleFitApi.QUERY_ACTIVITIES_HERMES);
+                GoogleFitApi.QUERY_ACTIVITIES_HERMES);*/
     }
 
     public static List<LocationSampleFit> dataSetsToLocationSampleList(List<DataSet> dataSets){
