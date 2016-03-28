@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -17,17 +16,15 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import us.idinfor.smartcitizen.Constants;
-import us.idinfor.smartcitizen.data.api.google.fit.GoogleFitHelper;
 import us.idinfor.smartcitizen.Utils;
-import us.idinfor.smartcitizen.event.FitBucketsResultEvent;
-import us.idinfor.smartcitizen.event.FitDataSetsResultEvent;
-import us.idinfor.smartcitizen.hermes.HermesCitizenApi_old;
+import us.idinfor.smartcitizen.data.api.google.fit.GoogleFitHelper;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.ActivitySegmentFit;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.LocationSampleFit;
+import us.idinfor.smartcitizen.event.FitBucketsResultEvent;
+import us.idinfor.smartcitizen.event.FitDataSetsResultEvent;
 
 public class HermesCitizenSyncService extends Service {
 
@@ -127,15 +124,15 @@ public class HermesCitizenSyncService extends Service {
     }
 
     private void handleActionUploadLocations(String username, List<LocationSampleFit> items) {
-        handleApiResult(ACTION_UPLOAD_LOCATIONS, HermesCitizenApi_old.uploadLocations(username,items));
+        // handleApiResult(ACTION_UPLOAD_LOCATIONS, HermesCitizenApi_old.uploadLocations(username,items));
     }
 
     private void handleActionUploadActivities(String username, List<ActivitySegmentFit> items) {
-        handleApiResult(ACTION_UPLOAD_ACTIVITIES, HermesCitizenApi_old.uploadActivities(username,items));
+       // handleApiResult(ACTION_UPLOAD_ACTIVITIES, HermesCitizenApi_old.uploadActivities(username,items));
     }
 
     private void handleApiResult(String action, Integer result) {
-        Log.i(TAG,"@handleApiResult");
+        /*Log.i(TAG,"@handleApiResult");
         SharedPreferences prefs = Utils.getSharedPreferences(getApplicationContext());
         switch (result) {
             case HermesCitizenApi_old.RESPONSE_OK:
@@ -157,7 +154,7 @@ public class HermesCitizenSyncService extends Service {
                 break;
             default:
                 Log.e(TAG,"Unknown error");
-        }
+        }*/
     }
 
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
