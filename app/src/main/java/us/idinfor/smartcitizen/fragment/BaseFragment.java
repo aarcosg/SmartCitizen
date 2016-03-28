@@ -35,6 +35,6 @@ public abstract class BaseFragment extends Fragment {
     }
 
     protected void unSubscribeFromFragment() {
-        mCompositeSubscription.unsubscribe();
+        mCompositeSubscription.clear();
     }
 }

@@ -54,7 +54,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void unSubscribeFromActivity() {
-        mCompositeSubscription.unsubscribe();
+        mCompositeSubscription.clear();
     }
 
     protected int getToolbarId() {
