@@ -1,4 +1,4 @@
-package us.idinfor.smartcitizen.model.entities.fit;
+package us.idinfor.smartcitizen.data.api.google.fit.entity;
 
 
 public class ActivitySummaryFit {

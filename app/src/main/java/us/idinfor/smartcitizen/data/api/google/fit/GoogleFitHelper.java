@@ -1,30 +1,22 @@
-package us.idinfor.smartcitizen;
+package us.idinfor.smartcitizen.data.api.google.fit;
 
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.Api;
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessStatusCodes;
 import com.google.android.gms.fitness.data.DataType;
-import com.google.android.gms.fitness.result.DataReadResult;
 import com.patloew.rxfit.RxFit;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.concurrent.TimeUnit;
 
-import us.idinfor.smartcitizen.event.FitBucketsResultEvent;
-import us.idinfor.smartcitizen.event.FitDataSetsResultEvent;
+public class GoogleFitHelper {
 
-public class GoogleFitApi{
-
-    private static final String TAG = GoogleFitApi.class.getCanonicalName();
+    private static final String TAG = GoogleFitHelper.class.getCanonicalName();
 
     public static final int QUERY_DEFAULT = 0;
     public static final int QUERY_LOCATIONS_HERMES = 1;
@@ -81,7 +73,7 @@ public class GoogleFitApi{
         }
     }
 
-    private class DataReadResultCallback implements ResultCallback<DataReadResult>{
+    /*private class DataReadResultCallback implements ResultCallback<DataReadResult>{
 
         private int queryType;
 
@@ -104,7 +96,7 @@ public class GoogleFitApi{
                 EventBus.getDefault().post(new FitDataSetsResultEvent(queryType,dataReadResult.getDataSets()));
             }
         }
-    }
+    }*/
 
     /*public void queryFitnessData(long startTime, long endTime, DataReadRequest.Builder builder, int queryType){
         DataReadRequest request = builder.setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)

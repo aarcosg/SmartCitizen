@@ -29,7 +29,7 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import us.idinfor.smartcitizen.Constants;
-import us.idinfor.smartcitizen.GoogleFitApi;
+import us.idinfor.smartcitizen.data.api.google.fit.GoogleFitHelper;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.activity.MainActivity;
 import us.idinfor.smartcitizen.data.api.hermes.HermesCitizenApi;
@@ -37,7 +37,7 @@ import us.idinfor.smartcitizen.di.components.DaggerGoogleApiClientSignInComponen
 import us.idinfor.smartcitizen.di.components.GoogleApiClientSignInComponent;
 import us.idinfor.smartcitizen.di.modules.ActivityModule;
 import us.idinfor.smartcitizen.di.modules.GoogleApiClientSignInModule;
-import us.idinfor.smartcitizen.hermes.User;
+import us.idinfor.smartcitizen.data.api.hermes.entity.User;
 
 public class LoginActivityFragment extends BaseFragment implements GoogleApiClient.OnConnectionFailedListener {
 
@@ -187,7 +187,7 @@ public class LoginActivityFragment extends BaseFragment implements GoogleApiClie
                 .edit()
                 .putString(Constants.PROPERTY_USER_NAME, email)
                 .commit();
-        GoogleFitApi.initFitApi(getBaseActivity().getApplicationContext());
+        GoogleFitHelper.initFitApi(getBaseActivity().getApplicationContext());
         MainActivity.launch(getActivity());
         getActivity().finish();
     }

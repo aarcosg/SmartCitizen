@@ -1,4 +1,4 @@
-package us.idinfor.smartcitizen.hermes;
+package us.idinfor.smartcitizen.data.api.hermes.entity;
 
 
 import java.util.List;

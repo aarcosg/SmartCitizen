@@ -15,8 +15,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import us.idinfor.smartcitizen.model.entities.fit.ActivitySegmentFit;
-import us.idinfor.smartcitizen.model.entities.fit.LocationSampleFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.ActivitySegmentFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.LocationSampleFit;
 
 public class HermesCitizenSyncUtils {
 

@@ -21,13 +21,13 @@ import java.util.Date;
 import java.util.List;
 
 import us.idinfor.smartcitizen.Constants;
-import us.idinfor.smartcitizen.GoogleFitApi;
+import us.idinfor.smartcitizen.data.api.google.fit.GoogleFitHelper;
 import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.event.FitBucketsResultEvent;
 import us.idinfor.smartcitizen.event.FitDataSetsResultEvent;
 import us.idinfor.smartcitizen.hermes.HermesCitizenApi_old;
-import us.idinfor.smartcitizen.model.entities.fit.ActivitySegmentFit;
-import us.idinfor.smartcitizen.model.entities.fit.LocationSampleFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.ActivitySegmentFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.LocationSampleFit;
 
 public class HermesCitizenSyncService extends Service {
 
@@ -163,7 +163,7 @@ public class HermesCitizenSyncService extends Service {
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onFitDataResult(FitDataSetsResultEvent result){
         switch (result.getQueryType()){
-            case GoogleFitApi.QUERY_LOCATIONS_HERMES:
+            case GoogleFitHelper.QUERY_LOCATIONS_HERMES:
                 Log.i(TAG,"FitDataSetsResultEvent@GoogleFitService.QUERY_LOCATIONS_HERMES");
                 String username = Utils.getSharedPreferences(getApplicationContext()).getString(Constants.PROPERTY_USER_NAME,"");
                 List<LocationSampleFit> locations = HermesCitizenSyncUtils.dataSetsToLocationSampleList(result.getDataSets());
@@ -177,7 +177,7 @@ public class HermesCitizenSyncService extends Service {
     @Subscribe(threadMode = ThreadMode.BACKGROUND)
     public void onFitDataResult(FitBucketsResultEvent result){
         switch (result.getQueryType()){
-            case GoogleFitApi.QUERY_ACTIVITIES_HERMES:
+            case GoogleFitHelper.QUERY_ACTIVITIES_HERMES:
                 Log.i(TAG,"FitBucketsResultEvent@GoogleFitService.QUERY_ACTIVITIES_HERMES");
                 String username = Utils.getSharedPreferences(getApplicationContext()).getString(Constants.PROPERTY_USER_NAME,"");
                 List<ActivitySegmentFit> activities = HermesCitizenSyncUtils.bucketsToActivitySegmentList(result.getBuckets());

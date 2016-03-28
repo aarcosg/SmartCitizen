@@ -29,12 +29,12 @@ import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.adapter.ActivitySegmentDetailsAdapter;
 import us.idinfor.smartcitizen.event.FitBucketsResultEvent;
 import us.idinfor.smartcitizen.event.GoogleApiClientConnectedEvent;
-import us.idinfor.smartcitizen.model.entities.ActivityDetails;
-import us.idinfor.smartcitizen.model.entities.fit.ActivitySummaryFit;
-import us.idinfor.smartcitizen.model.entities.fit.CaloriesExpendedFit;
-import us.idinfor.smartcitizen.model.entities.fit.DistanceDeltaFit;
-import us.idinfor.smartcitizen.model.entities.fit.LocationBoundingBoxFit;
-import us.idinfor.smartcitizen.model.entities.fit.StepCountDeltaFit;
+import us.idinfor.smartcitizen.data.api.google.fit.ActivityDetails;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.ActivitySummaryFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.CaloriesExpendedFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.DistanceDeltaFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.LocationBoundingBoxFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.StepCountDeltaFit;
 
 
 public class ActivityDetailsActivityFragment extends BaseFragment {

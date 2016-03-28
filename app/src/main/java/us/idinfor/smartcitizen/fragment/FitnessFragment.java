@@ -55,13 +55,13 @@ import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.activity.ActivityDetailsActivity;
 import us.idinfor.smartcitizen.activity.LocationDetailsActivity;
 import us.idinfor.smartcitizen.adapter.ActivityDurationPagerAdapter;
-import us.idinfor.smartcitizen.model.entities.ActivityDetails;
-import us.idinfor.smartcitizen.model.entities.fit.ActivitySummaryFit;
-import us.idinfor.smartcitizen.model.entities.fit.CaloriesExpendedFit;
-import us.idinfor.smartcitizen.model.entities.fit.DistanceDeltaFit;
-import us.idinfor.smartcitizen.model.entities.fit.HeartRateSummaryFit;
-import us.idinfor.smartcitizen.model.entities.fit.LocationBoundingBoxFit;
-import us.idinfor.smartcitizen.model.entities.fit.StepCountDeltaFit;
+import us.idinfor.smartcitizen.data.api.google.fit.ActivityDetails;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.ActivitySummaryFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.CaloriesExpendedFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.DistanceDeltaFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.HeartRateSummaryFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.LocationBoundingBoxFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.StepCountDeltaFit;
 
 public class FitnessFragment extends BaseFragment {
 

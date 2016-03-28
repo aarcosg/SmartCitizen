@@ -6,10 +6,10 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import rx.Observable;
-import us.idinfor.smartcitizen.hermes.ItemsList;
-import us.idinfor.smartcitizen.hermes.User;
-import us.idinfor.smartcitizen.model.entities.fit.ActivitySegmentFit;
-import us.idinfor.smartcitizen.model.entities.fit.LocationSampleFit;
+import us.idinfor.smartcitizen.data.api.hermes.entity.ItemsList;
+import us.idinfor.smartcitizen.data.api.hermes.entity.User;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.ActivitySegmentFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.LocationSampleFit;
 
 public interface HermesCitizenApi {
 

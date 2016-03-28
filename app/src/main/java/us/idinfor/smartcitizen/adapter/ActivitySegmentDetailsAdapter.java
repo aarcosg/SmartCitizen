@@ -24,7 +24,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
-import us.idinfor.smartcitizen.model.entities.ActivityDetails;
+import us.idinfor.smartcitizen.data.api.google.fit.ActivityDetails;
 
 public class ActivitySegmentDetailsAdapter extends RecyclerView.Adapter<ActivitySegmentDetailsAdapter.ViewHolder> implements View.OnClickListener {
 

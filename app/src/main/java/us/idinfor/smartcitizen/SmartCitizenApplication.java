@@ -23,7 +23,6 @@ public class SmartCitizenApplication extends MultiDexApplication {
         return (SmartCitizenApplication) context.getApplicationContext();
     }
 
-
     @Override
     public void onCreate() {
         super.onCreate();

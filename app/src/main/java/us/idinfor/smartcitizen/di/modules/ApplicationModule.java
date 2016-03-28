@@ -12,7 +12,7 @@ import dagger.Provides;
 import io.fabric.sdk.android.Fabric;
 import us.idinfor.smartcitizen.BuildConfig;
 import us.idinfor.smartcitizen.Constants;
-import us.idinfor.smartcitizen.GoogleFitApi;
+import us.idinfor.smartcitizen.data.api.google.fit.GoogleFitHelper;
 import us.idinfor.smartcitizen.SmartCitizenApplication;
 import us.idinfor.smartcitizen.di.scopes.PerApp;
 
@@ -31,7 +31,7 @@ public class ApplicationModule {
         }
 
         if(!TextUtils.isEmpty(provideDefaultSharedPreferences().getString(Constants.PROPERTY_USER_NAME, ""))){
-            GoogleFitApi.initFitApi(provideApplicationContext());
+            GoogleFitHelper.initFitApi(provideApplicationContext());
         }
     }
 

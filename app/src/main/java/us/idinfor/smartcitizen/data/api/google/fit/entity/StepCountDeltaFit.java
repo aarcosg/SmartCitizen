@@ -1,27 +1,27 @@
-package us.idinfor.smartcitizen.model.entities.fit;
+package us.idinfor.smartcitizen.data.api.google.fit.entity;
 
 
-public class CaloriesExpendedFit {
+public class StepCountDeltaFit {
 
-    Float calories;
+    Integer steps;
     Long startTime;
     Long endTime;
 
-    public CaloriesExpendedFit() {
+    public StepCountDeltaFit() {
     }
 
-    public CaloriesExpendedFit(Float calories, Long startTime, Long endTime) {
-        this.calories = calories;
+    public StepCountDeltaFit(Integer steps, Long startTime, Long endTime) {
+        this.steps = steps;
         this.startTime = startTime;
         this.endTime = endTime;
     }
 
-    public Float getCalories() {
-        return calories;
+    public Integer getSteps() {
+        return steps;
     }
 
-    public void setCalories(Float calories) {
-        this.calories = calories;
+    public void setSteps(Integer steps) {
+        this.steps = steps;
     }
 
     public Long getStartTime() {
