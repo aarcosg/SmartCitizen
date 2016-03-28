@@ -7,12 +7,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.Toolbar;
 
-import org.greenrobot.eventbus.EventBus;
-
 import butterknife.Bind;
+import butterknife.ButterKnife;
 import butterknife.OnItemSelected;
+import rx.Observable;
+import rx.subjects.PublishSubject;
 import us.idinfor.smartcitizen.R;
-import us.idinfor.smartcitizen.event.TimeRangeSelectedEvent;
 
 public class LocationDetailsActivity extends BaseActivity {
 
@@ -23,10 +23,13 @@ public class LocationDetailsActivity extends BaseActivity {
     @Bind(R.id.toolbar)
     Toolbar mToolbar;
 
+    private final PublishSubject<Integer> mTimeRangeSubject = PublishSubject.create();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_details);
+        ButterKnife.bind(this);
         setSupportActionBar(mToolbar);
         if(getSupportActionBar() != null){
             getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -35,13 +38,23 @@ public class LocationDetailsActivity extends BaseActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ButterKnife.unbind(this);
+    }
+
+    @Override
     protected void injectActivityComponent() {
         getActivityComponent().inject(this);
     }
 
     @OnItemSelected(R.id.toolbarSpinner)
-    public void timeRangeSelected(int position){
-        EventBus.getDefault().post(new TimeRangeSelectedEvent(position));
+    public void setTimeRange(int position){
+        mTimeRangeSubject.onNext(position);
+    }
+
+    public Observable<Integer> getTimeRange(){
+        return mTimeRangeSubject;
     }
 
     public static void launch(Activity activity) {

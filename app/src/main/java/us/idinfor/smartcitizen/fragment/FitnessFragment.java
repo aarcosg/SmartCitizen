@@ -130,29 +130,8 @@ public class FitnessFragment extends BaseFragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_fitness, container, false);
         ButterKnife.bind(this, view);
-
-        mDate.setText(DateUtils.formatDateTime(getContext(),
-                System.currentTimeMillis(),
-                DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_ABBREV_MONTH));
-
-        mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        mMapObservableProvider = new MapObservableProvider(mMapFragment);
-        subscribeToFragment(mMapObservableProvider.getMapReadyObservable()
-                .subscribe(googleMap -> {
-                    mMap = googleMap;
-                    mMap.getUiSettings().setAllGesturesEnabled(false);
-                    mMap.getUiSettings().setZoomControlsEnabled(true);
-                    if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                        mMap.setMyLocationEnabled(true);
-                    }
-                    if (mBoundingBoxPolygon != null && mBounds != null){
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(mBounds, 12));
-                        mMap.moveCamera(CameraUpdateFactory.zoomOut());
-                        mMap.addPolygon(mBoundingBoxPolygon);
-                    }
-                })
-        );
-
+        initDateView();
+        initMapView();
         return view;
     }
 
@@ -178,6 +157,31 @@ public class FitnessFragment extends BaseFragment {
         ActivityDetailsActivity.launch(getActivity());
     }
 
+    private void initDateView(){
+        mDate.setText(DateUtils.formatDateTime(getContext(),
+                System.currentTimeMillis(),
+                DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_ABBREV_MONTH));
+    }
+
+    private void initMapView(){
+        mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        mMapObservableProvider = new MapObservableProvider(mMapFragment);
+        subscribeToFragment(mMapObservableProvider.getMapReadyObservable()
+                .subscribe(googleMap -> {
+                    mMap = googleMap;
+                    mMap.getUiSettings().setAllGesturesEnabled(false);
+                    mMap.getUiSettings().setZoomControlsEnabled(true);
+                    if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                        mMap.setMyLocationEnabled(true);
+                    }
+                    if (mBoundingBoxPolygon != null && mBounds != null){
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(mBounds, 12));
+                        mMap.moveCamera(CameraUpdateFactory.zoomOut());
+                        mMap.addPolygon(mBoundingBoxPolygon);
+                    }
+                })
+        );
+    }
 
     private DataReadRequest.Builder buildFitDataReadRequest() {
         DataReadRequest.Builder builder = new DataReadRequest.Builder()
@@ -217,7 +221,7 @@ public class FitnessFragment extends BaseFragment {
                 }, e -> {
                     mProgressBar.setVisibility(View.GONE);
                     Log.e(TAG, "Error reading fitness data", e);
-                    Snackbar.make(mProgressBar.getRootView(), "Error getting Fit data", Snackbar.LENGTH_INDEFINITE)
+                    Snackbar.make(mProgressBar.getRootView(), "Error getting Fit data", Snackbar.LENGTH_LONG)
                             .setAction("Retry", v -> queryGoogleFit(timeRange))
                             .show();
 
@@ -228,7 +232,7 @@ public class FitnessFragment extends BaseFragment {
         );
     }
 
-    public void processFitBucket(Bucket bucket) {
+    private void processFitBucket(Bucket bucket) {
         mActivityDetails = new ActivityDetails();
         // Single bucket expected
         for (DataSet dataSet : bucket.getDataSets()) {
@@ -326,7 +330,6 @@ public class FitnessFragment extends BaseFragment {
                 }
             }
         }
-        updateUI();
     }
 
     private void updateUI() {
@@ -394,6 +397,5 @@ public class FitnessFragment extends BaseFragment {
                 mMap.addPolygon(mBoundingBoxPolygon);
             }
         }
-        mProgressBar.setVisibility(View.GONE);
     }
 }
