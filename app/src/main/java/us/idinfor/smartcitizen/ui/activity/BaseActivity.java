@@ -1,60 +1,46 @@
-package us.idinfor.smartcitizen.activity;
+package us.idinfor.smartcitizen.ui.activity;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import rx.Subscription;
-import rx.subscriptions.CompositeSubscription;
+import javax.inject.Inject;
+
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.SmartCitizenApplication;
-import us.idinfor.smartcitizen.di.components.ActivityComponent;
 import us.idinfor.smartcitizen.di.components.ApplicationComponent;
-import us.idinfor.smartcitizen.di.components.DaggerActivityComponent;
+import us.idinfor.smartcitizen.di.modules.ActivityModule;
+import us.idinfor.smartcitizen.navigation.Navigator;
 
 
 public abstract class BaseActivity extends AppCompatActivity {
 
-    private final CompositeSubscription mCompositeSubscription = new CompositeSubscription();
-    private ActivityComponent mActivityComponent;
+    @Inject
+    Navigator mNavigator;
 
     protected Toolbar mActionBarToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initDependencies();
-        injectActivityComponent();
+        this.getApplicationComponent().inject(this);
     }
 
-    @Override
-    protected void onDestroy() {
-        unSubscribeFromActivity();
-        super.onDestroy();
+    protected void addFragment(int containerViewId, Fragment fragment){
+        FragmentTransaction fragmentTransaction =
+                this.getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.add(containerViewId,fragment);
+        fragmentTransaction.commit();
     }
 
-    private void initDependencies() {
-        mActivityComponent = DaggerActivityComponent.builder()
-                .applicationComponent(getApplicationComponent())
-                .build();
-    }
-
-    protected abstract void injectActivityComponent();
-
-    public ApplicationComponent getApplicationComponent(){
+    protected ApplicationComponent getApplicationComponent(){
         return SmartCitizenApplication.get(this).getApplicationComponent();
     }
 
-    public ActivityComponent getActivityComponent() {
-        return mActivityComponent;
-    }
-
-    protected void subscribeToActivity(Subscription subscription) {
-        mCompositeSubscription.add(subscription);
-    }
-
-    protected void unSubscribeFromActivity() {
-        mCompositeSubscription.clear();
+    protected ActivityModule getActivityModule(){
+        return new ActivityModule(this);
     }
 
     protected int getToolbarId() {

@@ -4,11 +4,14 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    tools:context="us.idinfor.smartcitizen.activity.LoginActivity">
+    tools:context=".ui.activity.LoginActivity">
 
     <include layout="@layout/toolbar"/>
 
-    <include layout="@layout/content_login" />
+    <FrameLayout
+        android:id="@+id/fragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </LinearLayout>
 

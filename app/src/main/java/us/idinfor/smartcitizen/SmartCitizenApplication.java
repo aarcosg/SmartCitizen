@@ -12,8 +12,7 @@ public class SmartCitizenApplication extends MultiDexApplication {
 
     private static final String TAG = SmartCitizenApplication.class.getCanonicalName();
 
-    private ApplicationComponent applicationComponent;
-    private ApplicationModule applicationModule;
+    private ApplicationComponent mApplicationComponent;
 
     public SmartCitizenApplication(){
         super();
@@ -26,23 +25,17 @@ public class SmartCitizenApplication extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        initApplicationComponent();
-        //Fabric.with(this, new Crashlytics());
+        initializeInjector();
     }
 
-    private void initApplicationComponent() {
-        applicationModule = new ApplicationModule(this);
-        applicationComponent = DaggerApplicationComponent.builder()
-                .applicationModule(applicationModule)
+    private void initializeInjector() {
+        mApplicationComponent = DaggerApplicationComponent.builder()
+                .applicationModule(new ApplicationModule(this))
                 .networkModule(new NetworkModule())
                 .build();
     }
 
     public ApplicationComponent getApplicationComponent() {
-        return applicationComponent;
-    }
-
-    public ApplicationModule getApplicationModule(){
-        return applicationModule;
+        return this.mApplicationComponent;
     }
 }

@@ -1,4 +1,4 @@
-package us.idinfor.smartcitizen.adapter;
+package us.idinfor.smartcitizen.ui.adapter;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;

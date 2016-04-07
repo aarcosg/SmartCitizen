@@ -115,4 +115,7 @@ dependencies {
 
     //RxGoogleMaps
     compile 'com.sdoward:rxgooglemaps:0.2@aar'
+
+    //LeakCanary
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
 }
