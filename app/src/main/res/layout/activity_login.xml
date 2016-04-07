@@ -1,16 +1,11 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center_horizontal"
-    android:orientation="vertical"
-    tools:context="us.idinfor.smartcitizen.activity.LoginActivity">
-
-    <include layout="@layout/toolbar"/>
-
-    <include layout="@layout/content_login" />
-
-</LinearLayout>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/fragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.activity.LoginActivity">
+</FrameLayout>
 
 
 

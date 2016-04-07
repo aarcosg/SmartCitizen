@@ -1,4 +1,4 @@
-package us.idinfor.smartcitizen.activity;
+package us.idinfor.smartcitizen.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -41,11 +41,6 @@ public class LocationDetailsActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         ButterKnife.unbind(this);
-    }
-
-    @Override
-    protected void injectActivityComponent() {
-        getActivityComponent().inject(this);
     }
 
     @OnItemSelected(R.id.toolbarSpinner)

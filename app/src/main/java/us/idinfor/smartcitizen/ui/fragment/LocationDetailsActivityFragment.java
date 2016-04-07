@@ -1,17 +1,11 @@
-package us.idinfor.smartcitizen.fragment;
+package us.idinfor.smartcitizen.ui.fragment;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
@@ -24,8 +18,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
-import com.patloew.rxfit.RxFit;
-import com.patloew.rxfit.StatusException;
 import com.sdoward.rxgooglemap.MapObservableProvider;
 
 import java.util.ArrayList;
@@ -34,12 +26,8 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
-import us.idinfor.smartcitizen.activity.LocationDetailsActivity;
 
 public class LocationDetailsActivityFragment extends BaseFragment {
 
@@ -64,11 +52,11 @@ public class LocationDetailsActivityFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.fragment_location_details, container, false);
         ButterKnife.bind(this, view);
         initMapView();
-        subscribeToFragment(((LocationDetailsActivity)getActivity()).getTimeRange()
+        /*subscribeToFragment(((LocationDetailsActivity)getActivity()).getTimeRange()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(timeRange -> queryGoogleFit(timeRange))
-        );
+        );*/
         return view;
     }
 
@@ -87,14 +75,14 @@ public class LocationDetailsActivityFragment extends BaseFragment {
     private void initMapView() {
         mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mMapObservableProvider = new MapObservableProvider(mMapFragment);
-        subscribeToFragment(mMapObservableProvider.getMapReadyObservable()
+        /*subscribeToFragment(mMapObservableProvider.getMapReadyObservable()
                 .subscribe(googleMap -> {
                     mMap = googleMap;
                     if(ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
                         mMap.setMyLocationEnabled(true);
                     }
                 })
-        );
+        );*/
     }
 
     protected DataReadRequest.Builder buildFitDataReadRequest(){
@@ -113,7 +101,7 @@ public class LocationDetailsActivityFragment extends BaseFragment {
         DataReadRequest dataReadRequest = dataReadRequestBuilder.build();
         DataReadRequest dataReadRequestServer = dataReadRequestBuilder.enableServerQueries().build();
 
-        subscribeToFragment(RxFit.History.read(dataReadRequestServer)
+        /*subscribeToFragment(RxFit.History.read(dataReadRequestServer)
                 .doOnError(throwable -> {
                     if(throwable instanceof StatusException && ((StatusException)throwable).getStatus().getStatusCode() == CommonStatusCodes.TIMEOUT) {
                         Log.e(TAG, "Timeout on server query request");
@@ -136,7 +124,7 @@ public class LocationDetailsActivityFragment extends BaseFragment {
                     mProgressBar.setVisibility(View.GONE);
                     updateUI();
                 })
-        );
+        );*/
     }
 
     private void processFitDataSet(DataSet dataSet) {
@@ -175,8 +163,8 @@ public class LocationDetailsActivityFragment extends BaseFragment {
         }
     }
 
-    @Override
+    /*@Override
     protected void injectActivityComponent() {
         getBaseActivity().getActivityComponent().inject(this);
-    }
+    }*/
 }

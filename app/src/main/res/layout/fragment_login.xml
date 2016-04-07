@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/blueGrey700">
+    android:layout_height="match_parent">
 
-    <RelativeLayout
+    <ImageView
+        android:id="@+id/skylineImage"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:src="@drawable/skyline"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:tint="#46000000"/>
 
-        <ImageView
-            android:id="@+id/skylineImage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:src="@drawable/skyline"
-            android:adjustViewBounds="true"
-            android:tint="#28000000"/>
-
-        <TextView
-            android:id="@+id/appName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name_alt"
-            android:layout_centerInParent="true"
-            android:textSize="45dp"
-            android:fontFamily="sans-serif-light"
-            android:textColor="@android:color/white"/>
-    </RelativeLayout>
-
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/signinBtn"
+    <TextView
+        android:id="@+id/appName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp"
+        android:textSize="45dp"
+        android:fontFamily="sans-serif-light"
+        android:text="@string/app_name_alt"
+        android:textColor="@android:color/white"/>
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/signInGoogleBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/appName"
+        android:layout_marginTop="50dp"
         android:visibility="visible" />
+
+</RelativeLayout>
+
+
 
     <!--<ProgressBar
         android:id="@+id/loginProgressBar"
@@ -92,5 +92,3 @@
         </LinearLayout>
 
     </ScrollView>-->
-
-</LinearLayout>

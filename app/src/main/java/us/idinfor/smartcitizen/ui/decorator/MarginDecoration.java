@@ -1,4 +1,4 @@
-package us.idinfor.smartcitizen.decorator;
+package us.idinfor.smartcitizen.ui.decorator;
 
 import android.content.Context;
 import android.graphics.Rect;

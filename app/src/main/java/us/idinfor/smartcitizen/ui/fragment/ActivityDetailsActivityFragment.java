@@ -1,4 +1,4 @@
-package us.idinfor.smartcitizen.fragment;
+package us.idinfor.smartcitizen.ui.fragment;
 
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -26,7 +26,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
-import us.idinfor.smartcitizen.adapter.ActivitySegmentDetailsAdapter;
+import us.idinfor.smartcitizen.ui.adapter.ActivitySegmentDetailsAdapter;
 import us.idinfor.smartcitizen.event.FitBucketsResultEvent;
 import us.idinfor.smartcitizen.event.GoogleApiClientConnectedEvent;
 import us.idinfor.smartcitizen.data.api.google.fit.ActivityDetails;
@@ -224,10 +224,5 @@ public class ActivityDetailsActivityFragment extends BaseFragment {
             adapter.notifyDataSetChanged();
         }
         mProgressBar.setVisibility(View.GONE);
-    }
-
-    @Override
-    protected void injectActivityComponent() {
-        getBaseActivity().getActivityComponent().inject(this);
     }
 }

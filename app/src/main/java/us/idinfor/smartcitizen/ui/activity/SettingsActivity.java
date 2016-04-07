@@ -1,4 +1,4 @@
-package us.idinfor.smartcitizen.activity;
+package us.idinfor.smartcitizen.ui.activity;
 
 
 import android.app.Activity;

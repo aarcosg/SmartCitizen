@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-//apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.fernandocejas.frodo'
 apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'io.fabric'
 apply plugin: 'me.tatarka.retrolambda'
@@ -115,4 +115,7 @@ dependencies {
 
     //RxGoogleMaps
     compile 'com.sdoward:rxgooglemaps:0.2@aar'
+
+    //LeakCanary
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
 }

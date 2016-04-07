@@ -1,4 +1,4 @@
-package us.idinfor.smartcitizen.activity;
+package us.idinfor.smartcitizen.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -16,11 +16,6 @@ public class ActivityDetailsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_activity_details);
         buildActionBarToolbar(getString(R.string.title_activity_activity_details),true);
-    }
-
-    @Override
-    protected void injectActivityComponent() {
-        getActivityComponent().inject(this);
     }
 
     public static void launch(Activity activity) {

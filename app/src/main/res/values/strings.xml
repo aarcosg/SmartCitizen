@@ -25,32 +25,7 @@
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_login">Log in</string>
 
-    <!-- Strings related to Settings -->
-
-    <!-- Example General settings -->
-    <string name="pref_header_general">General</string>
-
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact
-        based on your message history
-    </string>
-
-    <string name="pref_title_display_name">Display name</string>
-    <string name="pref_default_display_name">John Smith</string>
-
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-    <string-array name="pref_example_list_titles">
-        <item>Always</item>
-        <item>When possible</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_example_list_values">
-        <item>1</item>
-        <item>0</item>
-        <item>-1</item>
-    </string-array>
-
-    <!-- Example settings for Data & Sync -->
+    <!-- Settings for Data & Sync -->
     <string name="pref_header_data_sync">Data &amp; sync</string>
 
     <string name="pref_title_sync_frequency">Sync frequency</string>
@@ -73,20 +48,13 @@
 
     <string name="pref_title_system_sync_settings">System sync settings</string>
 
-    <!-- Example settings for Notifications -->
-    <string name="pref_header_notifications">Notifications</string>
+    <!-- Exception messages -->
+    <string name="exception_message_generic">There was an application error</string>
+    <string name="exception_message_no_connection">There is no internet connection</string>
+    <string name="exception_message_user_not_found">User not found</string>
+    <string name="exception_message_user_already_taken">User already taken</string>
 
-    <string name="pref_title_new_message_notifications">New message notifications</string>
 
-    <string name="pref_title_ringtone">Ringtone</string>
-    <string name="pref_ringtone_silent">Silent</string>
-
-    <string name="pref_title_vibrate">Vibrate</string>
-    <string name="start">Start</string>
-    <string name="stop">Stop</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="location">Location</string>
     <string name="minutes">minutes</string>
     <string name="hours">hours</string>
@@ -139,4 +107,8 @@
     <string name="signup">Sign up</string>
     <string name="not_registered_signup_hint">Not registered? Sign up now</string>
     <string name="loading">Loading</string>
+    <string name="retry">Retry</string>
+    <string name="user_signed_up">User signed up</string>
+
+
 </resources>

@@ -1,22 +1,24 @@
 package us.idinfor.smartcitizen.di.modules;
 
+import android.app.Activity;
+import android.support.v4.app.FragmentActivity;
+
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 import dagger.Module;
 import dagger.Provides;
-import us.idinfor.smartcitizen.activity.BaseActivity;
 import us.idinfor.smartcitizen.di.scopes.PerActivity;
 
-@Module (includes = ActivityModule.class)
+@Module
 public class GoogleApiClientSignInModule {
 
-    private GoogleApiClient.OnConnectionFailedListener connectionFailedListener;
+    private final GoogleApiClient.OnConnectionFailedListener mConnectionFailedListener;
 
     public GoogleApiClientSignInModule(
-            GoogleApiClient.OnConnectionFailedListener connectionFailedListener) {
-        connectionFailedListener = connectionFailedListener;
+                           GoogleApiClient.OnConnectionFailedListener connectionFailedListener) {
+        this.mConnectionFailedListener = connectionFailedListener;
     }
 
     @PerActivity
@@ -30,11 +32,11 @@ public class GoogleApiClientSignInModule {
 
     @PerActivity
     @Provides
-    public GoogleApiClient providesGoogleApiClientSignIn(BaseActivity baseActivity,
-                                                   GoogleSignInOptions googleSignInOptions) {
+    public GoogleApiClient providesGoogleApiClientSignIn(Activity activity,
+            GoogleSignInOptions googleSignInOptions) {
         return new GoogleApiClient
-                .Builder(baseActivity)
-                .enableAutoManage(baseActivity, connectionFailedListener)
+                .Builder(activity)
+                .enableAutoManage((FragmentActivity)activity, this.mConnectionFailedListener)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, googleSignInOptions)
                 .build();
     }

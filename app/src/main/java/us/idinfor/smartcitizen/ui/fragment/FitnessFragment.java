@@ -1,15 +1,10 @@
-package us.idinfor.smartcitizen.fragment;
+package us.idinfor.smartcitizen.ui.fragment;
 
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +12,6 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.fitness.data.Bucket;
 import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
@@ -31,8 +25,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.maps.android.SphericalUtil;
-import com.patloew.rxfit.RxFit;
-import com.patloew.rxfit.StatusException;
 import com.sdoward.rxgooglemap.MapObservableProvider;
 import com.viewpagerindicator.CirclePageIndicator;
 
@@ -46,15 +38,9 @@ import java.util.concurrent.TimeUnit;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
-import us.idinfor.smartcitizen.activity.ActivityDetailsActivity;
-import us.idinfor.smartcitizen.activity.LocationDetailsActivity;
-import us.idinfor.smartcitizen.adapter.ActivityDurationPagerAdapter;
 import us.idinfor.smartcitizen.data.api.google.fit.ActivityDetails;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.ActivitySummaryFit;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.CaloriesExpendedFit;
@@ -62,6 +48,9 @@ import us.idinfor.smartcitizen.data.api.google.fit.entity.DistanceDeltaFit;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.HeartRateSummaryFit;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.LocationBoundingBoxFit;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.StepCountDeltaFit;
+import us.idinfor.smartcitizen.ui.activity.ActivityDetailsActivity;
+import us.idinfor.smartcitizen.ui.activity.LocationDetailsActivity;
+import us.idinfor.smartcitizen.ui.adapter.ActivityDurationPagerAdapter;
 
 public class FitnessFragment extends BaseFragment {
 
@@ -120,10 +109,10 @@ public class FitnessFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
     }
 
-    @Override
+    /*@Override
     protected void injectActivityComponent() {
         getBaseActivity().getActivityComponent().inject(this);
-    }
+    }*/
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -166,7 +155,7 @@ public class FitnessFragment extends BaseFragment {
     private void initMapView(){
         mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mMapObservableProvider = new MapObservableProvider(mMapFragment);
-        subscribeToFragment(mMapObservableProvider.getMapReadyObservable()
+        /*subscribeToFragment(mMapObservableProvider.getMapReadyObservable()
                 .subscribe(googleMap -> {
                     mMap = googleMap;
                     mMap.getUiSettings().setAllGesturesEnabled(false);
@@ -180,7 +169,7 @@ public class FitnessFragment extends BaseFragment {
                         mMap.addPolygon(mBoundingBoxPolygon);
                     }
                 })
-        );
+        );*/
     }
 
     private DataReadRequest.Builder buildFitDataReadRequest() {
@@ -206,7 +195,7 @@ public class FitnessFragment extends BaseFragment {
 
         mActivityDetails = new ActivityDetails();
 
-        subscribeToFragment(RxFit.History.read(dataReadRequestServer)
+        /*subscribeToFragment(RxFit.History.read(dataReadRequestServer)
                 .doOnError(throwable -> {
                     if(throwable instanceof StatusException && ((StatusException)throwable).getStatus().getStatusCode() == CommonStatusCodes.TIMEOUT) {
                         Log.e(TAG, "Timeout on server query request");
@@ -229,7 +218,7 @@ public class FitnessFragment extends BaseFragment {
                     mProgressBar.setVisibility(View.GONE);
                     updateUI();
                 })
-        );
+        );*/
     }
 
     private void processFitBucket(Bucket bucket) {
