@@ -1,9 +1,10 @@
 package us.idinfor.smartcitizen.mvp.presenter;
 
 
+import us.idinfor.smartcitizen.data.api.hermes.entity.User;
+
 public interface MainPresenter extends Presenter {
-    void bindUserLoggedIn();
-    void onUserNotFound();
+    User getUser();
     void bindDrawerLearned();
     void onDrawerLearned();
 }

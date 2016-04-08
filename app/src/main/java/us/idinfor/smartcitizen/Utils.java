@@ -31,7 +31,7 @@ public class Utils {
         return isConnected;
     }
 
-    public static boolean checkPlayServices(Activity activity) {
+    public static boolean isGooglePlayServicesAvailable(Activity activity) {
         GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
         int result = googleAPI.isGooglePlayServicesAvailable(activity);
         if(result != ConnectionResult.SUCCESS) {

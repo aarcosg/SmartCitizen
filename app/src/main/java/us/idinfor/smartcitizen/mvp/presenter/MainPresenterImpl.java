@@ -6,7 +6,6 @@ import rx.Subscription;
 import rx.subscriptions.Subscriptions;
 import us.idinfor.smartcitizen.data.api.hermes.entity.User;
 import us.idinfor.smartcitizen.interactor.MainInteractor;
-import us.idinfor.smartcitizen.mvp.model.UserNotFoundInPreferencesException;
 import us.idinfor.smartcitizen.mvp.view.MainView;
 import us.idinfor.smartcitizen.mvp.view.View;
 
@@ -27,26 +26,15 @@ public class MainPresenterImpl implements MainPresenter{
     }
 
     @Override
+    public User getUser() {
+        return this.mMainInteractor.getUserFromPreferences();
+    }
+
+    @Override
     public void onPause() {
         if(!mSubscription.isUnsubscribed()){
             mSubscription.unsubscribe();
         }
-    }
-
-    @Override
-    public void bindUserLoggedIn() {
-        try {
-            User user = this.mMainInteractor.getUserInPreferences();
-            this.mMainView.bindUser(user);
-        } catch (UserNotFoundInPreferencesException e) {
-            onUserNotFound();
-        }
-    }
-
-    @Override
-    public void onUserNotFound() {
-        this.mMainView.navigateToLoginScreen();
-        this.mMainView.finishActivity();
     }
 
     @Override

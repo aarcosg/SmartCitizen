@@ -1,13 +1,11 @@
 package us.idinfor.smartcitizen.interactor;
 
 import android.content.SharedPreferences;
-import android.text.TextUtils;
 
 import javax.inject.Inject;
 
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.data.api.hermes.entity.User;
-import us.idinfor.smartcitizen.mvp.model.UserNotFoundInPreferencesException;
 
 public class MainInteractorImpl implements MainInteractor {
 
@@ -21,12 +19,8 @@ public class MainInteractorImpl implements MainInteractor {
     }
 
     @Override
-    public User getUserInPreferences() throws UserNotFoundInPreferencesException {
-        User user = new User(this.mPrefs.getString(Constants.PROPERTY_USER_NAME,""),null);
-        if(TextUtils.isEmpty(user.getEmail())){
-            throw new UserNotFoundInPreferencesException();
-        }
-        return user;
+    public User getUserFromPreferences() {
+        return new User(this.mPrefs.getString(Constants.PROPERTY_USER_NAME,""), null);
     }
 
     @Override

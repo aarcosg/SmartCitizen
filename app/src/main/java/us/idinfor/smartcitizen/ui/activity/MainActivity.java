@@ -13,6 +13,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -62,23 +63,22 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!Utils.checkPlayServices(this)) {
-            finishActivity();
-        }
 
+        if(!Utils.isGooglePlayServicesAvailable(this)){
+            finish();
+            return;
+        }
         this.initializeInjector();
         this.mMainPresenter.setView(this);
-        this.mMainPresenter.bindUserLoggedIn();
-
-        /*if(!Utils.isServiceRunning(this,HermesCitizenSyncService.class)){
-            //FIXME
-            //HermesCitizenSyncService.startSync(this);
-        }*/
-
+        mUser = this.mMainPresenter.getUser();
+        if(TextUtils.isEmpty(mUser.getEmail())){
+            this.navigateToLoginScreen();
+            this.finish();
+            return;
+        }
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         buildActionBarToolbar(getString(R.string.app_name),false);
-
         mTitle = mDrawerTitle = getTitle();
 
         // Read in the flag indicating whether or not the user has demonstrated awareness of the drawer.
@@ -91,49 +91,15 @@ public class MainActivity extends BaseActivity
             mNavItemId = savedInstanceState.getInt(NAV_ITEM_ID);
         }
 
-        // listen for navigation events
-        mNavigationView.setNavigationItemSelectedListener(this);
-
-        // select the correct nav menu item
-        mNavigationView.getMenu().findItem(mNavItemId).setChecked(true);
-
-        // set up the hamburger icon to open and close the drawer
-        mDrawerToggle = new ActionBarDrawerToggle(
-                this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
-            /** Called when a drawer has settled in a completely closed state. */
-            public void onDrawerClosed(View view) {
-                super.onDrawerClosed(view);
-                mToolbar.setTitle(mTitle);
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-            }
-
-            /** Called when a drawer has settled in a completely open state. */
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                mToolbar.setTitle(mDrawerTitle);
-                if(!mUserLearnedDrawer){
-                    // The user manually opened the drawer; store this flag to prevent auto-showing
-                    // the navigation drawer automatically in the future.
-                    mMainPresenter.onDrawerLearned();
-                }
-                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
-            }
-        };
-
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-
+        this.setupNavigationDrawer();
         selectDrawerItem(mNavItemId);
+        this.openDrawerNotLearned();
+        this.setupNavigationViewHeader();
 
-        // If the user hasn't 'learned' about the drawer, open it to introduce them to the drawer,
-        // per the navigation drawer design guidelines.
-        if(!mUserLearnedDrawer){
-            mDrawerLayout.openDrawer(GravityCompat.START);
-        }
-
-        mUserNameTV = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.username);
-        if(mUserNameTV != null){
-            mUserNameTV.setText(this.mUser.getEmail());
-        }
+        /*if(!Utils.isServiceRunning(this,HermesCitizenSyncService.class)){
+            //FIXME
+            //HermesCitizenSyncService.startSync(this);
+        }*/
     }
 
     @Override
@@ -145,15 +111,10 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if(mDrawerLayout != null){
+            mDrawerLayout.removeDrawerListener(mDrawerToggle);
+        }
         ButterKnife.unbind(this);
-    }
-
-    private void initializeInjector() {
-        this.mMainComponent = DaggerMainComponent.builder()
-                .applicationComponent(getApplicationComponent())
-                .activityModule(getActivityModule())
-                .build();
-        this.mMainComponent.inject(this);
     }
 
     @Override
@@ -167,18 +128,68 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
-    public void finishActivity() {
-        this.finish();
-    }
-
-    @Override
-    public void bindUser(User user) {
-        this.mUser = user;
-    }
-
-    @Override
     public void bindDrawerLearned(boolean isDrawerLearned) {
         this.mUserLearnedDrawer = isDrawerLearned;
+    }
+
+    private void initializeInjector() {
+        this.mMainComponent = DaggerMainComponent.builder()
+                .applicationComponent(getApplicationComponent())
+                .activityModule(getActivityModule())
+                .build();
+        this.mMainComponent.inject(this);
+    }
+
+    private void setupNavigationDrawer() {
+        // listen for navigation events
+        mNavigationView.setNavigationItemSelectedListener(this);
+
+        // select the correct nav menu item
+        mNavigationView.getMenu().findItem(mNavItemId).setChecked(true);
+
+        // set up the hamburger icon to open and close the drawer
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                MainActivity.this.onDrawerClosed();
+            }
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                MainActivity.this.onDrawerOpened();
+            }
+        };
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
+    }
+
+    private void onDrawerClosed(){
+        mToolbar.setTitle(mTitle);
+        invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+    }
+
+    private void onDrawerOpened() {
+        mToolbar.setTitle(mDrawerTitle);
+        if(!mUserLearnedDrawer){
+            // The user manually opened the drawer; store this flag to prevent auto-showing
+            // the navigation drawer automatically in the future.
+            mMainPresenter.onDrawerLearned();
+        }
+        invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+    }
+
+    private void setupNavigationViewHeader() {
+        mUserNameTV = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.username);
+        if(mUserNameTV != null){
+            mUserNameTV.setText(this.mUser.getEmail());
+        }
+    }
+
+    private void openDrawerNotLearned() {
+        // If the user hasn't 'learned' about the drawer, open it to introduce them to the drawer,
+        // per the navigation drawer design guidelines.
+        if(!mUserLearnedDrawer){
+            mDrawerLayout.openDrawer(GravityCompat.START);
+        }
     }
 
     private void selectDrawerItem(int itemId) {
@@ -194,7 +205,7 @@ public class MainActivity extends BaseActivity
 
         if(fragment != null){
             FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.content_frame,fragment).commit();
+            fragmentManager.beginTransaction().replace(R.id.fragmentContainer,fragment).commit();
         }
     }
 

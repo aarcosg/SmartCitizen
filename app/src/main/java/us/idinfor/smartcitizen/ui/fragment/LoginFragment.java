@@ -111,7 +111,7 @@ public class LoginFragment extends BaseFragment implements LoginView{
     public void showLoginSuccessMessage() {
         Toast.makeText(getContext(),
                 getString(R.string.user_signed_up),
-                Toast.LENGTH_SHORT)
+                Toast.LENGTH_LONG)
                 .show();
     }
 

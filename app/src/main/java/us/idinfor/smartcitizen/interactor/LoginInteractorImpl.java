@@ -33,27 +33,31 @@ public class LoginInteractorImpl implements LoginInteractor {
     @RxLogObservable
     @Override
     public Observable<User> loginOrRegisterUserInHermes(final GoogleSignInAccount account) {
+        String email = account.getEmail();
         return Observable.create(subscriber -> {
-            mHermesCitizenApi.existsUser(account.getEmail())
+            mHermesCitizenApi.existsUser(email)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnNext(booleanResponse -> {
                         if(booleanResponse.body()) {
                             // User exists
-                            subscriber.onNext(new User(account.getEmail(),null));
+                            subscriber.onNext(new User(email,null));
                             subscriber.onCompleted();
                         }else{
                             // User doesn't exist, sign up user
-                            mHermesCitizenApi.registerUser(
-                                new User(account.getEmail(), Constants.DEFAULT_PASSWORD))
+                            mHermesCitizenApi.registerUser(new User(email, Constants.DEFAULT_PASSWORD))
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
                                 .doOnNext(integerResponse -> {
                                     if (integerResponse.body() == HermesCitizenApi.RESPONSE_OK) {
-                                        subscriber.onNext(new User(account.getEmail(), null));
+                                        subscriber.onNext(new User(email, null));
                                         subscriber.onCompleted();
                                     } else {
                                         subscriber.onError(getHermesException(integerResponse.body()));
                                     }
-                                });
+                                })
+                                .doOnError(throwable -> subscriber.onError(new UnknownErrorHermesException()))
+                                .subscribe();
                         }
                     })
                     .doOnError(throwable -> subscriber.onError(new UnknownErrorHermesException()))
