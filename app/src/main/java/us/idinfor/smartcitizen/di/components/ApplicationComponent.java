@@ -14,6 +14,7 @@ import us.idinfor.smartcitizen.di.modules.InteractorsModule;
 import us.idinfor.smartcitizen.di.modules.NetworkModule;
 import us.idinfor.smartcitizen.di.scopes.PerApp;
 import us.idinfor.smartcitizen.interactor.LoginInteractor;
+import us.idinfor.smartcitizen.interactor.MainInteractor;
 import us.idinfor.smartcitizen.ui.activity.BaseActivity;
 
 @PerApp
@@ -37,5 +38,6 @@ public interface ApplicationComponent {
     HermesCitizenApi getHermesCitizenApi();
 
     LoginInteractor getLoginInteractor();
+    MainInteractor getMainInteractor();
 
 }

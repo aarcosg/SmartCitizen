@@ -2,7 +2,6 @@ package us.idinfor.smartcitizen.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,20 +17,22 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.crashlytics.android.Crashlytics;
-
 import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
-import us.idinfor.smartcitizen.data.api.hermes.HermesCitizenSyncService;
+import us.idinfor.smartcitizen.data.api.hermes.entity.User;
+import us.idinfor.smartcitizen.di.HasComponent;
+import us.idinfor.smartcitizen.di.components.DaggerMainComponent;
+import us.idinfor.smartcitizen.di.components.MainComponent;
+import us.idinfor.smartcitizen.mvp.presenter.MainPresenter;
+import us.idinfor.smartcitizen.mvp.view.MainView;
 import us.idinfor.smartcitizen.ui.fragment.FitnessFragment;
 
 public class MainActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements HasComponent<MainComponent>, MainView, NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = MainActivity.class.getCanonicalName();
 
@@ -47,32 +48,32 @@ public class MainActivity extends BaseActivity
     TextView mUserNameTV;
 
     @Inject
-    protected SharedPreferences prefs;
+    MainPresenter mMainPresenter;
 
+    private MainComponent mMainComponent;
     private final Handler mDrawerActionHandler = new Handler();
     private ActionBarDrawerToggle mDrawerToggle;
     private int mNavItemId;
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
-
     private boolean mUserLearnedDrawer;
+    private User mUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (!Utils.checkPlayServices(this)) {
-            finish();
+            finishActivity();
         }
 
-        /*if (TextUtils.isEmpty(prefs.getString(Constants.PROPERTY_USER_NAME, ""))) {
-            LoginActivity.launch(this);
-            finish();
-        }*/
+        this.initializeInjector();
+        this.mMainPresenter.setView(this);
+        this.mMainPresenter.bindUserLoggedIn();
 
-        if(!Utils.isServiceRunning(this,HermesCitizenSyncService.class)){
+        /*if(!Utils.isServiceRunning(this,HermesCitizenSyncService.class)){
             //FIXME
             //HermesCitizenSyncService.startSync(this);
-        }
+        }*/
 
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
@@ -81,7 +82,7 @@ public class MainActivity extends BaseActivity
         mTitle = mDrawerTitle = getTitle();
 
         // Read in the flag indicating whether or not the user has demonstrated awareness of the drawer.
-        mUserLearnedDrawer = prefs.getBoolean(Constants.PROPERTY_DRAWER_LEARNED, false);
+        this.mMainPresenter.bindDrawerLearned();
 
         // load saved navigation state if present
         if (null == savedInstanceState) {
@@ -113,8 +114,7 @@ public class MainActivity extends BaseActivity
                 if(!mUserLearnedDrawer){
                     // The user manually opened the drawer; store this flag to prevent auto-showing
                     // the navigation drawer automatically in the future.
-                    mUserLearnedDrawer = true;
-                    prefs.edit().putBoolean(Constants.PROPERTY_DRAWER_LEARNED,true).apply();
+                    mMainPresenter.onDrawerLearned();
                 }
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
@@ -132,8 +132,14 @@ public class MainActivity extends BaseActivity
 
         mUserNameTV = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.username);
         if(mUserNameTV != null){
-            mUserNameTV.setText(prefs.getString(Constants.PROPERTY_USER_NAME,getString(R.string.user)));
+            mUserNameTV.setText(this.mUser.getEmail());
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        this.mMainPresenter.onPause();
     }
 
     @Override
@@ -142,8 +148,37 @@ public class MainActivity extends BaseActivity
         ButterKnife.unbind(this);
     }
 
-    private void logFabricUser() {
-        Crashlytics.setUserIdentifier(prefs.getString(Constants.PROPERTY_USER_NAME,getString(R.string.user)));
+    private void initializeInjector() {
+        this.mMainComponent = DaggerMainComponent.builder()
+                .applicationComponent(getApplicationComponent())
+                .activityModule(getActivityModule())
+                .build();
+        this.mMainComponent.inject(this);
+    }
+
+    @Override
+    public MainComponent getComponent() {
+        return this.mMainComponent;
+    }
+
+    @Override
+    public void navigateToLoginScreen() {
+        LoginActivity.launch(this);
+    }
+
+    @Override
+    public void finishActivity() {
+        this.finish();
+    }
+
+    @Override
+    public void bindUser(User user) {
+        this.mUser = user;
+    }
+
+    @Override
+    public void bindDrawerLearned(boolean isDrawerLearned) {
+        this.mUserLearnedDrawer = isDrawerLearned;
     }
 
     private void selectDrawerItem(int itemId) {
@@ -168,12 +203,9 @@ public class MainActivity extends BaseActivity
         item.setChecked(true);
         mNavItemId = item.getItemId();
         mDrawerLayout.closeDrawer(GravityCompat.START);
-        mDrawerActionHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                selectDrawerItem(mNavItemId);
-            }
-        }, DRAWER_DELAY_MS);
+        mDrawerActionHandler
+                .postDelayed(() -> selectDrawerItem(mNavItemId),
+                        DRAWER_DELAY_MS);
         return true;
     }
 

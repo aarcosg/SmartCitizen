@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
@@ -108,9 +109,9 @@ public class LoginFragment extends BaseFragment implements LoginView{
 
     @Override
     public void showLoginSuccessMessage() {
-        Snackbar.make(mSignInGoogleBtn.getRootView(),
+        Toast.makeText(getContext(),
                 getString(R.string.user_signed_up),
-                Snackbar.LENGTH_SHORT)
+                Toast.LENGTH_SHORT)
                 .show();
     }
 
