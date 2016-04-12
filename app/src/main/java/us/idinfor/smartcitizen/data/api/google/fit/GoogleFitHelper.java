@@ -9,10 +9,23 @@ import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessStatusCodes;
+import com.google.android.gms.fitness.data.Bucket;
+import com.google.android.gms.fitness.data.DataPoint;
+import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
+import com.google.android.gms.fitness.data.Field;
 import com.patloew.rxfit.RxFit;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import us.idinfor.smartcitizen.data.api.google.fit.entity.ActivitySummaryFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.CaloriesExpendedFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.DistanceDeltaFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.HeartRateSummaryFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.LocationBoundingBoxFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.StepCountDeltaFit;
 
 public class GoogleFitHelper {
 
@@ -71,6 +84,104 @@ public class GoogleFitHelper {
                         }
                     });
         }
+    }
+
+    public static ActivityDetails parseGoogleFitBucket(Bucket bucket) {
+        ActivityDetails activityDetails = new ActivityDetails();
+        List<ActivitySummaryFit> activitiesSummary = new ArrayList<>();
+        // Single bucket expected
+        for (DataSet dataSet : bucket.getDataSets()) {
+            if (dataSet.getDataType().equals(DataType.AGGREGATE_STEP_COUNT_DELTA)) {
+                for (DataPoint dp : dataSet.getDataPoints()) {
+                    if (dp.getDataType().equals(DataType.AGGREGATE_STEP_COUNT_DELTA)) {
+                        StepCountDeltaFit stepCount = new StepCountDeltaFit(
+                                dp.getValue(Field.FIELD_STEPS).asInt(),
+                                dp.getStartTime(TimeUnit.MILLISECONDS),
+                                dp.getEndTime(TimeUnit.MILLISECONDS)
+                        );
+                        activityDetails.setStepCountDelta(stepCount);
+                    }
+                }
+            }
+            if (dataSet.getDataType().equals(DataType.AGGREGATE_DISTANCE_DELTA)) {
+                for (DataPoint dp : dataSet.getDataPoints()) {
+                    if (dp.getDataType().equals(DataType.AGGREGATE_DISTANCE_DELTA)) {
+                        DistanceDeltaFit distanceDelta = new DistanceDeltaFit(
+                                dp.getValue(Field.FIELD_DISTANCE).asFloat() / 1000,
+                                dp.getStartTime(TimeUnit.MILLISECONDS),
+                                dp.getEndTime(TimeUnit.MILLISECONDS)
+                        );
+                        activityDetails.setDistanceDelta(distanceDelta);
+                    }
+                }
+            }
+            if (dataSet.getDataType().equals(DataType.AGGREGATE_CALORIES_EXPENDED)) {
+                for (DataPoint dp : dataSet.getDataPoints()) {
+                    if (dp.getDataType().equals(DataType.AGGREGATE_CALORIES_EXPENDED)) {
+                        CaloriesExpendedFit caloriesExpended = new CaloriesExpendedFit(
+                                dp.getValue(Field.FIELD_CALORIES).asFloat(),
+                                dp.getStartTime(TimeUnit.MILLISECONDS),
+                                dp.getEndTime(TimeUnit.MILLISECONDS)
+                        );
+                        activityDetails.setCaloriesExpended(caloriesExpended);
+                    }
+                }
+            }
+            if (dataSet.getDataType().equals(DataType.AGGREGATE_ACTIVITY_SUMMARY)) {
+                for (DataPoint dp : dataSet.getDataPoints()) {
+                    if (dp.getDataType().equals(DataType.AGGREGATE_ACTIVITY_SUMMARY)) {
+                        ActivitySummaryFit activity = new ActivitySummaryFit(
+                                dp.getValue(Field.FIELD_ACTIVITY).asActivity(),
+                                dp.getValue(Field.FIELD_DURATION).asInt() / 1000 / 60,
+                                dp.getValue(Field.FIELD_NUM_SEGMENTS).asInt(),
+                                dp.getStartTime(TimeUnit.MILLISECONDS),
+                                dp.getEndTime(TimeUnit.MILLISECONDS)
+                        );
+                        activitiesSummary.add(activity);
+                    }
+                }
+                activityDetails.setActivitiesSummary(activitiesSummary);
+            }
+            if (dataSet.getDataType().equals(DataType.AGGREGATE_LOCATION_BOUNDING_BOX)) {
+                Float latitudeSW, longitudeSW, latitudeNE, longitudeNE;
+                for (DataPoint dp : dataSet.getDataPoints()) {
+                    if (dp.getDataType().equals(DataType.AGGREGATE_LOCATION_BOUNDING_BOX)) {
+
+                        latitudeSW = dp.getValue(Field.FIELD_LOW_LATITUDE).asFloat();
+                        longitudeSW = dp.getValue(Field.FIELD_LOW_LONGITUDE).asFloat();
+
+                        latitudeNE = dp.getValue(Field.FIELD_HIGH_LATITUDE).asFloat();
+                        longitudeNE = dp.getValue(Field.FIELD_HIGH_LONGITUDE).asFloat();
+
+                        LocationBoundingBoxFit locationBoundingBox = new LocationBoundingBoxFit(
+                                latitudeSW,
+                                longitudeSW,
+                                latitudeNE,
+                                longitudeNE,
+                                dp.getStartTime(TimeUnit.MILLISECONDS),
+                                dp.getEndTime(TimeUnit.MILLISECONDS)
+                        );
+                        activityDetails.setLocationBoundingBox(locationBoundingBox);
+                    }
+                }
+
+            }
+            if (dataSet.getDataType().equals(DataType.AGGREGATE_HEART_RATE_SUMMARY)) {
+                for (DataPoint dp : dataSet.getDataPoints()) {
+                    if (dp.getDataType().equals(DataType.AGGREGATE_HEART_RATE_SUMMARY)) {
+                        HeartRateSummaryFit heartRateSummary = new HeartRateSummaryFit(
+                                dp.getValue(Field.FIELD_AVERAGE).asFloat(),
+                                dp.getValue(Field.FIELD_MIN).asFloat(),
+                                dp.getValue(Field.FIELD_MAX).asFloat(),
+                                dp.getStartTime(TimeUnit.MILLISECONDS),
+                                dp.getEndTime(TimeUnit.MILLISECONDS)
+                        );
+                        activityDetails.setHeartRateSummary(heartRateSummary);
+                    }
+                }
+            }
+        }
+        return activityDetails;
     }
 
     /*private class DataReadResultCallback implements ResultCallback<DataReadResult>{

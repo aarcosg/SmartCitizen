@@ -27,7 +27,7 @@ public class LoginActivity extends BaseActivity implements HasComponent<LoginCom
 
         this.initializeInjector();
         if(savedInstanceState == null){
-            addFragment(R.id.fragmentContainer, new LoginFragment());
+            addFragment(R.id.fragment_container, new LoginFragment());
         }
     }
 

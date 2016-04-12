@@ -23,7 +23,6 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import us.idinfor.smartcitizen.R;
-import us.idinfor.smartcitizen.data.api.google.fit.GoogleFitHelper;
 import us.idinfor.smartcitizen.di.components.LoginComponent;
 import us.idinfor.smartcitizen.exception.ErrorMessageFactory;
 import us.idinfor.smartcitizen.mvp.presenter.LoginPresenter;
@@ -113,11 +112,6 @@ public class LoginFragment extends BaseFragment implements LoginView{
                 getString(R.string.user_signed_up),
                 Toast.LENGTH_LONG)
                 .show();
-    }
-
-    @Override
-    public void initGoogleFitApi() {
-        GoogleFitHelper.initFitApi(getActivity().getApplicationContext());
     }
 
     @Override

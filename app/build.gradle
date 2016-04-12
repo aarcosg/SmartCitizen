@@ -115,4 +115,7 @@ dependencies {
 
     //LeakCanary
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
+
+    //RxPermissions
+    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.7.0@aar'
 }

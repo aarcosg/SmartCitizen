@@ -31,6 +31,16 @@ public class MainPresenterImpl implements MainPresenter{
     }
 
     @Override
+    public void onCreate() {
+        // Read in the flag indicating whether or not the user has demonstrated awareness of the drawer.
+        this.bindDrawerLearnedFlag();
+        this.mMainView.setupNavigationDrawer();
+        this.mMainView.openDrawerNotLearned();
+        this.mMainView.setupNavigationDrawerHeader();
+        this.mMainView.selectDrawerItem();
+    }
+
+    @Override
     public void onPause() {
         if(!mSubscription.isUnsubscribed()){
             mSubscription.unsubscribe();
@@ -38,7 +48,7 @@ public class MainPresenterImpl implements MainPresenter{
     }
 
     @Override
-    public void bindDrawerLearned() {
+    public void bindDrawerLearnedFlag() {
         boolean isDrawerLearned = this.mMainInteractor.isDrawerLearnedInPreferences();
         this.mMainView.bindDrawerLearned(isDrawerLearned);
     }
@@ -48,6 +58,4 @@ public class MainPresenterImpl implements MainPresenter{
         this.mMainInteractor.setDrawerLearnedInPreferences(true);
         this.mMainView.bindDrawerLearned(true);
     }
-
-
 }

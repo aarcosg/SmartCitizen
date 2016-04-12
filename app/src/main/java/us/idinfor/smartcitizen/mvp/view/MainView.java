@@ -4,6 +4,8 @@ public interface MainView extends View {
 
     void navigateToLoginScreen();
     void bindDrawerLearned(boolean isDrawerLearned);
-
-
+    void setupNavigationDrawer();
+    void setupNavigationDrawerHeader();
+    void openDrawerNotLearned();
+    void selectDrawerItem();
 }
