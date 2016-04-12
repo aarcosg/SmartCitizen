@@ -1,6 +1,8 @@
 package us.idinfor.smartcitizen.data.api.google.fit;
 
 
+import java.util.List;
+
 import us.idinfor.smartcitizen.data.api.google.fit.entity.ActivitySummaryFit;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.CaloriesExpendedFit;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.DistanceDeltaFit;
@@ -16,17 +18,19 @@ public class ActivityDetails {
     DistanceDeltaFit distanceDelta;
     CaloriesExpendedFit caloriesExpended;
     HeartRateSummaryFit heartRateSummary;
+    List<ActivitySummaryFit> activitiesSummary;
 
     public ActivityDetails() {
     }
 
-    public ActivityDetails(ActivitySummaryFit activitySummary, LocationBoundingBoxFit locationBoundingBox, StepCountDeltaFit stepCountDelta, DistanceDeltaFit distanceDelta, CaloriesExpendedFit caloriesExpended, HeartRateSummaryFit heartRateSummary) {
+    public ActivityDetails(ActivitySummaryFit activitySummary, LocationBoundingBoxFit locationBoundingBox, StepCountDeltaFit stepCountDelta, DistanceDeltaFit distanceDelta, CaloriesExpendedFit caloriesExpended, HeartRateSummaryFit heartRateSummary, List<ActivitySummaryFit> activitiesSummary) {
         this.activitySummary = activitySummary;
         this.locationBoundingBox = locationBoundingBox;
         this.stepCountDelta = stepCountDelta;
         this.distanceDelta = distanceDelta;
         this.caloriesExpended = caloriesExpended;
         this.heartRateSummary = heartRateSummary;
+        this.activitiesSummary = activitiesSummary;
     }
 
     public ActivitySummaryFit getActivitySummary() {
@@ -75,5 +79,13 @@ public class ActivityDetails {
 
     public void setHeartRateSummary(HeartRateSummaryFit heartRateSummary) {
         this.heartRateSummary = heartRateSummary;
+    }
+
+    public List<ActivitySummaryFit> getActivitiesSummary() {
+        return activitiesSummary;
+    }
+
+    public void setActivitiesSummary(List<ActivitySummaryFit> activitiesSummary) {
+        this.activitiesSummary = activitiesSummary;
     }
 }

@@ -6,7 +6,6 @@ public interface LoginView extends View {
     void hideProgressDialog();
     void showGoogleSignInErrorMessage();
     void showLoginSuccessMessage();
-    void initGoogleFitApi();
     void navigateToMainScreen();
     void finishActivity();
     void showErrorMessage(Throwable throwable);

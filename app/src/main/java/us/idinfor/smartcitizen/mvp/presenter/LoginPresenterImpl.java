@@ -65,7 +65,6 @@ public class LoginPresenterImpl implements LoginPresenter{
     public void onUserLogged(User user) {
         this.mLoginInteractor.saveLoggedUserInPreferences(user);
         this.mLoginView.showLoginSuccessMessage();
-        this.mLoginView.initGoogleFitApi();
         this.mLoginView.navigateToMainScreen();
         this.mLoginView.finishActivity();
     }

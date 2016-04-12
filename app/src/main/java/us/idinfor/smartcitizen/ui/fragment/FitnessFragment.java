@@ -1,10 +1,16 @@
 package us.idinfor.smartcitizen.ui.fragment;
 
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,12 +18,6 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.android.gms.fitness.data.Bucket;
-import com.google.android.gms.fitness.data.DataPoint;
-import com.google.android.gms.fitness.data.DataSet;
-import com.google.android.gms.fitness.data.DataType;
-import com.google.android.gms.fitness.data.Field;
-import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -26,14 +26,13 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.maps.android.SphericalUtil;
 import com.sdoward.rxgooglemap.MapObservableProvider;
+import com.tbruyelle.rxpermissions.RxPermissions;
 import com.viewpagerindicator.CirclePageIndicator;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -42,17 +41,14 @@ import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.data.api.google.fit.ActivityDetails;
-import us.idinfor.smartcitizen.data.api.google.fit.entity.ActivitySummaryFit;
-import us.idinfor.smartcitizen.data.api.google.fit.entity.CaloriesExpendedFit;
-import us.idinfor.smartcitizen.data.api.google.fit.entity.DistanceDeltaFit;
-import us.idinfor.smartcitizen.data.api.google.fit.entity.HeartRateSummaryFit;
-import us.idinfor.smartcitizen.data.api.google.fit.entity.LocationBoundingBoxFit;
-import us.idinfor.smartcitizen.data.api.google.fit.entity.StepCountDeltaFit;
+import us.idinfor.smartcitizen.di.components.MainComponent;
+import us.idinfor.smartcitizen.mvp.presenter.FitnessPresenter;
+import us.idinfor.smartcitizen.mvp.view.FitnessView;
 import us.idinfor.smartcitizen.ui.activity.ActivityDetailsActivity;
 import us.idinfor.smartcitizen.ui.activity.LocationDetailsActivity;
 import us.idinfor.smartcitizen.ui.adapter.ActivityDurationPagerAdapter;
 
-public class FitnessFragment extends BaseFragment {
+public class FitnessFragment extends BaseFragment implements FitnessView {
 
     private static final String TAG = FitnessFragment.class.getCanonicalName();
 
@@ -83,6 +79,9 @@ public class FitnessFragment extends BaseFragment {
     @Bind(R.id.caloriesProgress)
     ProgressBar mCaloriesProgress;
 
+    @Inject
+    FitnessPresenter mFitnessPresenter;
+
     private GoogleMap mMap;
     private PolygonOptions mBoundingBoxPolygon;
     private LatLngBounds mBounds;
@@ -90,8 +89,9 @@ public class FitnessFragment extends BaseFragment {
     private SupportMapFragment mMapFragment;
     private MapObservableProvider mMapObservableProvider;
 
-    private List<ActivitySummaryFit> mActivitiesSummary = new ArrayList<>();
     private ActivityDetails mActivityDetails;
+
+    private Snackbar mPermissionsSnackbar;
 
     public static FitnessFragment newInstance() {
         FitnessFragment fragment = new FitnessFragment();
@@ -107,27 +107,34 @@ public class FitnessFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.getComponent(MainComponent.class).inject(this);
+        this.mFitnessPresenter.onCreate();
     }
-
-    /*@Override
-    protected void injectActivityComponent() {
-        getBaseActivity().getActivityComponent().inject(this);
-    }*/
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_fitness, container, false);
-        ButterKnife.bind(this, view);
-        initDateView();
-        initMapView();
-        return view;
+        final View fragmentView = inflater.inflate(R.layout.fragment_fitness, container, false);
+        ButterKnife.bind(this, fragmentView);
+        return fragmentView;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        this.mFitnessPresenter.setView(this);
+        this.mFitnessPresenter.onViewCreated();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        this.mFitnessPresenter.onPause();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        queryGoogleFit(Constants.RANGE_DAY);
+        this.mFitnessPresenter.onResume();
     }
 
     @Override
@@ -136,194 +143,95 @@ public class FitnessFragment extends BaseFragment {
         ButterKnife.unbind(this);
     }
 
-    @OnClick(R.id.locationDetailsBtn)
-    public void openLocationDetailsActivity() {
-        LocationDetailsActivity.launch(getActivity());
-    }
-
-    @OnClick(R.id.activityDetailsBtn)
-    public void openActivityDetailsActivity() {
-        ActivityDetailsActivity.launch(getActivity());
-    }
-
-    private void initDateView(){
+    @Override
+    public void setupDateView() {
         mDate.setText(DateUtils.formatDateTime(getContext(),
                 System.currentTimeMillis(),
                 DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_ABBREV_MONTH));
     }
 
-    private void initMapView(){
+    @Override
+    public void setupMapView() {
         mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        mMapObservableProvider = new MapObservableProvider(mMapFragment);
-        /*subscribeToFragment(mMapObservableProvider.getMapReadyObservable()
-                .subscribe(googleMap -> {
-                    mMap = googleMap;
-                    mMap.getUiSettings().setAllGesturesEnabled(false);
-                    mMap.getUiSettings().setZoomControlsEnabled(true);
-                    if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                        mMap.setMyLocationEnabled(true);
-                    }
-                    if (mBoundingBoxPolygon != null && mBounds != null){
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(mBounds, 12));
-                        mMap.moveCamera(CameraUpdateFactory.zoomOut());
-                        mMap.addPolygon(mBoundingBoxPolygon);
-                    }
-                })
-        );*/
+        this.mFitnessPresenter.initGoogleMap(mMapFragment);
     }
 
-    private DataReadRequest.Builder buildFitDataReadRequest() {
-        DataReadRequest.Builder builder = new DataReadRequest.Builder()
-                .aggregate(DataType.TYPE_LOCATION_SAMPLE, DataType.AGGREGATE_LOCATION_BOUNDING_BOX)
-                .aggregate(DataType.TYPE_ACTIVITY_SEGMENT, DataType.AGGREGATE_ACTIVITY_SUMMARY)
-                .aggregate(DataType.TYPE_STEP_COUNT_DELTA, DataType.AGGREGATE_STEP_COUNT_DELTA)
-                .aggregate(DataType.TYPE_HEART_RATE_BPM, DataType.AGGREGATE_HEART_RATE_SUMMARY)
-                .aggregate(DataType.TYPE_CALORIES_EXPENDED, DataType.AGGREGATE_CALORIES_EXPENDED)
-                .aggregate(DataType.TYPE_DISTANCE_DELTA, DataType.AGGREGATE_DISTANCE_DELTA);
-        return builder;
-    }
-
-    private void queryGoogleFit(int timeRange) {
-        mProgressBar.setVisibility(View.VISIBLE);
-        DataReadRequest.Builder dataReadRequestBuilder = buildFitDataReadRequest();
-
-        dataReadRequestBuilder.setTimeRange(Utils.getStartTimeRange(timeRange),new Date().getTime(),TimeUnit.MILLISECONDS);
-        dataReadRequestBuilder.bucketByTime(1, TimeUnit.DAYS);
-
-        DataReadRequest dataReadRequest = dataReadRequestBuilder.build();
-        DataReadRequest dataReadRequestServer = dataReadRequestBuilder.enableServerQueries().build();
-
-        mActivityDetails = new ActivityDetails();
-
-        /*subscribeToFragment(RxFit.History.read(dataReadRequestServer)
-                .doOnError(throwable -> {
-                    if(throwable instanceof StatusException && ((StatusException)throwable).getStatus().getStatusCode() == CommonStatusCodes.TIMEOUT) {
-                        Log.e(TAG, "Timeout on server query request");
-                    }
-                })
-                .compose(new RxFit.OnExceptionResumeNext.Single<>(RxFit.History.read(dataReadRequest)))
-                .flatMapObservable(dataReadResult -> Observable.from(dataReadResult.getBuckets()))
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(bucket -> {
-                    processFitBucket(bucket);
-                }, e -> {
-                    mProgressBar.setVisibility(View.GONE);
-                    Log.e(TAG, "Error reading fitness data", e);
-                    Snackbar.make(mProgressBar.getRootView(), "Error getting Fit data", Snackbar.LENGTH_LONG)
-                            .setAction("Retry", v -> queryGoogleFit(timeRange))
-                            .show();
-
-                }, () -> {
-                    mProgressBar.setVisibility(View.GONE);
-                    updateUI();
-                })
-        );*/
-    }
-
-    private void processFitBucket(Bucket bucket) {
-        mActivityDetails = new ActivityDetails();
-        // Single bucket expected
-        for (DataSet dataSet : bucket.getDataSets()) {
-            if (dataSet.getDataType().equals(DataType.AGGREGATE_STEP_COUNT_DELTA)) {
-                for (DataPoint dp : dataSet.getDataPoints()) {
-                    if (dp.getDataType().equals(DataType.AGGREGATE_STEP_COUNT_DELTA)) {
-                        StepCountDeltaFit stepCount = new StepCountDeltaFit(
-                                dp.getValue(Field.FIELD_STEPS).asInt(),
-                                dp.getStartTime(TimeUnit.MILLISECONDS),
-                                dp.getEndTime(TimeUnit.MILLISECONDS)
-                        );
-                        mActivityDetails.setStepCountDelta(stepCount);
-                    }
-                }
-            }
-            if (dataSet.getDataType().equals(DataType.AGGREGATE_DISTANCE_DELTA)) {
-                for (DataPoint dp : dataSet.getDataPoints()) {
-                    if (dp.getDataType().equals(DataType.AGGREGATE_DISTANCE_DELTA)) {
-                        DistanceDeltaFit distanceDelta = new DistanceDeltaFit(
-                                dp.getValue(Field.FIELD_DISTANCE).asFloat() / 1000,
-                                dp.getStartTime(TimeUnit.MILLISECONDS),
-                                dp.getEndTime(TimeUnit.MILLISECONDS)
-                        );
-                        mActivityDetails.setDistanceDelta(distanceDelta);
-                    }
-                }
-            }
-            if (dataSet.getDataType().equals(DataType.AGGREGATE_CALORIES_EXPENDED)) {
-                for (DataPoint dp : dataSet.getDataPoints()) {
-                    if (dp.getDataType().equals(DataType.AGGREGATE_CALORIES_EXPENDED)) {
-                        CaloriesExpendedFit caloriesExpended = new CaloriesExpendedFit(
-                                dp.getValue(Field.FIELD_CALORIES).asFloat(),
-                                dp.getStartTime(TimeUnit.MILLISECONDS),
-                                dp.getEndTime(TimeUnit.MILLISECONDS)
-                        );
-                        mActivityDetails.setCaloriesExpended(caloriesExpended);
-                    }
-                }
-            }
-            if (dataSet.getDataType().equals(DataType.AGGREGATE_ACTIVITY_SUMMARY)) {
-                if (mActivitiesSummary == null) {
-                    mActivitiesSummary = new ArrayList<ActivitySummaryFit>();
-                } else {
-                    mActivitiesSummary.clear();
-                }
-                for (DataPoint dp : dataSet.getDataPoints()) {
-                    if (dp.getDataType().equals(DataType.AGGREGATE_ACTIVITY_SUMMARY)) {
-                        ActivitySummaryFit activity = new ActivitySummaryFit(
-                                dp.getValue(Field.FIELD_ACTIVITY).asActivity(),
-                                dp.getValue(Field.FIELD_DURATION).asInt() / 1000 / 60,
-                                dp.getValue(Field.FIELD_NUM_SEGMENTS).asInt(),
-                                dp.getStartTime(TimeUnit.MILLISECONDS),
-                                dp.getEndTime(TimeUnit.MILLISECONDS)
-                        );
-                        mActivitiesSummary.add(activity);
-                    }
-                }
-            }
-            if (dataSet.getDataType().equals(DataType.AGGREGATE_LOCATION_BOUNDING_BOX)) {
-                Float latitudeSW, longitudeSW, latitudeNE, longitudeNE;
-                for (DataPoint dp : dataSet.getDataPoints()) {
-                    if (dp.getDataType().equals(DataType.AGGREGATE_LOCATION_BOUNDING_BOX)) {
-
-                        latitudeSW = dp.getValue(Field.FIELD_LOW_LATITUDE).asFloat();
-                        longitudeSW = dp.getValue(Field.FIELD_LOW_LONGITUDE).asFloat();
-
-                        latitudeNE = dp.getValue(Field.FIELD_HIGH_LATITUDE).asFloat();
-                        longitudeNE = dp.getValue(Field.FIELD_HIGH_LONGITUDE).asFloat();
-
-                        LocationBoundingBoxFit locationBoundingBox = new LocationBoundingBoxFit(
-                                latitudeSW,
-                                longitudeSW,
-                                latitudeNE,
-                                longitudeNE,
-                                dp.getStartTime(TimeUnit.MILLISECONDS),
-                                dp.getEndTime(TimeUnit.MILLISECONDS)
-                        );
-                        mActivityDetails.setLocationBoundingBox(locationBoundingBox);
-                    }
-                }
-
-            }
-            if (dataSet.getDataType().equals(DataType.AGGREGATE_HEART_RATE_SUMMARY)) {
-                for (DataPoint dp : dataSet.getDataPoints()) {
-                    if (dp.getDataType().equals(DataType.AGGREGATE_HEART_RATE_SUMMARY)) {
-                        HeartRateSummaryFit heartRateSummary = new HeartRateSummaryFit(
-                                dp.getValue(Field.FIELD_AVERAGE).asFloat(),
-                                dp.getValue(Field.FIELD_MIN).asFloat(),
-                                dp.getValue(Field.FIELD_MAX).asFloat(),
-                                dp.getStartTime(TimeUnit.MILLISECONDS),
-                                dp.getEndTime(TimeUnit.MILLISECONDS)
-                        );
-                        mActivityDetails.setHeartRateSummary(heartRateSummary);
-                    }
-                }
-            }
+    @Override
+    public void onGoogleMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+        mMap.getUiSettings().setAllGesturesEnabled(false);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
+        }
+        if (mBoundingBoxPolygon != null && mBounds != null){
+            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(mBounds, 12));
+            mMap.moveCamera(CameraUpdateFactory.zoomOut());
+            mMap.addPolygon(mBoundingBoxPolygon);
         }
     }
 
-    private void updateUI() {
+    @Override
+    public void showProgressDialog() {
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void hideProgressDialog() {
+        mProgressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showGoogleFitErrorMessage() {
+        Snackbar.make(mProgressBar.getRootView(),
+                getString(R.string.exception_message_google_fit_query),
+                Snackbar.LENGTH_INDEFINITE)
+                .setAction(getString(R.string.retry),
+                        v -> this.mFitnessPresenter.queryGoogleFit(Constants.RANGE_DAY))
+                .show();
+    }
+
+    @Override
+    public void showAppPermissionsRequiredErrorMessage() {
+        mPermissionsSnackbar = Snackbar.make(mProgressBar.getRootView(),
+                getString(R.string.exception_message_permissions_required),
+                Snackbar.LENGTH_INDEFINITE)
+                .setAction(getString(R.string.retry),
+                        v -> requestMandatoryAppPermissions());
+        mPermissionsSnackbar.show();
+    }
+
+    @Override
+    public void requestMandatoryAppPermissions() {
+        RxPermissions.getInstance(getActivity())
+                .request(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.BODY_SENSORS)
+                .subscribe(granted -> {
+                    if(granted){
+                        onAppPermissionsGranted();
+                    }
+                });
+    }
+
+    private void onAppPermissionsGranted() {
+        Log.i(TAG,"Permissions granted");
+        hidePermissionsSnackbar();
+        this.mFitnessPresenter.queryGoogleFit(Constants.RANGE_DAY);
+    }
+
+    private void hidePermissionsSnackbar(){
+        if(mPermissionsSnackbar != null && mPermissionsSnackbar.isShown()){
+            mPermissionsSnackbar.dismiss();
+        }
+    }
+
+    @Override
+    public void bindActivityDetails(ActivityDetails activityDetails) {
         NumberFormat df = DecimalFormat.getInstance();
         df.setMaximumFractionDigits(2);
+
+        mActivityDetails = activityDetails;
 
         if (mActivityDetails.getStepCountDelta() != null) {
             Integer steps = mActivityDetails.getStepCountDelta().getSteps();
@@ -354,8 +262,8 @@ public class FitnessFragment extends BaseFragment {
 
         }
 
-        if (mActivitiesSummary != null && !mActivitiesSummary.isEmpty()) {
-            mTimePager.setAdapter(new ActivityDurationPagerAdapter(this.getContext(), mActivitiesSummary));
+        if (mActivityDetails.getActivitiesSummary() != null && !mActivityDetails.getActivitiesSummary().isEmpty()) {
+            mTimePager.setAdapter(new ActivityDurationPagerAdapter(this.getContext(), mActivityDetails.getActivitiesSummary()));
             mTimePagerIndicator.setViewPager(mTimePager);
         }
 
@@ -387,4 +295,15 @@ public class FitnessFragment extends BaseFragment {
             }
         }
     }
+
+    @OnClick(R.id.locationDetailsBtn)
+    public void openLocationDetailsActivity() {
+        LocationDetailsActivity.launch(getActivity());
+    }
+
+    @OnClick(R.id.activityDetailsBtn)
+    public void openActivityDetailsActivity() {
+        ActivityDetailsActivity.launch(getActivity());
+    }
+
 }

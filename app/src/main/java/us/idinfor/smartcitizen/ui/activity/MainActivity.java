@@ -28,12 +28,13 @@ import us.idinfor.smartcitizen.data.api.hermes.entity.User;
 import us.idinfor.smartcitizen.di.HasComponent;
 import us.idinfor.smartcitizen.di.components.DaggerMainComponent;
 import us.idinfor.smartcitizen.di.components.MainComponent;
+import us.idinfor.smartcitizen.di.modules.FitnessModule;
 import us.idinfor.smartcitizen.mvp.presenter.MainPresenter;
 import us.idinfor.smartcitizen.mvp.view.MainView;
 import us.idinfor.smartcitizen.ui.fragment.FitnessFragment;
 
 public class MainActivity extends BaseActivity
-        implements HasComponent<MainComponent>, MainView, NavigationView.OnNavigationItemSelectedListener {
+        implements MainView, HasComponent<MainComponent>, NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = MainActivity.class.getCanonicalName();
 
@@ -63,7 +64,6 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if(!Utils.isGooglePlayServicesAvailable(this)){
             finish();
             return;
@@ -73,16 +73,14 @@ public class MainActivity extends BaseActivity
         mUser = this.mMainPresenter.getUser();
         if(TextUtils.isEmpty(mUser.getEmail())){
             this.navigateToLoginScreen();
-            this.finish();
+            finish();
             return;
         }
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         buildActionBarToolbar(getString(R.string.app_name),false);
-        mTitle = mDrawerTitle = getTitle();
 
-        // Read in the flag indicating whether or not the user has demonstrated awareness of the drawer.
-        this.mMainPresenter.bindDrawerLearned();
+        mTitle = mDrawerTitle = getTitle();
 
         // load saved navigation state if present
         if (null == savedInstanceState) {
@@ -91,10 +89,7 @@ public class MainActivity extends BaseActivity
             mNavItemId = savedInstanceState.getInt(NAV_ITEM_ID);
         }
 
-        this.setupNavigationDrawer();
-        selectDrawerItem(mNavItemId);
-        this.openDrawerNotLearned();
-        this.setupNavigationViewHeader();
+        this.mMainPresenter.onCreate();
 
         /*if(!Utils.isServiceRunning(this,HermesCitizenSyncService.class)){
             //FIXME
@@ -136,11 +131,13 @@ public class MainActivity extends BaseActivity
         this.mMainComponent = DaggerMainComponent.builder()
                 .applicationComponent(getApplicationComponent())
                 .activityModule(getActivityModule())
+                .fitnessModule(new FitnessModule())
                 .build();
         this.mMainComponent.inject(this);
     }
 
-    private void setupNavigationDrawer() {
+    @Override
+    public void setupNavigationDrawer() {
         // listen for navigation events
         mNavigationView.setNavigationItemSelectedListener(this);
 
@@ -177,14 +174,16 @@ public class MainActivity extends BaseActivity
         invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
     }
 
-    private void setupNavigationViewHeader() {
+    @Override
+    public void setupNavigationDrawerHeader() {
         mUserNameTV = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.username);
         if(mUserNameTV != null){
             mUserNameTV.setText(this.mUser.getEmail());
         }
     }
 
-    private void openDrawerNotLearned() {
+    @Override
+    public void openDrawerNotLearned() {
         // If the user hasn't 'learned' about the drawer, open it to introduce them to the drawer,
         // per the navigation drawer design guidelines.
         if(!mUserLearnedDrawer){
@@ -192,9 +191,10 @@ public class MainActivity extends BaseActivity
         }
     }
 
-    private void selectDrawerItem(int itemId) {
+    @Override
+    public void selectDrawerItem() {
         Fragment fragment = null;
-        switch (itemId) {
+        switch (mNavItemId) {
             case R.id.navigation_home:
                 fragment = FitnessFragment.newInstance();
                 break;
@@ -205,7 +205,7 @@ public class MainActivity extends BaseActivity
 
         if(fragment != null){
             FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.fragmentContainer,fragment).commit();
+            fragmentManager.beginTransaction().replace(R.id.fragment_container,fragment).commit();
         }
     }
 
@@ -215,7 +215,7 @@ public class MainActivity extends BaseActivity
         mNavItemId = item.getItemId();
         mDrawerLayout.closeDrawer(GravityCompat.START);
         mDrawerActionHandler
-                .postDelayed(() -> selectDrawerItem(mNavItemId),
+                .postDelayed(() -> selectDrawerItem(),
                         DRAWER_DELAY_MS);
         return true;
     }
