@@ -26,15 +26,15 @@ import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.data.api.google.fit.ActivityDetails;
 
-public class ActivitySegmentDetailsAdapter extends RecyclerView.Adapter<ActivitySegmentDetailsAdapter.ViewHolder> implements View.OnClickListener {
+public class ActivityTimelineAdapter extends RecyclerView.Adapter<ActivityTimelineAdapter.ViewHolder> implements View.OnClickListener {
 
-    private static final String TAG = ActivitySegmentDetailsAdapter.class.getCanonicalName();
+    private static final String TAG = ActivityTimelineAdapter.class.getCanonicalName();
     private static final String DATE_FORMAT = "HH:mm";
 
     private List<ActivityDetails> mActivities;
     private NumberFormat df;
 
-    public ActivitySegmentDetailsAdapter(List<ActivityDetails> activities) {
+    public ActivityTimelineAdapter(List<ActivityDetails> activities) {
         this.mActivities = activities;
     }
 

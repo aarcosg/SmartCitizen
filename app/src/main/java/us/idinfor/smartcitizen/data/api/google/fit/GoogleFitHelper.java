@@ -7,6 +7,7 @@ import android.util.Log;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.fitness.Fitness;
 import com.google.android.gms.fitness.FitnessStatusCodes;
 import com.google.android.gms.fitness.data.Bucket;
@@ -20,6 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import rx.Single;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import us.idinfor.smartcitizen.Constants;
+import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.ActivitySummaryFit;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.CaloriesExpendedFit;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.DistanceDeltaFit;
@@ -55,21 +61,40 @@ public class GoogleFitHelper {
         RxFit.setDefaultTimeout(15, TimeUnit.SECONDS);
     }
 
-    public static void subscribeFitnessData(){
+    public static void subscribeFitnessData(Context context){
         for(DataType dataType : recordingDataTypes){
-            RxFit.Recording.subscribe(dataType)
-                    .subscribe(status -> {
-                        if (status.isSuccess()) {
-                            if (status.getStatusCode() == FitnessStatusCodes.SUCCESS_ALREADY_SUBSCRIBED) {
-                                Log.i(TAG, "Existing subscription for " + dataType.getName() + " detected.");
-                            } else {
-                                Log.i(TAG, "Successfully subscribed!: " + dataType.getName());
-                            }
-                        } else {
-                            Log.i(TAG, "There was a problem subscribing: " + dataType.getName());
-                        }
-                    });
+            Single<Status> statusObservable = RxFit.Recording.subscribe(dataType)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+            statusObservable.subscribe(
+                    status ->  handleSubscriptionStatus(status,dataType),
+                    throwable -> handleSubscriptionException(context,throwable,statusObservable,dataType)
+            );
         }
+    }
+
+    private static void handleSubscriptionStatus(Status status, DataType dataType){
+        if (status.isSuccess()) {
+            if (status.getStatusCode() == FitnessStatusCodes.SUCCESS_ALREADY_SUBSCRIBED) {
+                //no-op
+                //Log.i(TAG, "Existing subscription for " + dataType.getName() + " detected.");
+            } else {
+                Log.i(TAG, "Successfully subscribed!: " + dataType.getName());
+            }
+        } else {
+            Log.i(TAG, "There was a problem subscribing: " + dataType.getName());
+        }
+    }
+
+    private static void handleSubscriptionException(Context context, Throwable throwable,
+        Single<Status> observable, DataType dataType){
+            if(throwable instanceof SecurityException){
+                Utils.requestMandatoryAppPermissions(context).subscribe(granted -> {
+                    observable.subscribe(
+                            status -> handleSubscriptionStatus(status,dataType)
+                    );
+                });
+            }
     }
 
     public static void unsubscribeFitnessData(){
@@ -86,7 +111,7 @@ public class GoogleFitHelper {
         }
     }
 
-    public static ActivityDetails parseGoogleFitBucket(Bucket bucket) {
+    public static ActivityDetails getActivityDetailsFromBucket(Bucket bucket) {
         ActivityDetails activityDetails = new ActivityDetails();
         List<ActivitySummaryFit> activitiesSummary = new ArrayList<>();
         // Single bucket expected
@@ -182,6 +207,115 @@ public class GoogleFitHelper {
             }
         }
         return activityDetails;
+    }
+
+    public static List<ActivityDetails> getActivityDetailsListFromBuckets(List<Bucket> buckets){
+        List<ActivityDetails> activities = new ArrayList<>();
+        for (Bucket bucket : buckets) {
+            ActivityDetails currentActivity = new ActivityDetails();
+            for (DataSet dataSet : bucket.getDataSets()) {
+                if (dataSet.getDataType().equals(DataType.AGGREGATE_STEP_COUNT_DELTA)) {
+                    for (DataPoint dp : dataSet.getDataPoints()) {
+                        if (dp.getDataType().equals(DataType.AGGREGATE_STEP_COUNT_DELTA)) {
+                            StepCountDeltaFit stepCount = new StepCountDeltaFit(
+                                    dp.getValue(Field.FIELD_STEPS).asInt(),
+                                    dp.getStartTime(TimeUnit.MILLISECONDS),
+                                    dp.getEndTime(TimeUnit.MILLISECONDS)
+                            );
+                            currentActivity.setStepCountDelta(stepCount);
+                        }
+                    }
+                }
+
+                if (dataSet.getDataType().equals(DataType.AGGREGATE_DISTANCE_DELTA)) {
+                    for (DataPoint dp : dataSet.getDataPoints()) {
+                        if (dp.getDataType().equals(DataType.AGGREGATE_DISTANCE_DELTA)) {
+                            DistanceDeltaFit distanceDelta = new DistanceDeltaFit(
+                                    dp.getValue(Field.FIELD_DISTANCE).asFloat() / 1000,
+                                    dp.getStartTime(TimeUnit.MILLISECONDS),
+                                    dp.getEndTime(TimeUnit.MILLISECONDS)
+                            );
+                            currentActivity.setDistanceDelta(distanceDelta);
+                        }
+                    }
+                }
+
+                if (dataSet.getDataType().equals(DataType.AGGREGATE_CALORIES_EXPENDED)) {
+                    for (DataPoint dp : dataSet.getDataPoints()) {
+                        if (dp.getDataType().equals(DataType.AGGREGATE_CALORIES_EXPENDED)) {
+                            CaloriesExpendedFit caloriesExpended = new CaloriesExpendedFit(
+                                    dp.getValue(Field.FIELD_CALORIES).asFloat(),
+                                    dp.getStartTime(TimeUnit.MILLISECONDS),
+                                    dp.getEndTime(TimeUnit.MILLISECONDS)
+                            );
+                            currentActivity.setCaloriesExpended(caloriesExpended);
+                        }
+                    }
+                }
+
+                if (dataSet.getDataType().equals(DataType.AGGREGATE_ACTIVITY_SUMMARY)) {
+                    for (DataPoint dp : dataSet.getDataPoints()) {
+                        if (dp.getDataType().equals(DataType.AGGREGATE_ACTIVITY_SUMMARY)) {
+                            ActivitySummaryFit activitySummary = new ActivitySummaryFit(
+                                    dp.getValue(Field.FIELD_ACTIVITY).asActivity(),
+                                    dp.getValue(Field.FIELD_DURATION).asInt() / 1000 / 60,
+                                    dp.getValue(Field.FIELD_NUM_SEGMENTS).asInt(),
+                                    dp.getStartTime(TimeUnit.MILLISECONDS),
+                                    dp.getEndTime(TimeUnit.MILLISECONDS)
+                            );
+                            if(activitySummary.getName().startsWith(Constants.ACTIVITY_SLEEP_PREFIX)){
+                                activitySummary.setName(Constants.ACTIVITY_SLEEP_PREFIX);
+                            }
+                            currentActivity.setActivitySummary(activitySummary);
+                        }
+                    }
+                }
+
+                if (dataSet.getDataType().equals(DataType.AGGREGATE_LOCATION_BOUNDING_BOX)) {
+                    Float latitudeSW, longitudeSW, latitudeNE, longitudeNE;
+                    for (DataPoint dp : dataSet.getDataPoints()) {
+                        if (dp.getDataType().equals(DataType.AGGREGATE_LOCATION_BOUNDING_BOX)) {
+
+                            latitudeSW = dp.getValue(Field.FIELD_LOW_LATITUDE).asFloat();
+                            longitudeSW = dp.getValue(Field.FIELD_LOW_LONGITUDE).asFloat();
+
+                            latitudeNE = dp.getValue(Field.FIELD_HIGH_LATITUDE).asFloat();
+                            longitudeNE = dp.getValue(Field.FIELD_HIGH_LONGITUDE).asFloat();
+
+                            LocationBoundingBoxFit locationBoundingBox = new LocationBoundingBoxFit(
+                                    latitudeSW,
+                                    longitudeSW,
+                                    latitudeNE,
+                                    longitudeNE,
+                                    dp.getStartTime(TimeUnit.MILLISECONDS),
+                                    dp.getEndTime(TimeUnit.MILLISECONDS)
+                            );
+                            currentActivity.setLocationBoundingBox(locationBoundingBox);
+                        }
+                    }
+                }
+            }
+
+            if(!activities.isEmpty() && currentActivity.getActivitySummary().getName().equals(Constants.ACTIVITY_SLEEP_PREFIX)){
+                //Join sleep activities
+                ActivityDetails lastActivity = activities.get(activities.size() - 1);
+                if (lastActivity.getActivitySummary().getName().equals(Constants.ACTIVITY_SLEEP_PREFIX)) {
+                    lastActivity.getActivitySummary().setEndTime(currentActivity.getActivitySummary().getEndTime());
+                    lastActivity.getStepCountDelta().setSteps(
+                            lastActivity.getStepCountDelta().getSteps() + currentActivity.getStepCountDelta().getSteps());
+                    lastActivity.getCaloriesExpended().setCalories(
+                            lastActivity.getCaloriesExpended().getCalories() + currentActivity.getCaloriesExpended().getCalories());
+                    lastActivity.getDistanceDelta().setDistance(
+                            lastActivity.getDistanceDelta().getDistance() + currentActivity.getDistanceDelta().getDistance());
+                    activities.set(activities.size() - 1, lastActivity);
+                } else {
+                    activities.add(currentActivity);
+                }
+            }else{
+                activities.add(currentActivity);
+            }
+        }
+        return activities;
     }
 
     /*private class DataReadResultCallback implements ResultCallback<DataReadResult>{

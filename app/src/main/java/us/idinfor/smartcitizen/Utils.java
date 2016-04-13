@@ -1,5 +1,6 @@
 package us.idinfor.smartcitizen;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -12,8 +13,11 @@ import android.support.v4.content.ContextCompat;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.tbruyelle.rxpermissions.RxPermissions;
 
 import java.util.Calendar;
+
+import rx.Observable;
 
 public class Utils {
     private static final String TAG = Utils.class.getCanonicalName();
@@ -42,6 +46,14 @@ public class Utils {
             return false;
         }
         return true;
+    }
+
+    public static Observable<Boolean> requestMandatoryAppPermissions(Context context){
+        return RxPermissions.getInstance(context)
+            .request(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.BODY_SENSORS
+            );
     }
 
     public static long getStartTimeRange(int range){

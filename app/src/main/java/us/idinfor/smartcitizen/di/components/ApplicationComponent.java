@@ -13,6 +13,7 @@ import us.idinfor.smartcitizen.di.modules.ApplicationModule;
 import us.idinfor.smartcitizen.di.modules.InteractorsModule;
 import us.idinfor.smartcitizen.di.modules.NetworkModule;
 import us.idinfor.smartcitizen.di.scopes.PerApp;
+import us.idinfor.smartcitizen.interactor.ActivityTimelineInteractor;
 import us.idinfor.smartcitizen.interactor.FitnessInteractor;
 import us.idinfor.smartcitizen.interactor.LoginInteractor;
 import us.idinfor.smartcitizen.interactor.MainInteractor;
@@ -41,5 +42,6 @@ public interface ApplicationComponent {
     LoginInteractor getLoginInteractor();
     MainInteractor getMainInteractor();
     FitnessInteractor getFitnessInteractor();
+    ActivityTimelineInteractor getActivityTimelineInteractor();
 
 }

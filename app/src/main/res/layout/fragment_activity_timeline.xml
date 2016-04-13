@@ -2,8 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.fragment.ActivityDetailsActivityFragment"
-    tools:showIn="@layout/activity_activity_details"
+    tools:context=".ui.fragment.ActivityTimelineFragment"
+    tools:showIn="@layout/activity_activity_timeline"
     android:orientation="vertical">
 
     <include layout="@layout/progress_bar"

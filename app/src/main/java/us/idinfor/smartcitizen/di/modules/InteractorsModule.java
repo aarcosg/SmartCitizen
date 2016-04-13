@@ -7,6 +7,8 @@ import dagger.Module;
 import dagger.Provides;
 import us.idinfor.smartcitizen.data.api.hermes.HermesCitizenApi;
 import us.idinfor.smartcitizen.di.scopes.PerApp;
+import us.idinfor.smartcitizen.interactor.ActivityTimelineInteractor;
+import us.idinfor.smartcitizen.interactor.ActivityTimelineInteractorImpl;
 import us.idinfor.smartcitizen.interactor.FitnessInteractor;
 import us.idinfor.smartcitizen.interactor.FitnessInteractorImpl;
 import us.idinfor.smartcitizen.interactor.LoginInteractor;
@@ -19,16 +21,13 @@ public class InteractorsModule {
 
     @Provides
     @PerApp
-    public LoginInteractor provideLoginInteractor(
-            HermesCitizenApi hermesCitizenApi,
-            SharedPreferences preferences) {
+    public LoginInteractor provideLoginInteractor(HermesCitizenApi hermesCitizenApi, SharedPreferences preferences) {
         return new LoginInteractorImpl(hermesCitizenApi,preferences);
     }
 
     @Provides
     @PerApp
-    public MainInteractor provideMainInteractor(
-            SharedPreferences preferences) {
+    public MainInteractor provideMainInteractor(SharedPreferences preferences) {
         return new MainInteractorImpl(preferences);
     }
 
@@ -36,5 +35,11 @@ public class InteractorsModule {
     @PerApp
     public FitnessInteractor provideFitnessInteractor(Context context) {
         return new FitnessInteractorImpl(context);
+    }
+
+    @Provides
+    @PerApp
+    public ActivityTimelineInteractor provideActivityTimelineInteractor() {
+        return new ActivityTimelineInteractorImpl();
     }
 }

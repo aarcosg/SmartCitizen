@@ -5,12 +5,10 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +24,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.maps.android.SphericalUtil;
 import com.sdoward.rxgooglemap.MapObservableProvider;
-import com.tbruyelle.rxpermissions.RxPermissions;
 import com.viewpagerindicator.CirclePageIndicator;
 
 import java.text.DecimalFormat;
@@ -44,7 +41,7 @@ import us.idinfor.smartcitizen.data.api.google.fit.ActivityDetails;
 import us.idinfor.smartcitizen.di.components.MainComponent;
 import us.idinfor.smartcitizen.mvp.presenter.FitnessPresenter;
 import us.idinfor.smartcitizen.mvp.view.FitnessView;
-import us.idinfor.smartcitizen.ui.activity.ActivityDetailsActivity;
+import us.idinfor.smartcitizen.ui.activity.ActivityTimelineActivity;
 import us.idinfor.smartcitizen.ui.activity.LocationDetailsActivity;
 import us.idinfor.smartcitizen.ui.adapter.ActivityDurationPagerAdapter;
 
@@ -101,7 +98,7 @@ public class FitnessFragment extends BaseFragment implements FitnessView {
     }
 
     public FitnessFragment() {
-        // Required empty public constructor
+        setRetainInstance(true);
     }
 
     @Override
@@ -115,14 +112,9 @@ public class FitnessFragment extends BaseFragment implements FitnessView {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View fragmentView = inflater.inflate(R.layout.fragment_fitness, container, false);
         ButterKnife.bind(this, fragmentView);
-        return fragmentView;
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
         this.mFitnessPresenter.setView(this);
-        this.mFitnessPresenter.onViewCreated();
+        this.mFitnessPresenter.onCreateView();
+        return fragmentView;
     }
 
     @Override
@@ -197,30 +189,12 @@ public class FitnessFragment extends BaseFragment implements FitnessView {
                 getString(R.string.exception_message_permissions_required),
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction(getString(R.string.retry),
-                        v -> requestMandatoryAppPermissions());
+                        v -> this.mFitnessPresenter.requestAppPermissions());
         mPermissionsSnackbar.show();
     }
 
     @Override
-    public void requestMandatoryAppPermissions() {
-        RxPermissions.getInstance(getActivity())
-                .request(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.BODY_SENSORS)
-                .subscribe(granted -> {
-                    if(granted){
-                        onAppPermissionsGranted();
-                    }
-                });
-    }
-
-    private void onAppPermissionsGranted() {
-        Log.i(TAG,"Permissions granted");
-        hidePermissionsSnackbar();
-        this.mFitnessPresenter.queryGoogleFit(Constants.RANGE_DAY);
-    }
-
-    private void hidePermissionsSnackbar(){
+    public void hideAppPermissionsRequiredErrorMessage(){
         if(mPermissionsSnackbar != null && mPermissionsSnackbar.isShown()){
             mPermissionsSnackbar.dismiss();
         }
@@ -303,7 +277,7 @@ public class FitnessFragment extends BaseFragment implements FitnessView {
 
     @OnClick(R.id.activityDetailsBtn)
     public void openActivityDetailsActivity() {
-        ActivityDetailsActivity.launch(getActivity());
+        ActivityTimelineActivity.launch(getActivity());
     }
 
 }

@@ -18,6 +18,7 @@ public class FitnessPresenterImpl implements FitnessPresenter{
     private final FitnessInteractor mFitnessInteractor;
     private Subscription mGoogleMapSubscription = Subscriptions.empty();
     private Subscription mGoogleFitSubscription = Subscriptions.empty();
+    private Subscription mAppPermissionsSubscription = Subscriptions.empty();
 
     @Inject
     public FitnessPresenterImpl(FitnessInteractor fitnessInteractor){
@@ -32,10 +33,11 @@ public class FitnessPresenterImpl implements FitnessPresenter{
     @Override
     public void onCreate() {
         this.mFitnessInteractor.initGoogleFitApi();
+        this.mFitnessInteractor.subscribeUserToGoogleFit();
     }
 
     @Override
-    public void onViewCreated() {
+    public void onCreateView() {
         this.mFitnessView.setupDateView();
         this.mFitnessView.setupMapView();
     }
@@ -47,6 +49,9 @@ public class FitnessPresenterImpl implements FitnessPresenter{
         }
         if(!this.mGoogleFitSubscription.isUnsubscribed()){
             this.mGoogleFitSubscription.unsubscribe();
+        }
+        if(!this.mAppPermissionsSubscription.isUnsubscribed()){
+            this.mAppPermissionsSubscription.unsubscribe();
         }
     }
 
@@ -77,13 +82,30 @@ public class FitnessPresenterImpl implements FitnessPresenter{
             );
     }
 
+    @Override
+    public void requestAppPermissions() {
+        this.mAppPermissionsSubscription = this.mFitnessInteractor.requestMandatoryAppPermissions()
+            .subscribe(granted -> {
+                onAppPermissionsGranted();
+            });
+    }
+
     private void handleException(Throwable throwable) {
         if(throwable instanceof SecurityException){
-            this.mFitnessView.requestMandatoryAppPermissions();
             this.mFitnessView.showAppPermissionsRequiredErrorMessage();
+            this.mFitnessInteractor.requestMandatoryAppPermissions()
+                .subscribe(granted -> {
+                    onAppPermissionsGranted();
+                });
         }else{
             this.mFitnessView.showGoogleFitErrorMessage();
         }
+    }
+
+    private void onAppPermissionsGranted(){
+        this.mAppPermissionsSubscription.unsubscribe();
+        this.mFitnessView.hideAppPermissionsRequiredErrorMessage();
+        this.queryGoogleFit(Constants.RANGE_DAY);
     }
 
 }

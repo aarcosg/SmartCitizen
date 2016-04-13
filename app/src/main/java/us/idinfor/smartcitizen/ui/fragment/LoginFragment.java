@@ -59,13 +59,8 @@ public class LoginFragment extends BaseFragment implements LoginView{
         final View fragmentView = inflater.inflate(R.layout.fragment_login, container, false);
         ButterKnife.bind(this, fragmentView);
         customizeSignInGoogleBtn();
-        return fragmentView;
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
         this.mLoginPresenter.setView(this);
+        return fragmentView;
     }
 
     @Override
