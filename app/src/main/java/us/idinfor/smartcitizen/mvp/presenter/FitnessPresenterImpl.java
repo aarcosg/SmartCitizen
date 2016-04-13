@@ -16,8 +16,8 @@ public class FitnessPresenterImpl implements FitnessPresenter{
 
     private FitnessView mFitnessView;
     private final FitnessInteractor mFitnessInteractor;
-    private Subscription mGoogleMapSuscription = Subscriptions.empty();
-    private Subscription mGoogleFitSuscription = Subscriptions.empty();
+    private Subscription mGoogleMapSubscription = Subscriptions.empty();
+    private Subscription mGoogleFitSubscription = Subscriptions.empty();
 
     @Inject
     public FitnessPresenterImpl(FitnessInteractor fitnessInteractor){
@@ -42,11 +42,11 @@ public class FitnessPresenterImpl implements FitnessPresenter{
 
     @Override
     public void onPause() {
-        if(!this.mGoogleMapSuscription.isUnsubscribed()){
-            this.mGoogleMapSuscription.unsubscribe();
+        if(!this.mGoogleMapSubscription.isUnsubscribed()){
+            this.mGoogleMapSubscription.unsubscribe();
         }
-        if(!this.mGoogleFitSuscription.isUnsubscribed()){
-            this.mGoogleFitSuscription.unsubscribe();
+        if(!this.mGoogleFitSubscription.isUnsubscribed()){
+            this.mGoogleFitSubscription.unsubscribe();
         }
     }
 
@@ -58,15 +58,15 @@ public class FitnessPresenterImpl implements FitnessPresenter{
     @Override
     public void initGoogleMap(SupportMapFragment mapFragment) {
         MapObservableProvider mapObservableProvider = new MapObservableProvider(mapFragment);
-        this.mGoogleMapSuscription = mapObservableProvider.getMapReadyObservable()
+        this.mGoogleMapSubscription = mapObservableProvider.getMapReadyObservable()
                 .subscribe(googleMap -> this.mFitnessView.onGoogleMapReady(googleMap));
     }
 
     @Override
     public void queryGoogleFit(int timeRange){
-        this.mGoogleFitSuscription.unsubscribe();
+        this.mGoogleFitSubscription.unsubscribe();
         this.mFitnessView.showProgressDialog();
-        this.mGoogleFitSuscription = this.mFitnessInteractor.getGoogleFitQueryResponse(timeRange)
+        this.mGoogleFitSubscription = this.mFitnessInteractor.getGoogleFitQueryResponse(timeRange)
             .subscribe(
                 activityDetails -> this.mFitnessView.bindActivityDetails(activityDetails),
                 throwable -> {
