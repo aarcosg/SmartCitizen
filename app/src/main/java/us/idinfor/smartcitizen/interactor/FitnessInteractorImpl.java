@@ -33,6 +33,7 @@ public class FitnessInteractorImpl implements FitnessInteractor {
     @Override
     public void initGoogleFitApi() {
         GoogleFitHelper.initFitApi(mContext);
+        RxFit.checkConnection().subscribe(() -> GoogleFitHelper.subscribeFitnessData());
     }
 
     @RxLogObservable
