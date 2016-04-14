@@ -15,6 +15,7 @@ import com.google.android.gms.fitness.data.DataPoint;
 import com.google.android.gms.fitness.data.DataSet;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.data.Field;
+import com.google.android.gms.maps.model.LatLng;
 import com.patloew.rxfit.RxFit;
 
 import java.util.ArrayList;
@@ -316,6 +317,23 @@ public class GoogleFitHelper {
             }
         }
         return activities;
+    }
+
+    public static List<LatLng> getPointListFromDataSets(List<DataSet> dataSets) {
+        List<LatLng> locations = new ArrayList<>();
+        for(DataSet dataSet : dataSets){
+            if (dataSet.getDataType().equals(DataType.TYPE_LOCATION_SAMPLE)) {
+                for (DataPoint dp : dataSet.getDataPoints()) {
+                    if (dp.getDataType().equals(DataType.TYPE_LOCATION_SAMPLE)) {
+                        LatLng point = new LatLng(
+                                dp.getValue(Field.FIELD_LATITUDE).asFloat(),
+                                dp.getValue(Field.FIELD_LONGITUDE).asFloat());
+                        locations.add(point);
+                    }
+                }
+            }
+        }
+        return locations;
     }
 
     /*private class DataReadResultCallback implements ResultCallback<DataReadResult>{

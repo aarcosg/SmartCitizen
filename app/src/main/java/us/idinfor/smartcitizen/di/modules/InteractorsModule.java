@@ -11,6 +11,8 @@ import us.idinfor.smartcitizen.interactor.ActivityTimelineInteractor;
 import us.idinfor.smartcitizen.interactor.ActivityTimelineInteractorImpl;
 import us.idinfor.smartcitizen.interactor.FitnessInteractor;
 import us.idinfor.smartcitizen.interactor.FitnessInteractorImpl;
+import us.idinfor.smartcitizen.interactor.LocationDetailsInteractor;
+import us.idinfor.smartcitizen.interactor.LocationDetailsInteractorImpl;
 import us.idinfor.smartcitizen.interactor.LoginInteractor;
 import us.idinfor.smartcitizen.interactor.LoginInteractorImpl;
 import us.idinfor.smartcitizen.interactor.MainInteractor;
@@ -41,5 +43,11 @@ public class InteractorsModule {
     @PerApp
     public ActivityTimelineInteractor provideActivityTimelineInteractor() {
         return new ActivityTimelineInteractorImpl();
+    }
+
+    @Provides
+    @PerApp
+    public LocationDetailsInteractor provideLocationDetailsInteractor() {
+        return new LocationDetailsInteractorImpl();
     }
 }

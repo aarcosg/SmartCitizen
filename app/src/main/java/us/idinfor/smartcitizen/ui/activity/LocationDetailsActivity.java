@@ -4,52 +4,40 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.widget.AppCompatSpinner;
-import android.support.v7.widget.Toolbar;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import butterknife.OnItemSelected;
-import rx.Observable;
-import rx.subjects.PublishSubject;
 import us.idinfor.smartcitizen.R;
+import us.idinfor.smartcitizen.di.HasComponent;
+import us.idinfor.smartcitizen.di.components.DaggerLocationDetailsComponent;
+import us.idinfor.smartcitizen.di.components.LocationDetailsComponent;
+import us.idinfor.smartcitizen.ui.fragment.LocationDetailsFragment;
 
-public class LocationDetailsActivity extends BaseActivity {
+public class LocationDetailsActivity extends BaseActivity implements HasComponent<LocationDetailsComponent>{
 
     private static final String TAG = LocationDetailsActivity.class.getCanonicalName();
 
-    @Bind(R.id.toolbarSpinner)
-    AppCompatSpinner mToolbarSpinner;
-    @Bind(R.id.toolbar)
-    Toolbar mToolbar;
-
-    private final PublishSubject<Integer> mTimeRangeSubject = PublishSubject.create();
+    private LocationDetailsComponent mLocationDetailsComponent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_details);
-        ButterKnife.bind(this);
-        setSupportActionBar(mToolbar);
-        if(getSupportActionBar() != null){
-            getSupportActionBar().setDisplayShowTitleEnabled(false);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        this.initializeInjector();
+        if(savedInstanceState == null){
+            addFragment(R.id.fragment_container, new LocationDetailsFragment());
         }
     }
 
+    private void initializeInjector() {
+        this.mLocationDetailsComponent = DaggerLocationDetailsComponent.builder()
+                .applicationComponent(getApplicationComponent())
+                .activityModule(getActivityModule())
+                .build();
+    }
+
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        ButterKnife.unbind(this);
-    }
-
-    @OnItemSelected(R.id.toolbarSpinner)
-    public void setTimeRange(int position){
-        mTimeRangeSubject.onNext(position);
-    }
-
-    public Observable<Integer> getTimeRange(){
-        return mTimeRangeSubject;
+    public LocationDetailsComponent getComponent() {
+        return this.mLocationDetailsComponent;
     }
 
     public static void launch(Activity activity) {
