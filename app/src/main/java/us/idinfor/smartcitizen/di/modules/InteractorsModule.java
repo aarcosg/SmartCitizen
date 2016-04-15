@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import dagger.Module;
 import dagger.Provides;
 import us.idinfor.smartcitizen.data.api.hermes.HermesCitizenApi;
+import us.idinfor.smartcitizen.data.api.ztreamy.ZtreamyApi;
 import us.idinfor.smartcitizen.di.scopes.PerApp;
 import us.idinfor.smartcitizen.interactor.ActivityTimelineInteractor;
 import us.idinfor.smartcitizen.interactor.ActivityTimelineInteractorImpl;
@@ -17,6 +18,8 @@ import us.idinfor.smartcitizen.interactor.LoginInteractor;
 import us.idinfor.smartcitizen.interactor.LoginInteractorImpl;
 import us.idinfor.smartcitizen.interactor.MainInteractor;
 import us.idinfor.smartcitizen.interactor.MainInteractorImpl;
+import us.idinfor.smartcitizen.interactor.SyncServiceInteractor;
+import us.idinfor.smartcitizen.interactor.SyncServiceInteractorImpl;
 
 @Module
 public class InteractorsModule {
@@ -49,5 +52,12 @@ public class InteractorsModule {
     @PerApp
     public LocationDetailsInteractor provideLocationDetailsInteractor() {
         return new LocationDetailsInteractorImpl();
+    }
+
+    @Provides
+    @PerApp
+    public SyncServiceInteractor provideSyncServiceInteractor(SharedPreferences preferences,
+        HermesCitizenApi hermesCitizenApi, ZtreamyApi ztreamyApi){
+            return new SyncServiceInteractorImpl(preferences, hermesCitizenApi, ztreamyApi);
     }
 }

@@ -70,6 +70,10 @@
             android:name=".data.api.hermes.HermesCitizenSyncService"
             android:exported="false" />
 
+        <service
+            android:name=".service.SyncService"
+            android:exported="false" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDT6YeYiTQ-08f0t211M8Fe0dLj8lf9BJU" />

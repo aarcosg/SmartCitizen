@@ -23,7 +23,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.maps.android.SphericalUtil;
-import com.sdoward.rxgooglemap.MapObservableProvider;
 import com.viewpagerindicator.CirclePageIndicator;
 
 import java.text.DecimalFormat;
@@ -82,12 +81,7 @@ public class FitnessFragment extends BaseFragment implements FitnessView {
     private GoogleMap mMap;
     private PolygonOptions mBoundingBoxPolygon;
     private LatLngBounds mBounds;
-
-    private SupportMapFragment mMapFragment;
-    private MapObservableProvider mMapObservableProvider;
-
     private ActivityDetails mActivityDetails;
-
     private Snackbar mPermissionsSnackbar;
 
     public static FitnessFragment newInstance() {
@@ -105,6 +99,7 @@ public class FitnessFragment extends BaseFragment implements FitnessView {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.getComponent(MainComponent.class).inject(this);
+        this.mFitnessPresenter.setView(this);
         this.mFitnessPresenter.onCreate();
     }
 
@@ -112,7 +107,6 @@ public class FitnessFragment extends BaseFragment implements FitnessView {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View fragmentView = inflater.inflate(R.layout.fragment_fitness, container, false);
         ButterKnife.bind(this, fragmentView);
-        this.mFitnessPresenter.setView(this);
         this.mFitnessPresenter.onCreateView();
         return fragmentView;
     }
@@ -144,8 +138,8 @@ public class FitnessFragment extends BaseFragment implements FitnessView {
 
     @Override
     public void setupMapView() {
-        mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        this.mFitnessPresenter.initGoogleMap(mMapFragment);
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        this.mFitnessPresenter.initGoogleMap(mapFragment);
     }
 
     @Override

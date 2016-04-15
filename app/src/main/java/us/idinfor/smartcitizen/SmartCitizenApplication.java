@@ -25,7 +25,7 @@ public class SmartCitizenApplication extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        initializeInjector();
+        this.initializeInjector();
     }
 
     private void initializeInjector() {

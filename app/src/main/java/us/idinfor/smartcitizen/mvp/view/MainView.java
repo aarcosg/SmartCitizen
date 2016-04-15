@@ -8,4 +8,5 @@ public interface MainView extends View {
     void setupNavigationDrawerHeader();
     void openDrawerNotLearned();
     void selectDrawerItem();
+    void setupBackgroundSyncService();
 }

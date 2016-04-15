@@ -2,7 +2,6 @@ package us.idinfor.smartcitizen;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
@@ -98,7 +97,7 @@ public class Utils {
         return ContextCompat.getDrawable(context,drawable);
     }
 
-    public static boolean isServiceRunning(Context context, Class<?> serviceClass) {
+    /*public static boolean isServiceRunning(Context context, Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
@@ -106,6 +105,6 @@ public class Utils {
             }
         }
         return false;
-    }
+    }*/
 
 }

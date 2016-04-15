@@ -12,16 +12,21 @@ import dagger.Module;
 import dagger.Provides;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import us.idinfor.smartcitizen.data.api.hermes.HermesCitizenApi;
+import us.idinfor.smartcitizen.data.api.ztreamy.ZtreamyApi;
 import us.idinfor.smartcitizen.di.scopes.PerApp;
+import us.idinfor.smartcitizen.mvp.presenter.SyncServicePresenter;
+import us.idinfor.smartcitizen.service.SyncService;
 
 @Module
 public class NetworkModule {
 
     public final static String NAME_RETROFIT_HERMESCITIZEN = "NAME_RETROFIT_HERMESCITIZEN";
+    public final static String NAME_RETROFIT_ZTREAMY = "NAME_RETROFIT_ZTREAMY";
     private final static long SECONDS_TIMEOUT = 20;
 
     @Provides
@@ -34,11 +39,14 @@ public class NetworkModule {
     @Provides
     @PerApp
     OkHttpClient provideOkHttpClient(Cache cache) {
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
         return new OkHttpClient.Builder()
                 .connectTimeout(SECONDS_TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(SECONDS_TIMEOUT, TimeUnit.SECONDS)
                 .writeTimeout(SECONDS_TIMEOUT, TimeUnit.SECONDS)
                 .cache(cache)
+                .addInterceptor(logging)
                 .build();
     }
 
@@ -71,6 +79,28 @@ public class NetworkModule {
     HermesCitizenApi provideHermesCitizenApi(
             @Named(NAME_RETROFIT_HERMESCITIZEN) Retrofit retrofit) {
         return retrofit.create(HermesCitizenApi.class);
+    }
+
+    @Named(NAME_RETROFIT_ZTREAMY)
+    @Provides
+    @PerApp
+    Retrofit provideZtreamyRetrofit(Retrofit.Builder builder) {
+        return builder
+                .baseUrl(ZtreamyApi.SERVICE_ENDPOINT)
+                .build();
+    }
+
+    @Provides
+    @PerApp
+    ZtreamyApi provideZtreamyApi(
+            @Named(NAME_RETROFIT_ZTREAMY) Retrofit retrofit) {
+        return retrofit.create(ZtreamyApi.class);
+    }
+
+    @Provides
+    @PerApp
+    SyncService provideSyncService(Context context, SyncServicePresenter syncServicePresenter){
+        return new SyncService(context,syncServicePresenter);
     }
 
 }

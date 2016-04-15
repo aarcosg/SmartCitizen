@@ -38,6 +38,7 @@ public class MainPresenterImpl implements MainPresenter{
         this.mMainView.openDrawerNotLearned();
         this.mMainView.setupNavigationDrawerHeader();
         this.mMainView.selectDrawerItem();
+        this.mMainView.setupBackgroundSyncService();
     }
 
     @Override

@@ -31,6 +31,7 @@ import us.idinfor.smartcitizen.di.components.MainComponent;
 import us.idinfor.smartcitizen.di.modules.FitnessModule;
 import us.idinfor.smartcitizen.mvp.presenter.MainPresenter;
 import us.idinfor.smartcitizen.mvp.view.MainView;
+import us.idinfor.smartcitizen.service.SyncService;
 import us.idinfor.smartcitizen.ui.fragment.FitnessFragment;
 
 public class MainActivity extends BaseActivity
@@ -49,6 +50,8 @@ public class MainActivity extends BaseActivity
     DrawerLayout mDrawerLayout;
     TextView mUserNameTV;
 
+    @Inject
+    SyncService mSyncService;
     @Inject
     MainPresenter mMainPresenter;
 
@@ -134,6 +137,13 @@ public class MainActivity extends BaseActivity
                 .fitnessModule(new FitnessModule())
                 .build();
         this.mMainComponent.inject(this);
+    }
+
+    @Override
+    public void setupBackgroundSyncService() {
+        if(!mSyncService.isRunning()){
+            mSyncService.start();
+        }
     }
 
     @Override

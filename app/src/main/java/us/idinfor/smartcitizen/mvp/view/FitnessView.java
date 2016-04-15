@@ -15,5 +15,4 @@ public interface FitnessView extends View {
     void hideAppPermissionsRequiredErrorMessage();
     void bindActivityDetails(ActivityDetails activityDetails);
     void showGoogleFitErrorMessage();
-
 }
