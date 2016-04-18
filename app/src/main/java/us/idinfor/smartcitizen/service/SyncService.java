@@ -66,7 +66,7 @@ public class SyncService extends Service implements SyncServiceView {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.e(TAG,"@onStartCommand");
+        Log.i(TAG,"@onStartCommand");
         checkUser();
         if(intent != null){
             this.mSyncServicePresenter.queryLocations();
@@ -76,7 +76,7 @@ public class SyncService extends Service implements SyncServiceView {
     }
 
     public void start(){
-        Log.e(TAG,"@start");
+        Log.i(TAG,"@start");
         AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
         Calendar startTime = Calendar.getInstance();
         startTime.add(Calendar.MINUTE, Constants.SYNC_INTERVAL_IN_MINUTES); // First time
@@ -85,12 +85,13 @@ public class SyncService extends Service implements SyncServiceView {
     }
 
     public void stop(){
-        Log.e(TAG,"@stop");
+        Log.i(TAG,"@stop");
         AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(getSyncPendingIntent());
     }
 
     public boolean isRunning() {
+        Log.i(TAG,"@isRunning");
         ActivityManager manager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (SyncService.class.getName().equals(service.service.getClassName())) {

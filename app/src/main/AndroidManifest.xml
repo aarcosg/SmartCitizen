@@ -67,10 +67,6 @@
         </receiver>
 
         <service
-            android:name=".data.api.hermes.HermesCitizenSyncService"
-            android:exported="false" />
-
-        <service
             android:name=".service.SyncService"
             android:exported="false" />
 

@@ -11,10 +11,10 @@ import com.patloew.rxfit.RxFit;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -30,14 +30,12 @@ import us.idinfor.smartcitizen.data.api.hermes.HermesCitizenApi;
 import us.idinfor.smartcitizen.data.api.hermes.entity.ItemsList;
 import us.idinfor.smartcitizen.data.api.hermes.entity.User;
 import us.idinfor.smartcitizen.data.api.ztreamy.ZtreamyApi;
+import us.idinfor.smartcitizen.data.api.ztreamy.entity.Event;
 import us.idinfor.smartcitizen.service.SyncServiceUtils;
 
 public class SyncServiceInteractorImpl implements SyncServiceInteractor {
 
     private static final String TAG = SyncServiceInteractorImpl.class.getCanonicalName();
-
-    private static final SimpleDateFormat RFC3339FORMAT =
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZZZ");
 
     private final SharedPreferences mPrefs;
     private final HermesCitizenApi mHermesCitizenApi;
@@ -127,12 +125,13 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
                 locations);
         uploadLocationsToHermesCitizen(items);
         uploadLocationsToZtreamy(items);
-        //mPrefs.edit().putLong(Constants.PROPERTY_LAST_LOCATION_TIME_SENT,new Date().getTime()).commit();
+        mPrefs.edit().putLong(Constants.PROPERTY_LAST_LOCATION_TIME_SENT,new Date().getTime()).commit();
     }
 
     @RxLogObservable
     private void uploadLocationsToHermesCitizen(ItemsList<LocationSampleFit> items){
         mHermesCitizenApi.uploadLocations(items)
+                .doOnError(throwable -> Log.e(TAG,throwable.getMessage()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(integerResponse -> {
@@ -144,13 +143,22 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
 
     @RxLogObservable
     private void uploadLocationsToZtreamy(ItemsList<LocationSampleFit> items){
-        mZtreamyApi.uploadLocations(getUUID(),getHash(items.getUser()),RFC3339FORMAT.format(new Date()),items)
+        Map<String,Object> map = new HashMap<>(1);
+        map.put(ZtreamyApi.EVENT_TYPE_LOCATIONS,items.getItems());
+        Event ztreamyEvent = new Event(
+                getHash(items.getUser()),
+                ZtreamyApi.SYNTAX,
+                ZtreamyApi.APPLICATION_ID,
+                ZtreamyApi.EVENT_TYPE_LOCATIONS,
+                map);
+        mZtreamyApi.uploadLocations(ztreamyEvent)
+                .doOnError(throwable -> Log.e(TAG,throwable.getMessage()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(integerResponse -> {
-                    /*if(integerResponse.body() == ZtreamyApi.RESPONSE_OK){
+                .subscribe(response -> {
+                    if(response.isSuccess()){
                         Log.i(TAG,"Locations uploaded to Ztreamy");
-                    }*/
+                    }
                 });
     }
 
@@ -161,12 +169,13 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
                 activities);
         uploadActivitiesToHermesCitizen(items);
         uploadActivitiesToZtreamy(items);
-        //mPrefs.edit().putLong(Constants.PROPERTY_LAST_ACTIVITY_TIME_SENT,new Date().getTime()).commit();
+        mPrefs.edit().putLong(Constants.PROPERTY_LAST_ACTIVITY_TIME_SENT,new Date().getTime()).commit();
     }
 
     @RxLogObservable
     private void uploadActivitiesToHermesCitizen(ItemsList<ActivitySegmentFit> items){
         mHermesCitizenApi.uploadActivities(items)
+                .doOnError(throwable -> Log.e(TAG,throwable.getMessage()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(integerResponse -> {
@@ -178,13 +187,22 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
 
     @RxLogObservable
     private void uploadActivitiesToZtreamy(ItemsList<ActivitySegmentFit> items){
-        mZtreamyApi.uploadActivities(getUUID(),getHash(items.getUser()),RFC3339FORMAT.format(new Date()),items)
+        Map<String,Object> map = new HashMap<>(1);
+        map.put(ZtreamyApi.EVENT_TYPE_ACTIVITIES,items.getItems());
+        Event ztreamyEvent = new Event(
+                getHash(items.getUser()),
+                ZtreamyApi.SYNTAX,
+                ZtreamyApi.APPLICATION_ID,
+                ZtreamyApi.EVENT_TYPE_ACTIVITIES,
+                map);
+        mZtreamyApi.uploadActivities(ztreamyEvent)
+                .doOnError(throwable -> Log.e(TAG,throwable.getMessage()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(integerResponse -> {
-                    /*if(integerResponse.body() == ZtreamyApi.RESPONSE_OK){
+                .subscribe(response -> {
+                    if(response.isSuccess()){
                         Log.i(TAG,"Activities uploaded to Ztreamy");
-                    }*/
+                    }
                 });
     }
 
@@ -194,7 +212,7 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
         try {
             messageDigest = MessageDigest.getInstance("SHA-256");
             messageDigest.reset();
-            hashedEmail = bin2hex(messageDigest.digest(stringToHash.getBytes()));
+            hashedEmail =  bin2hex(messageDigest.digest(stringToHash.getBytes()));
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
@@ -205,7 +223,4 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
         return String.format("%0" + (data.length*2) + "X", new BigInteger(1, data));
     }
 
-    private String getUUID(){
-        return UUID.randomUUID().toString();
-    }
 }

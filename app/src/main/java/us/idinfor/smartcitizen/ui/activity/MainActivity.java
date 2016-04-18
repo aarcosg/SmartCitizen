@@ -93,11 +93,6 @@ public class MainActivity extends BaseActivity
         }
 
         this.mMainPresenter.onCreate();
-
-        /*if(!Utils.isServiceRunning(this,HermesCitizenSyncService.class)){
-            //FIXME
-            //HermesCitizenSyncService.startSync(this);
-        }*/
     }
 
     @Override

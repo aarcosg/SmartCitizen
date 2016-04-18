@@ -45,7 +45,9 @@ public class SyncServicePresenterImpl implements SyncServicePresenter{
     public void queryLocations() {
         mSubscriptions.add(this.mSyncServiceInteractor.queryLocationsToGoogleFit().subscribe(
             locations ->  {
-                this.mSyncServiceInteractor.uploadLocations(locations);
+                if(!locations.isEmpty()){
+                    this.mSyncServiceInteractor.uploadLocations(locations);
+                }
             }
         ));
     }
@@ -54,7 +56,9 @@ public class SyncServicePresenterImpl implements SyncServicePresenter{
     public void queryActivities() {
         mSubscriptions.add(this.mSyncServiceInteractor.queryActivitiesToGoogleFit().subscribe(
             activities -> {
-                this.mSyncServiceInteractor.uploadActivities(activities);
+                if(!activities.isEmpty()){
+                    this.mSyncServiceInteractor.uploadActivities(activities);
+                }
             }
         ));
     }

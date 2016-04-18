@@ -20,6 +20,7 @@ import us.idinfor.smartcitizen.interactor.LocationDetailsInteractor;
 import us.idinfor.smartcitizen.interactor.LoginInteractor;
 import us.idinfor.smartcitizen.interactor.MainInteractor;
 import us.idinfor.smartcitizen.interactor.SyncServiceInteractor;
+import us.idinfor.smartcitizen.receiver.OnBootReceiver;
 import us.idinfor.smartcitizen.service.SyncService;
 import us.idinfor.smartcitizen.ui.activity.BaseActivity;
 
@@ -36,6 +37,7 @@ public interface ApplicationComponent {
 
     void inject(BaseActivity baseActivity);
     void inject(SyncService syncService);
+    void inject(OnBootReceiver onBootReceiver);
 
     Context getContext();
     SharedPreferences getSharedPreferences();
