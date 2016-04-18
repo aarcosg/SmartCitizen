@@ -20,7 +20,7 @@ android {
         }
     }
     compileSdkVersion 23
-    buildToolsVersion '23.0.2'
+    buildToolsVersion '23.0.3'
     defaultConfig {
         applicationId "us.idinfor.smartcitizen"
         minSdkVersion 15
@@ -57,11 +57,11 @@ dependencies {
     testCompile 'junit:junit:4.12'
 
     //Android
-    compile 'com.android.support:appcompat-v7:23.2.0'
-    compile 'com.android.support:design:23.2.0'
-    compile 'com.android.support:support-v4:23.2.0'
-    compile 'com.android.support:recyclerview-v7:23.2.0'
-    compile 'com.android.support:cardview-v7:23.2.0'
+    compile 'com.android.support:appcompat-v7:23.3.0'
+    compile 'com.android.support:design:23.3.0'
+    compile 'com.android.support:support-v4:23.3.0'
+    compile 'com.android.support:recyclerview-v7:23.3.0'
+    compile 'com.android.support:cardview-v7:23.3.0'
     compile 'com.android.support:multidex:1.0.1'
 
     //Google Play Services
@@ -114,9 +114,9 @@ dependencies {
     //RxGoogleMaps
     compile 'com.sdoward:rxgooglemaps:0.2@aar'
 
-    //LeakCanary
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
-
     //RxPermissions
     compile 'com.tbruyelle.rxpermissions:rxpermissions:0.7.0@aar'
+
+    //LeakCanary
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
 }
