@@ -56,7 +56,10 @@ public class LoginPresenterImpl implements LoginPresenter{
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         this::onUserLogged,
-                        this::onLoginException,
+                        throwable -> {
+                            this.onLoginException(throwable);
+                            this.mLoginView.hideProgressDialog();
+                        },
                         () -> this.mLoginView.hideProgressDialog()
                 );
     }

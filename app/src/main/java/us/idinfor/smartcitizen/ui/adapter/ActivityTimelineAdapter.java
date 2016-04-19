@@ -23,7 +23,7 @@ import java.util.Locale;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.R;
-import us.idinfor.smartcitizen.Utils;
+import us.idinfor.smartcitizen.utils.Utils;
 import us.idinfor.smartcitizen.data.api.google.fit.ActivityDetails;
 
 public class ActivityTimelineAdapter extends RecyclerView.Adapter<ActivityTimelineAdapter.ViewHolder> implements View.OnClickListener {

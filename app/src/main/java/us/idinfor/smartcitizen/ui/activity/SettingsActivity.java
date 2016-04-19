@@ -20,7 +20,7 @@ import android.view.ViewGroup;
 
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
-import us.idinfor.smartcitizen.Utils;
+import us.idinfor.smartcitizen.utils.Utils;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
 

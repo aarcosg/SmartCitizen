@@ -23,6 +23,7 @@ import us.idinfor.smartcitizen.interactor.SyncServiceInteractor;
 import us.idinfor.smartcitizen.receiver.OnBootReceiver;
 import us.idinfor.smartcitizen.service.SyncService;
 import us.idinfor.smartcitizen.ui.activity.BaseActivity;
+import us.idinfor.smartcitizen.utils.RxNetwork;
 
 @PerApp
 @Component(
@@ -42,6 +43,7 @@ public interface ApplicationComponent {
     Context getContext();
     SharedPreferences getSharedPreferences();
 
+    RxNetwork getRxNetwork();
     OkHttpClient getOkHttpClient();
     Gson getGson();
     HermesCitizenApi getHermesCitizenApi();

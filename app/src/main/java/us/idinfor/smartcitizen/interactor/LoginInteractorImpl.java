@@ -16,16 +16,19 @@ import us.idinfor.smartcitizen.data.api.hermes.entity.User;
 import us.idinfor.smartcitizen.data.api.hermes.exception.UnknownErrorHermesException;
 import us.idinfor.smartcitizen.data.api.hermes.exception.UserAlreadyExistsErrorHermesException;
 import us.idinfor.smartcitizen.data.api.hermes.exception.UserNotRegisteredErrorHermesException;
+import us.idinfor.smartcitizen.utils.RxNetwork;
 
 public class LoginInteractorImpl implements LoginInteractor {
 
     private static final String TAG = LoginInteractorImpl.class.getCanonicalName();
 
+    private final RxNetwork mRxNetwork;
     private final HermesCitizenApi mHermesCitizenApi;
     private final SharedPreferences mPrefs;
 
     @Inject
-    public LoginInteractorImpl(HermesCitizenApi hermesCitizenApi, SharedPreferences prefs){
+    public LoginInteractorImpl(RxNetwork rxNetwork, HermesCitizenApi hermesCitizenApi, SharedPreferences prefs){
+        this.mRxNetwork = rxNetwork;
         this.mHermesCitizenApi =  hermesCitizenApi;
         this.mPrefs = prefs;
     }
@@ -34,35 +37,35 @@ public class LoginInteractorImpl implements LoginInteractor {
     @Override
     public Observable<User> loginOrRegisterUserInHermes(final GoogleSignInAccount account) {
         String email = account.getEmail();
-        return Observable.create(subscriber -> {
-            mHermesCitizenApi.existsUser(email)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnNext(booleanResponse -> {
-                        if(booleanResponse.body()) {
-                            // User exists
-                            subscriber.onNext(new User(email,null));
-                            subscriber.onCompleted();
-                        }else{
-                            // User doesn't exist, sign up user
-                            mHermesCitizenApi.registerUser(new User(email, Constants.DEFAULT_PASSWORD))
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .doOnNext(integerResponse -> {
-                                    if (integerResponse.body() == HermesCitizenApi.RESPONSE_OK) {
-                                        subscriber.onNext(new User(email, null));
-                                        subscriber.onCompleted();
-                                    } else {
-                                        subscriber.onError(getHermesException(integerResponse.body()));
-                                    }
-                                })
-                                .doOnError(throwable -> subscriber.onError(new UnknownErrorHermesException()))
-                                .subscribe();
-                        }
-                    })
-                    .doOnError(throwable -> subscriber.onError(new UnknownErrorHermesException()))
-                    .subscribe();
-        });
+        return mRxNetwork.checkInternetConnection().andThen(
+                Observable.create(subscriber -> {
+                    mHermesCitizenApi.existsUser(email)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(booleanResponse -> {
+                            if (booleanResponse.body()) {
+                                // User exists
+                                subscriber.onNext(new User(email, null));
+                                subscriber.onCompleted();
+                            } else {
+                                // User doesn't exist, sign up user
+                                mHermesCitizenApi.registerUser(new User(email, Constants.DEFAULT_PASSWORD))
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe(response -> {
+                                            if (response.body() == HermesCitizenApi.RESPONSE_OK) {
+                                                subscriber.onNext(new User(email, null));
+                                                subscriber.onCompleted();
+                                            } else {
+                                                subscriber.onError(getHermesException(response.body()));
+                                            }
+                                        },
+                                        throwable -> subscriber.onError(new UnknownErrorHermesException()));
+                            }
+                        },
+                        throwable -> subscriber.onError(new UnknownErrorHermesException()));
+            })
+        );
     }
 
     @Override

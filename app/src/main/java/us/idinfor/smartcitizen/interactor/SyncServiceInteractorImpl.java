@@ -23,7 +23,8 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import us.idinfor.smartcitizen.Constants;
-import us.idinfor.smartcitizen.Utils;
+import us.idinfor.smartcitizen.utils.RxNetwork;
+import us.idinfor.smartcitizen.utils.Utils;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.ActivitySegmentFit;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.LocationSampleFit;
 import us.idinfor.smartcitizen.data.api.hermes.HermesCitizenApi;
@@ -38,15 +39,18 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
     private static final String TAG = SyncServiceInteractorImpl.class.getCanonicalName();
 
     private final SharedPreferences mPrefs;
+    private final RxNetwork mRxNetwork;
     private final HermesCitizenApi mHermesCitizenApi;
     private final ZtreamyApi mZtreamyApi;
 
     @Inject
     public SyncServiceInteractorImpl(
             SharedPreferences sharedPreferences,
+            RxNetwork rxNetwork,
             HermesCitizenApi hermesCitizenApi,
             ZtreamyApi ztreamyApi){
         this.mPrefs = sharedPreferences;
+        this.mRxNetwork = rxNetwork;
         this.mHermesCitizenApi = hermesCitizenApi;
         this.mZtreamyApi = ztreamyApi;
     }
@@ -130,15 +134,16 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
 
     @RxLogObservable
     private void uploadLocationsToHermesCitizen(ItemsList<LocationSampleFit> items){
-        mHermesCitizenApi.uploadLocations(items)
-                .doOnError(throwable -> Log.e(TAG,throwable.getMessage()))
+        mRxNetwork.checkInternetConnection()
+            .andThen(mHermesCitizenApi.uploadLocations(items)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread()))
                 .subscribe(integerResponse -> {
                     if(integerResponse.body() == HermesCitizenApi.RESPONSE_OK){
-                        Log.i(TAG,"Locations uploaded to Hermes Citizen server");
+                            Log.i(TAG,"Locations uploaded to Hermes Citizen server");
                     }
-                });
+                },
+                throwable -> Log.e(TAG,"Locations not uploaded to Hermes Citizen server"));
     }
 
     @RxLogObservable
@@ -151,15 +156,16 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
                 ZtreamyApi.APPLICATION_ID,
                 ZtreamyApi.EVENT_TYPE_LOCATIONS,
                 map);
-        mZtreamyApi.uploadLocations(ztreamyEvent)
-                .doOnError(throwable -> Log.e(TAG,throwable.getMessage()))
+        mRxNetwork.checkInternetConnection()
+                .andThen(mZtreamyApi.uploadLocations(ztreamyEvent)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread()))
                 .subscribe(response -> {
                     if(response.isSuccess()){
                         Log.i(TAG,"Locations uploaded to Ztreamy");
                     }
-                });
+                },
+                throwable -> Log.e(TAG,"Locations not uploaded to Ztreamy"));
     }
 
     @Override
@@ -174,15 +180,16 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
 
     @RxLogObservable
     private void uploadActivitiesToHermesCitizen(ItemsList<ActivitySegmentFit> items){
-        mHermesCitizenApi.uploadActivities(items)
-                .doOnError(throwable -> Log.e(TAG,throwable.getMessage()))
+        mRxNetwork.checkInternetConnection()
+                .andThen(mHermesCitizenApi.uploadActivities(items)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread()))
                 .subscribe(integerResponse -> {
                     if(integerResponse.body() == HermesCitizenApi.RESPONSE_OK){
                         Log.i(TAG,"Activities uploaded to Hermes Citizen server");
                     }
-                });
+                },
+                throwable -> Log.e(TAG,"Activities not uploaded to Hermes Citizen server"));
     }
 
     @RxLogObservable
@@ -195,15 +202,16 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
                 ZtreamyApi.APPLICATION_ID,
                 ZtreamyApi.EVENT_TYPE_ACTIVITIES,
                 map);
-        mZtreamyApi.uploadActivities(ztreamyEvent)
-                .doOnError(throwable -> Log.e(TAG,throwable.getMessage()))
+        mRxNetwork.checkInternetConnection()
+                .andThen(mZtreamyApi.uploadActivities(ztreamyEvent)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread()))
                 .subscribe(response -> {
                     if(response.isSuccess()){
                         Log.i(TAG,"Activities uploaded to Ztreamy");
                     }
-                });
+                },
+                throwable -> Log.e(TAG,"Activities not uploaded to Ztreamy"));
     }
 
     private String getHash(String stringToHash){

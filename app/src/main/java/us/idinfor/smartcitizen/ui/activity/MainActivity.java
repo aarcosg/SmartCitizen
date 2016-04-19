@@ -23,7 +23,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.R;
-import us.idinfor.smartcitizen.Utils;
+import us.idinfor.smartcitizen.utils.Utils;
 import us.idinfor.smartcitizen.data.api.hermes.entity.User;
 import us.idinfor.smartcitizen.di.HasComponent;
 import us.idinfor.smartcitizen.di.components.DaggerMainComponent;

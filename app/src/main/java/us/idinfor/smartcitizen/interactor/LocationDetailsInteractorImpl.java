@@ -15,7 +15,7 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-import us.idinfor.smartcitizen.Utils;
+import us.idinfor.smartcitizen.utils.Utils;
 import us.idinfor.smartcitizen.data.api.google.fit.GoogleFitHelper;
 
 public class LocationDetailsInteractorImpl implements LocationDetailsInteractor {

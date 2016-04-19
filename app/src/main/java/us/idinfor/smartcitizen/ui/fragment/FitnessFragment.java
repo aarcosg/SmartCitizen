@@ -35,7 +35,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
-import us.idinfor.smartcitizen.Utils;
+import us.idinfor.smartcitizen.utils.Utils;
 import us.idinfor.smartcitizen.data.api.google.fit.ActivityDetails;
 import us.idinfor.smartcitizen.di.components.MainComponent;
 import us.idinfor.smartcitizen.mvp.presenter.FitnessPresenter;

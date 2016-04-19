@@ -14,9 +14,9 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-import us.idinfor.smartcitizen.Utils;
 import us.idinfor.smartcitizen.data.api.google.fit.ActivityDetails;
 import us.idinfor.smartcitizen.data.api.google.fit.GoogleFitHelper;
+import us.idinfor.smartcitizen.utils.Utils;
 
 public class ActivityTimelineInteractorImpl implements ActivityTimelineInteractor {
 

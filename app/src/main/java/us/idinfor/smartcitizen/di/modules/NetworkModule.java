@@ -22,6 +22,7 @@ import us.idinfor.smartcitizen.data.api.ztreamy.ZtreamyApi;
 import us.idinfor.smartcitizen.di.scopes.PerApp;
 import us.idinfor.smartcitizen.mvp.presenter.SyncServicePresenter;
 import us.idinfor.smartcitizen.service.SyncService;
+import us.idinfor.smartcitizen.utils.RxNetwork;
 
 @Module
 public class NetworkModule {
@@ -29,6 +30,12 @@ public class NetworkModule {
     public final static String NAME_RETROFIT_HERMESCITIZEN = "NAME_RETROFIT_HERMESCITIZEN";
     public final static String NAME_RETROFIT_ZTREAMY = "NAME_RETROFIT_ZTREAMY";
     private final static long SECONDS_TIMEOUT = 20;
+
+    @Provides
+    @PerApp
+    RxNetwork provideRxNetwork(Context context){
+        return new RxNetwork(context);
+    }
 
     @Provides
     @PerApp

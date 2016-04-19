@@ -26,7 +26,7 @@ import rx.Single;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import us.idinfor.smartcitizen.Constants;
-import us.idinfor.smartcitizen.Utils;
+import us.idinfor.smartcitizen.utils.Utils;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.ActivitySummaryFit;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.CaloriesExpendedFit;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.DistanceDeltaFit;

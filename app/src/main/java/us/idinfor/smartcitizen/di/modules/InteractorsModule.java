@@ -20,14 +20,15 @@ import us.idinfor.smartcitizen.interactor.MainInteractor;
 import us.idinfor.smartcitizen.interactor.MainInteractorImpl;
 import us.idinfor.smartcitizen.interactor.SyncServiceInteractor;
 import us.idinfor.smartcitizen.interactor.SyncServiceInteractorImpl;
+import us.idinfor.smartcitizen.utils.RxNetwork;
 
 @Module
 public class InteractorsModule {
 
     @Provides
     @PerApp
-    public LoginInteractor provideLoginInteractor(HermesCitizenApi hermesCitizenApi, SharedPreferences preferences) {
-        return new LoginInteractorImpl(hermesCitizenApi,preferences);
+    public LoginInteractor provideLoginInteractor(RxNetwork rxNetwork, HermesCitizenApi hermesCitizenApi, SharedPreferences preferences) {
+        return new LoginInteractorImpl(rxNetwork, hermesCitizenApi, preferences);
     }
 
     @Provides
@@ -57,7 +58,7 @@ public class InteractorsModule {
     @Provides
     @PerApp
     public SyncServiceInteractor provideSyncServiceInteractor(SharedPreferences preferences,
-        HermesCitizenApi hermesCitizenApi, ZtreamyApi ztreamyApi){
-            return new SyncServiceInteractorImpl(preferences, hermesCitizenApi, ztreamyApi);
+        RxNetwork rxNetwork, HermesCitizenApi hermesCitizenApi, ZtreamyApi ztreamyApi){
+            return new SyncServiceInteractorImpl(preferences, rxNetwork, hermesCitizenApi, ztreamyApi);
     }
 }

@@ -13,7 +13,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.R;
-import us.idinfor.smartcitizen.Utils;
+import us.idinfor.smartcitizen.utils.Utils;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.ActivitySummaryFit;
 
 public class ActivityDurationPagerAdapter extends PagerAdapter {

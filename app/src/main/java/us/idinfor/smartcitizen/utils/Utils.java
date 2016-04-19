@@ -1,4 +1,4 @@
-package us.idinfor.smartcitizen;
+package us.idinfor.smartcitizen.utils;
 
 import android.Manifest;
 import android.app.Activity;
@@ -17,6 +17,8 @@ import com.tbruyelle.rxpermissions.RxPermissions;
 import java.util.Calendar;
 
 import rx.Observable;
+import us.idinfor.smartcitizen.Constants;
+import us.idinfor.smartcitizen.R;
 
 public class Utils {
     private static final String TAG = Utils.class.getCanonicalName();
@@ -82,7 +84,7 @@ public class Utils {
 
     public static Integer getIconColorId(Context context, String activity){
         Integer color = context.getResources().getIdentifier("activity_" + activity,"color",context.getPackageName());
-        return color > 0 ? ContextCompat.getColor(context,color) : ContextCompat.getColor(context,R.color.accent);
+        return color > 0 ? ContextCompat.getColor(context,color) : ContextCompat.getColor(context, R.color.accent);
     }
 
     public static Drawable getFitnessProgressBarDrawable(Context context, Integer progress){
