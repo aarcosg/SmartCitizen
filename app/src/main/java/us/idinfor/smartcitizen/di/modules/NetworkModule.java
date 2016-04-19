@@ -16,6 +16,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import us.idinfor.smartcitizen.BuildConfig;
 import us.idinfor.smartcitizen.data.api.hermes.HermesCitizenApi;
 import us.idinfor.smartcitizen.data.api.ztreamy.ZtreamyApi;
 import us.idinfor.smartcitizen.di.scopes.PerApp;
@@ -39,15 +40,17 @@ public class NetworkModule {
     @Provides
     @PerApp
     OkHttpClient provideOkHttpClient(Cache cache) {
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-        return new OkHttpClient.Builder()
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectTimeout(SECONDS_TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(SECONDS_TIMEOUT, TimeUnit.SECONDS)
                 .writeTimeout(SECONDS_TIMEOUT, TimeUnit.SECONDS)
-                .cache(cache)
-                .addInterceptor(logging)
-                .build();
+                .cache(cache);
+        if(BuildConfig.DEBUG){
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+            builder.addInterceptor(logging);
+        }
+        return builder.build();
     }
 
     @Provides
