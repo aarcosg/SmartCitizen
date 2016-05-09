@@ -6,7 +6,6 @@ import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
-import com.squareup.leakcanary.LeakCanary;
 
 import dagger.Module;
 import dagger.Provides;
@@ -26,7 +25,7 @@ public class ApplicationModule {
         this.mApplication = application;
 
         if(BuildConfig.DEBUG){
-            LeakCanary.install(this.mApplication);
+            //LeakCanary.install(this.mApplication);
         }else{
             Fabric.with(this.mApplication, new Crashlytics());
         }

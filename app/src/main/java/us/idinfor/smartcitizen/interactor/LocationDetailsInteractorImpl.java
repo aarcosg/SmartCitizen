@@ -1,6 +1,5 @@
 package us.idinfor.smartcitizen.interactor;
 
-import com.fernandocejas.frodo.annotation.RxLogObservable;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.maps.model.LatLng;
@@ -15,8 +14,8 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-import us.idinfor.smartcitizen.utils.Utils;
 import us.idinfor.smartcitizen.data.api.google.fit.GoogleFitHelper;
+import us.idinfor.smartcitizen.utils.Utils;
 
 public class LocationDetailsInteractorImpl implements LocationDetailsInteractor {
 
@@ -25,7 +24,7 @@ public class LocationDetailsInteractorImpl implements LocationDetailsInteractor 
     @Inject
     public LocationDetailsInteractorImpl(){}
 
-    @RxLogObservable
+    //@RxLogObservable
     @Override
     public Observable<List<LatLng>> getGoogleFitQueryResponse(int timeRange) {
         DataReadRequest.Builder dataReadRequestBuilder = buildFitDataReadRequest();

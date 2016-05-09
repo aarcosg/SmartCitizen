@@ -3,7 +3,6 @@ package us.idinfor.smartcitizen.interactor;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.fernandocejas.frodo.annotation.RxLogObservable;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.patloew.rxfit.RxFit;
@@ -23,8 +22,6 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import us.idinfor.smartcitizen.Constants;
-import us.idinfor.smartcitizen.utils.RxNetwork;
-import us.idinfor.smartcitizen.utils.Utils;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.ActivitySegmentFit;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.LocationSampleFit;
 import us.idinfor.smartcitizen.data.api.hermes.HermesCitizenApi;
@@ -33,6 +30,8 @@ import us.idinfor.smartcitizen.data.api.hermes.entity.User;
 import us.idinfor.smartcitizen.data.api.ztreamy.ZtreamyApi;
 import us.idinfor.smartcitizen.data.api.ztreamy.entity.Event;
 import us.idinfor.smartcitizen.service.SyncServiceUtils;
+import us.idinfor.smartcitizen.utils.RxNetwork;
+import us.idinfor.smartcitizen.utils.Utils;
 
 public class SyncServiceInteractorImpl implements SyncServiceInteractor {
 
@@ -74,7 +73,7 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
         return builder;
     }
 
-    @RxLogObservable
+    //@RxLogObservable
     @Override
     public Observable<List<LocationSampleFit>> queryLocationsToGoogleFit() {
 
@@ -97,7 +96,7 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
                         .observeOn(AndroidSchedulers.mainThread()));
     }
 
-    @RxLogObservable
+    //@RxLogObservable
     @Override
     public Observable<List<ActivitySegmentFit>> queryActivitiesToGoogleFit() {
 
@@ -132,7 +131,7 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
         mPrefs.edit().putLong(Constants.PROPERTY_LAST_LOCATION_TIME_SENT,new Date().getTime()).commit();
     }
 
-    @RxLogObservable
+    //@RxLogObservable
     private void uploadLocationsToHermesCitizen(ItemsList<LocationSampleFit> items){
         mRxNetwork.checkInternetConnection()
             .andThen(mHermesCitizenApi.uploadLocations(items)
@@ -146,7 +145,7 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
                 throwable -> Log.e(TAG,"Locations not uploaded to Hermes Citizen server"));
     }
 
-    @RxLogObservable
+    //@RxLogObservable
     private void uploadLocationsToZtreamy(ItemsList<LocationSampleFit> items){
         Map<String,Object> subMap = new HashMap<>(1);
         subMap.put(ZtreamyApi.LOCATIONS_LIST_KEY,items.getItems());
@@ -163,7 +162,7 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()))
                 .subscribe(response -> {
-                    if(response.isSuccess()){
+                    if(response.isSuccessful()){
                         Log.i(TAG,"Locations uploaded to Ztreamy");
                     }
                 },
@@ -180,7 +179,7 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
         mPrefs.edit().putLong(Constants.PROPERTY_LAST_ACTIVITY_TIME_SENT,new Date().getTime()).commit();
     }
 
-    @RxLogObservable
+    //@RxLogObservable
     private void uploadActivitiesToHermesCitizen(ItemsList<ActivitySegmentFit> items){
         mRxNetwork.checkInternetConnection()
                 .andThen(mHermesCitizenApi.uploadActivities(items)
@@ -194,7 +193,7 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
                 throwable -> Log.e(TAG,"Activities not uploaded to Hermes Citizen server"));
     }
 
-    @RxLogObservable
+    //@RxLogObservable
     private void uploadActivitiesToZtreamy(ItemsList<ActivitySegmentFit> items){
         Map<String,Object> subMap = new HashMap<>(1);
         subMap.put(ZtreamyApi.ACTIVITIES_LIST_KEY,items.getItems());
@@ -211,7 +210,7 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()))
                 .subscribe(response -> {
-                    if(response.isSuccess()){
+                    if(response.isSuccessful()){
                         Log.i(TAG,"Activities uploaded to Ztreamy");
                     }
                 },

@@ -1,6 +1,5 @@
 package us.idinfor.smartcitizen.interactor;
 
-import com.fernandocejas.frodo.annotation.RxLogObservable;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.patloew.rxfit.RxFit;
@@ -25,7 +24,7 @@ public class ActivityTimelineInteractorImpl implements ActivityTimelineInteracto
     @Inject
     public ActivityTimelineInteractorImpl(){}
 
-    @RxLogObservable
+    //@RxLogObservable
     @Override
     public Observable<List<ActivityDetails>> getGoogleFitQueryResponse(int timeRange) {
         DataReadRequest.Builder dataReadRequestBuilder = buildFitDataReadRequest();

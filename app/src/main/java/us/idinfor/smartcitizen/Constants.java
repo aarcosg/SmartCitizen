@@ -16,8 +16,8 @@ public class Constants {
     public static final int PLAY_SERVICES_RESOLUTION_REQUEST  = 9000;
     public static final String ACTIVITY_SLEEP_PREFIX = "sleep";
     public static final int SIGNUP_RESOLUTION_REQUEST = 100;
-    public static final int HERMES_SYNC_INTERVAL_IN_MINUTES = 15;
-    public static final int SYNC_INTERVAL_IN_MINUTES = 15;
+    public static final int HERMES_SYNC_INTERVAL_IN_MINUTES = 30;
+    public static final int SYNC_INTERVAL_IN_MINUTES = 30;
 
     public static final String ACTION_QUERY_ALL =  Constants.PACKAGE_NAME + ".ACTION_QUERY_ALL";
 

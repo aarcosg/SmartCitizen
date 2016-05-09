@@ -2,7 +2,6 @@ package us.idinfor.smartcitizen.interactor;
 
 import android.content.SharedPreferences;
 
-import com.fernandocejas.frodo.annotation.RxLogObservable;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import javax.inject.Inject;
@@ -33,7 +32,7 @@ public class LoginInteractorImpl implements LoginInteractor {
         this.mPrefs = prefs;
     }
 
-    @RxLogObservable
+    //@RxLogObservable
     @Override
     public Observable<User> loginOrRegisterUserInHermes(final GoogleSignInAccount account) {
         String email = account.getEmail();

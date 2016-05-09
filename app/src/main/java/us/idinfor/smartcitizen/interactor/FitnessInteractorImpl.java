@@ -2,7 +2,6 @@ package us.idinfor.smartcitizen.interactor;
 
 import android.content.Context;
 
-import com.fernandocejas.frodo.annotation.RxLogObservable;
 import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.patloew.rxfit.RxFit;
@@ -40,7 +39,7 @@ public class FitnessInteractorImpl implements FitnessInteractor {
         RxFit.checkConnection().subscribe(() -> GoogleFitHelper.subscribeFitnessData(mContext));
     }
 
-    @RxLogObservable
+    //@RxLogObservable
     @Override
     public Observable<ActivityDetails> getGoogleFitQueryResponse(int timeRange) {
 
