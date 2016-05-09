@@ -148,8 +148,10 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
 
     @RxLogObservable
     private void uploadLocationsToZtreamy(ItemsList<LocationSampleFit> items){
+        Map<String,Object> subMap = new HashMap<>(1);
+        subMap.put(ZtreamyApi.LOCATIONS_LIST_KEY,items.getItems());
         Map<String,Object> map = new HashMap<>(1);
-        map.put(ZtreamyApi.EVENT_TYPE_LOCATIONS,items.getItems());
+        map.put(ZtreamyApi.EVENT_TYPE_LOCATIONS,subMap);
         Event ztreamyEvent = new Event(
                 getHash(items.getUser()),
                 ZtreamyApi.SYNTAX,
@@ -194,8 +196,10 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
 
     @RxLogObservable
     private void uploadActivitiesToZtreamy(ItemsList<ActivitySegmentFit> items){
+        Map<String,Object> subMap = new HashMap<>(1);
+        subMap.put(ZtreamyApi.ACTIVITIES_LIST_KEY,items.getItems());
         Map<String,Object> map = new HashMap<>(1);
-        map.put(ZtreamyApi.EVENT_TYPE_ACTIVITIES,items.getItems());
+        map.put(ZtreamyApi.EVENT_TYPE_ACTIVITIES,subMap);
         Event ztreamyEvent = new Event(
                 getHash(items.getUser()),
                 ZtreamyApi.SYNTAX,

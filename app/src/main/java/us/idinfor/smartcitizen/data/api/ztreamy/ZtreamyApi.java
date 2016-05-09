@@ -14,6 +14,8 @@ public interface ZtreamyApi {
     String SYNTAX = "application/json";
     String EVENT_TYPE_LOCATIONS = "User Locations";
     String EVENT_TYPE_ACTIVITIES = "User Activities";
+    String LOCATIONS_LIST_KEY = "userLocationsList";
+    String ACTIVITIES_LIST_KEY = "userActivitiesList";
     String SERVICE_ENDPOINT = "http://hermes1.gast.it.uc3m.es:9100/";
 
     @Headers("Content-Type: application/json")
