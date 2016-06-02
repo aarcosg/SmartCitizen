@@ -1,5 +1,8 @@
 package us.idinfor.smartcitizen.mvp.presenter;
 
+import java.util.Calendar;
+import java.util.Date;
+
 import javax.inject.Inject;
 
 import rx.subscriptions.CompositeSubscription;
@@ -42,24 +45,67 @@ public class SyncServicePresenterImpl implements SyncServicePresenter{
     }
 
     @Override
-    public void queryLocations() {
-        mSubscriptions.add(this.mSyncServiceInteractor.queryLocationsToGoogleFit().subscribe(
-            locations ->  {
-                if(!locations.isEmpty()){
-                    this.mSyncServiceInteractor.uploadLocations(locations);
-                }
-            }
+    public void queryPeriodicLocations() {
+        mSubscriptions.add(this.mSyncServiceInteractor.queryLocationsToGoogleFit(
+                this.mSyncServiceInteractor.getLastLocationTimeSentFromPreferences(),new Date().getTime())
+                .subscribe(
+                    locations ->  {
+                        if(!locations.isEmpty()){
+                            this.mSyncServiceInteractor.uploadPeriodicLocations(locations);
+                        }
+                    }
         ));
     }
 
     @Override
-    public void queryActivities() {
-        mSubscriptions.add(this.mSyncServiceInteractor.queryActivitiesToGoogleFit().subscribe(
-            activities -> {
-                if(!activities.isEmpty()){
-                    this.mSyncServiceInteractor.uploadActivities(activities);
-                }
-            }
+    public void queryPeriodicActivities() {
+        mSubscriptions.add(this.mSyncServiceInteractor.queryActivitiesToGoogleFit(
+                this.mSyncServiceInteractor.getLastActivityTimeSentFromPreferences(),new Date().getTime())
+                .subscribe(
+                    activities -> {
+                        if(!activities.isEmpty()){
+                            this.mSyncServiceInteractor.uploadPeriodicActivities(activities);
+                        }
+                    }
         ));
+    }
+
+    @Override
+    public void queryFullDayData(){
+        Calendar now = Calendar.getInstance();
+        Calendar lastDay = mSyncServiceInteractor.getLastDayDataSentFromPreferences();
+        if(lastDay.get(Calendar.DAY_OF_YEAR) < now.get(Calendar.DAY_OF_YEAR)){
+            lastDay.set(Calendar.HOUR_OF_DAY,0);
+            lastDay.set(Calendar.MINUTE,0);
+            lastDay.set(Calendar.SECOND,0);
+            now.add(Calendar.DAY_OF_YEAR, -1);
+            now.set(Calendar.HOUR_OF_DAY,23);
+            now.set(Calendar.MINUTE,59);
+            now.set(Calendar.SECOND,59);
+
+            mSubscriptions.add(this.mSyncServiceInteractor.queryLocationsToGoogleFit(
+                    lastDay.getTimeInMillis(),now.getTimeInMillis())
+                    .subscribe(
+                            locations ->  {
+                                if(!locations.isEmpty()){
+                                    mSyncServiceInteractor.uploadFullDayLocations(locations);
+                                }
+                            }
+                    )
+            );
+
+            mSubscriptions.add(this.mSyncServiceInteractor.queryActivitiesToGoogleFit(
+                    lastDay.getTimeInMillis(),now.getTimeInMillis())
+                    .subscribe(
+                            activities ->  {
+                                if(!activities.isEmpty()){
+                                    mSyncServiceInteractor.uploadFullDayActivities(activities);
+                                }
+                            }
+                    )
+            );
+            mSyncServiceInteractor.saveLastDayDataSentInPreferences();
+        }
+
     }
 }

@@ -10,6 +10,7 @@ import com.patloew.rxfit.RxFit;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -60,6 +61,30 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
     }
 
     @Override
+    public Calendar getLastDayDataSentFromPreferences(){
+        Calendar defaultLastDay = Calendar.getInstance();
+        defaultLastDay.add(Calendar.DAY_OF_YEAR, -1);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(mPrefs.getLong(Constants.PROPERTY_LAST_DAY_DATA_SENT, defaultLastDay.getTimeInMillis()));
+        return calendar;
+    }
+
+    @Override
+    public void saveLastDayDataSentInPreferences(){
+        mPrefs.edit().putLong(Constants.PROPERTY_LAST_DAY_DATA_SENT,new Date().getTime()).apply();
+    }
+
+    @Override
+    public long getLastLocationTimeSentFromPreferences(){
+        return mPrefs.getLong(Constants.PROPERTY_LAST_LOCATION_TIME_SENT, Utils.getStartTimeRange(Constants.RANGE_DAY));
+    }
+
+    @Override
+    public long getLastActivityTimeSentFromPreferences(){
+        return mPrefs.getLong(Constants.PROPERTY_LAST_ACTIVITY_TIME_SENT,Utils.getStartTimeRange(Constants.RANGE_DAY));
+    }
+
+    @Override
     public DataReadRequest.Builder buildGoogleFitLocationsRequest() {
         DataReadRequest.Builder builder = new DataReadRequest.Builder()
                 .read(DataType.TYPE_LOCATION_SAMPLE);
@@ -75,12 +100,10 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
 
     //@RxLogObservable
     @Override
-    public Observable<List<LocationSampleFit>> queryLocationsToGoogleFit() {
+    public Observable<List<LocationSampleFit>> queryLocationsToGoogleFit(long startTime, long endTime) {
 
         DataReadRequest.Builder dataReadRequestBuilder = buildGoogleFitLocationsRequest();
 
-        long startTime = mPrefs.getLong(Constants.PROPERTY_LAST_LOCATION_TIME_SENT,Utils.getStartTimeRange(Constants.RANGE_DAY));
-        long endTime = new Date().getTime();
         dataReadRequestBuilder.setTimeRange(startTime,endTime, TimeUnit.MILLISECONDS);
 
         DataReadRequest dataReadRequest = dataReadRequestBuilder.build();
@@ -98,12 +121,10 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
 
     //@RxLogObservable
     @Override
-    public Observable<List<ActivitySegmentFit>> queryActivitiesToGoogleFit() {
+    public Observable<List<ActivitySegmentFit>> queryActivitiesToGoogleFit(long startTime, long endTime) {
 
         DataReadRequest.Builder dataReadRequestBuilder = buildGoogleFitActivitiesRequest();
-
-        long startTime = mPrefs.getLong(Constants.PROPERTY_LAST_ACTIVITY_TIME_SENT,Utils.getStartTimeRange(Constants.RANGE_DAY));
-        long endTime = new Date().getTime();
+        
         dataReadRequestBuilder
                 .setTimeRange(startTime,endTime, TimeUnit.MILLISECONDS)
                 .bucketByActivitySegment(1,TimeUnit.MINUTES);
@@ -122,13 +143,21 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
     }
 
     @Override
-    public void uploadLocations(List<LocationSampleFit> locations) {
+    public void uploadPeriodicLocations(List<LocationSampleFit> locations) {
         ItemsList<LocationSampleFit> items = new ItemsList<>(
                 getUserFromPreferences().getEmail(),
                 locations);
         uploadLocationsToHermesCitizen(items);
-        uploadLocationsToZtreamy(items);
+        uploadLocationsToZtreamy(items, ZtreamyApi.EVENT_TYPE_PERIODIC_LOCATIONS);
         mPrefs.edit().putLong(Constants.PROPERTY_LAST_LOCATION_TIME_SENT,new Date().getTime()).commit();
+    }
+
+    @Override
+    public void uploadFullDayLocations(List<LocationSampleFit> locations) {
+        ItemsList<LocationSampleFit> items = new ItemsList<>(
+                getUserFromPreferences().getEmail(),
+                locations);
+        uploadLocationsToZtreamy(items,ZtreamyApi.EVENT_TYPE_FULL_LOCATIONS);
     }
 
     //@RxLogObservable
@@ -146,16 +175,16 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
     }
 
     //@RxLogObservable
-    private void uploadLocationsToZtreamy(ItemsList<LocationSampleFit> items){
+    private void uploadLocationsToZtreamy(ItemsList<LocationSampleFit> items, String eventType){
         Map<String,Object> subMap = new HashMap<>(1);
         subMap.put(ZtreamyApi.LOCATIONS_LIST_KEY,items.getItems());
         Map<String,Object> map = new HashMap<>(1);
-        map.put(ZtreamyApi.EVENT_TYPE_LOCATIONS,subMap);
+        map.put(eventType,subMap);
         Event ztreamyEvent = new Event(
                 getHash(items.getUser()),
                 ZtreamyApi.SYNTAX,
                 ZtreamyApi.APPLICATION_ID,
-                ZtreamyApi.EVENT_TYPE_LOCATIONS,
+                eventType,
                 map);
         mRxNetwork.checkInternetConnection()
                 .andThen(mZtreamyApi.uploadLocations(ztreamyEvent)
@@ -170,13 +199,21 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
     }
 
     @Override
-    public void uploadActivities(List<ActivitySegmentFit> activities) {
+    public void uploadPeriodicActivities(List<ActivitySegmentFit> activities) {
         ItemsList<ActivitySegmentFit> items = new ItemsList<>(
                 getUserFromPreferences().getEmail(),
                 activities);
         uploadActivitiesToHermesCitizen(items);
-        uploadActivitiesToZtreamy(items);
+        uploadActivitiesToZtreamy(items, ZtreamyApi.EVENT_TYPE_PERIODIC_ACTIVITIES);
         mPrefs.edit().putLong(Constants.PROPERTY_LAST_ACTIVITY_TIME_SENT,new Date().getTime()).commit();
+    }
+
+    @Override
+    public void uploadFullDayActivities(List<ActivitySegmentFit> activities) {
+        ItemsList<ActivitySegmentFit> items = new ItemsList<>(
+                getUserFromPreferences().getEmail(),
+                activities);
+        uploadActivitiesToZtreamy(items, ZtreamyApi.EVENT_TYPE_FULL_ACTIVITIES);
     }
 
     //@RxLogObservable
@@ -194,16 +231,16 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
     }
 
     //@RxLogObservable
-    private void uploadActivitiesToZtreamy(ItemsList<ActivitySegmentFit> items){
+    private void uploadActivitiesToZtreamy(ItemsList<ActivitySegmentFit> items, String eventType){
         Map<String,Object> subMap = new HashMap<>(1);
         subMap.put(ZtreamyApi.ACTIVITIES_LIST_KEY,items.getItems());
         Map<String,Object> map = new HashMap<>(1);
-        map.put(ZtreamyApi.EVENT_TYPE_ACTIVITIES,subMap);
+        map.put(eventType,subMap);
         Event ztreamyEvent = new Event(
                 getHash(items.getUser()),
                 ZtreamyApi.SYNTAX,
                 ZtreamyApi.APPLICATION_ID,
-                ZtreamyApi.EVENT_TYPE_ACTIVITIES,
+                eventType,
                 map);
         mRxNetwork.checkInternetConnection()
                 .andThen(mZtreamyApi.uploadActivities(ztreamyEvent)

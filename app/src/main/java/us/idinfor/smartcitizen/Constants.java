@@ -12,6 +12,7 @@ public class Constants {
     public static final String PROPERTY_SYNC_DATA_HERMES = "sync_data_hermes";
     public static final String PROPERTY_LAST_LOCATION_TIME_SENT = "last_location_time_sent";
     public static final String PROPERTY_LAST_ACTIVITY_TIME_SENT = "last_activity_time_sent";
+    public static final String PROPERTY_LAST_DAY_DATA_SENT = "last_day_data_sent";
 
     public static final int PLAY_SERVICES_RESOLUTION_REQUEST  = 9000;
     public static final String ACTIVITY_SLEEP_PREFIX = "sleep";

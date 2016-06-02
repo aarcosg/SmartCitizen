@@ -69,8 +69,9 @@ public class SyncService extends Service implements SyncServiceView {
         Log.i(TAG,"@onStartCommand");
         checkUser();
         if(intent != null){
-            this.mSyncServicePresenter.queryLocations();
-            this.mSyncServicePresenter.queryActivities();
+            this.mSyncServicePresenter.queryPeriodicLocations();
+            this.mSyncServicePresenter.queryPeriodicActivities();
+            this.mSyncServicePresenter.queryFullDayData();
         }
         return START_STICKY;
     }
