@@ -13,6 +13,11 @@ public class Constants {
     public static final String PROPERTY_LAST_LOCATION_TIME_SENT = "last_location_time_sent";
     public static final String PROPERTY_LAST_ACTIVITY_TIME_SENT = "last_activity_time_sent";
     public static final String PROPERTY_LAST_DAY_DATA_SENT = "last_day_data_sent";
+    public static final String PROPERTY_LAST_STEPS_TIME_SENT = "last_steps_time_sent";
+    public static final String PROPERTY_LAST_DISTANCE_TIME_SENT = "last_distance_time_sent";
+    public static final String PROPERTY_LAST_CALORIES_EXPENDED_TIME_SENT = "last_calories_expended_time_sent";
+    public static final String PROPERTY_LAST_HEART_RATE_TIME_SENT = "last_heart_rate_time_sent";
+    public static final String PROPERTY_LAST_SLEEP_TIME_SENT = "last_sleep_time_sent";
 
     public static final int PLAY_SERVICES_RESOLUTION_REQUEST  = 9000;
     public static final String ACTIVITY_SLEEP_PREFIX = "sleep";

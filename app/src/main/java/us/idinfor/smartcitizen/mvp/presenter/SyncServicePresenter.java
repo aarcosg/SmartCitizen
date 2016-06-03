@@ -9,6 +9,17 @@ public interface SyncServicePresenter extends Presenter {
     void onDestroy();
     void queryPeriodicLocations();
     void queryPeriodicActivities();
+
+    void queryPeriodicSteps();
+
+    void queryPeriodicDistances();
+
+    void queryPeriodicCaloriesExpended();
+
+    void queryPeriodicHeartRates();
+
+    void queryPeriodicSleep();
+
     void queryFullDayData();
 
 }

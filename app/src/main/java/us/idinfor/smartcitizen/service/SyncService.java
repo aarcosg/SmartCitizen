@@ -71,6 +71,11 @@ public class SyncService extends Service implements SyncServiceView {
         if(intent != null){
             this.mSyncServicePresenter.queryPeriodicLocations();
             this.mSyncServicePresenter.queryPeriodicActivities();
+            this.mSyncServicePresenter.queryPeriodicSteps();
+            this.mSyncServicePresenter.queryPeriodicDistances();
+            this.mSyncServicePresenter.queryPeriodicCaloriesExpended();
+            this.mSyncServicePresenter.queryPeriodicHeartRates();
+            this.mSyncServicePresenter.queryPeriodicSleep();
             this.mSyncServicePresenter.queryFullDayData();
         }
         return START_STICKY;

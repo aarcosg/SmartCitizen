@@ -1,5 +1,7 @@
 package us.idinfor.smartcitizen.mvp.presenter;
 
+import android.util.Log;
+
 import java.util.Calendar;
 import java.util.Date;
 
@@ -12,6 +14,8 @@ import us.idinfor.smartcitizen.mvp.view.SyncServiceView;
 import us.idinfor.smartcitizen.mvp.view.View;
 
 public class SyncServicePresenterImpl implements SyncServicePresenter{
+
+    private static final String TAG = SyncServicePresenterImpl.class.getCanonicalName();
 
     private SyncServiceView mSyncServiceView;
     private final SyncServiceInteractor mSyncServiceInteractor;
@@ -54,6 +58,7 @@ public class SyncServicePresenterImpl implements SyncServicePresenter{
                             this.mSyncServiceInteractor.uploadPeriodicLocations(locations);
                         }
                     }
+                    , throwable -> Log.e(TAG,"Error @queryPeriodicLocations: " + throwable.getLocalizedMessage())
         ));
     }
 
@@ -67,7 +72,78 @@ public class SyncServicePresenterImpl implements SyncServicePresenter{
                             this.mSyncServiceInteractor.uploadPeriodicActivities(activities);
                         }
                     }
+                    , throwable -> Log.e(TAG,"Error @queryPeriodicActivities: " + throwable.getLocalizedMessage())
         ));
+    }
+
+    @Override
+    public void queryPeriodicSteps() {
+        mSubscriptions.add(this.mSyncServiceInteractor.queryStepsToGoogleFit(
+                this.mSyncServiceInteractor.getLastStepsTimeSentFromPreferences(),new Date().getTime())
+                .subscribe(
+                        steps ->  {
+                            if(!steps.isEmpty()){
+                                this.mSyncServiceInteractor.uploadPeriodicSteps(steps);
+                            }
+                        }
+                        , throwable -> Log.e(TAG,"Error @queryPeriodicSteps: " + throwable.getLocalizedMessage())
+                ));
+    }
+
+    @Override
+    public void queryPeriodicDistances() {
+        mSubscriptions.add(this.mSyncServiceInteractor.queryDistancesToGoogleFit(
+                this.mSyncServiceInteractor.getLastDistanceTimeSentFromPreferences(),new Date().getTime())
+                .subscribe(
+                        distances ->  {
+                            if(!distances.isEmpty()){
+                                this.mSyncServiceInteractor.uploadPeriodicDistances(distances);
+                            }
+                        }
+                        , throwable -> Log.e(TAG,"Error @queryPeriodicDistances: " + throwable.getLocalizedMessage())
+                ));
+    }
+
+    @Override
+    public void queryPeriodicCaloriesExpended() {
+        mSubscriptions.add(this.mSyncServiceInteractor.queryCaloriesExpendedToGoogleFit(
+                this.mSyncServiceInteractor.getLastCaloriesExpendedTimeSentFromPreferences(),new Date().getTime())
+                .subscribe(
+                        caloriesExpendedList ->  {
+                            if(!caloriesExpendedList.isEmpty()){
+                                this.mSyncServiceInteractor.uploadPeriodicCaloriesExpended(caloriesExpendedList);
+                            }
+                        }
+                        , throwable -> Log.e(TAG,"Error @queryPeriodicCaloriesExpended: " + throwable.getLocalizedMessage())
+                ));
+    }
+
+    @Override
+    public void queryPeriodicHeartRates() {
+        mSubscriptions.add(this.mSyncServiceInteractor.queryHeartRateSamplesToGoogleFit(
+                this.mSyncServiceInteractor.getLastHeartRateTimeSentFromPreferences(),new Date().getTime())
+                .subscribe(
+                        heartRates ->  {
+                            if(!heartRates.isEmpty()){
+                                this.mSyncServiceInteractor.uploadPeriodicHeartRateSample(heartRates);
+                            }
+                        }
+                        , throwable -> Log.e(TAG,"Error @queryPeriodicHeartRates: " + throwable.getLocalizedMessage())
+                ));
+    }
+
+    @Override
+    public void queryPeriodicSleep() {
+        mSubscriptions.add(this.mSyncServiceInteractor.querySleepActivityToGoogleFit(
+                this.mSyncServiceInteractor.getLastSleepTimeSentFromPreferences(),new Date().getTime())
+                .subscribe(
+                        sleepActivities -> {
+                            if(!sleepActivities.isEmpty()){
+                                this.mSyncServiceInteractor.uploadPeriodicSleep(sleepActivities);
+                            }
+                        }
+                        , throwable -> Log.e(TAG,"Error @queryPeriodicSleep: " + throwable.getLocalizedMessage())
+                ));
     }
 
     @Override
@@ -91,6 +167,7 @@ public class SyncServicePresenterImpl implements SyncServicePresenter{
                                     mSyncServiceInteractor.uploadFullDayLocations(locations);
                                 }
                             }
+                            , throwable -> Log.e(TAG,"Error @queryFullDayData: " + throwable.getLocalizedMessage())
                     )
             );
 
@@ -102,8 +179,58 @@ public class SyncServicePresenterImpl implements SyncServicePresenter{
                                     mSyncServiceInteractor.uploadFullDayActivities(activities);
                                 }
                             }
+                            , throwable -> Log.e(TAG,"Error @queryFullDayData: " + throwable.getLocalizedMessage())
                     )
             );
+
+            mSubscriptions.add(this.mSyncServiceInteractor.queryStepsToGoogleFit(
+                    lastDay.getTimeInMillis(),now.getTimeInMillis())
+                    .subscribe(
+                            steps ->  {
+                                if(!steps.isEmpty()){
+                                    mSyncServiceInteractor.uploadFullDaySteps(steps);
+                                }
+                            }
+                            , throwable -> Log.e(TAG,"Error @queryFullDayData: " + throwable.getLocalizedMessage())
+                    )
+            );
+
+            mSubscriptions.add(this.mSyncServiceInteractor.queryDistancesToGoogleFit(
+                    lastDay.getTimeInMillis(),now.getTimeInMillis())
+                    .subscribe(
+                            distances ->  {
+                                if(!distances.isEmpty()){
+                                    mSyncServiceInteractor.uploadFullDayDistances(distances);
+                                }
+                            }
+                            , throwable -> Log.e(TAG,"Error @queryFullDayData: " + throwable.getLocalizedMessage())
+                    )
+            );
+
+            mSubscriptions.add(this.mSyncServiceInteractor.queryCaloriesExpendedToGoogleFit(
+                    lastDay.getTimeInMillis(),now.getTimeInMillis())
+                    .subscribe(
+                            caloriesExpended ->  {
+                                if(!caloriesExpended.isEmpty()){
+                                    mSyncServiceInteractor.uploadFullDayCaloriesExpended(caloriesExpended);
+                                }
+                            }
+                            , throwable -> Log.e(TAG,"Error @queryFullDayData: " + throwable.getLocalizedMessage())
+                    )
+            );
+
+            mSubscriptions.add(this.mSyncServiceInteractor.queryHeartRateSamplesToGoogleFit(
+                    lastDay.getTimeInMillis(),now.getTimeInMillis())
+                    .subscribe(
+                            heartRates ->  {
+                                if(!heartRates.isEmpty()){
+                                    mSyncServiceInteractor.uploadFullDayHeartRates(heartRates);
+                                }
+                            }
+                            , throwable -> Log.e(TAG,"Error @queryFullDayData: " + throwable.getLocalizedMessage())
+                    )
+            );
+
             mSyncServiceInteractor.saveLastDayDataSentInPreferences();
         }
 

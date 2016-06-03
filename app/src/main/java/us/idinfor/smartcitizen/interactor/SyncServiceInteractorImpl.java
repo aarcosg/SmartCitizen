@@ -7,9 +7,6 @@ import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.patloew.rxfit.RxFit;
 
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,7 +21,11 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.ActivitySegmentFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.CaloriesExpendedFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.DistanceDeltaFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.HeartRateSampleFit;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.LocationSampleFit;
+import us.idinfor.smartcitizen.data.api.google.fit.entity.StepCountDeltaFit;
 import us.idinfor.smartcitizen.data.api.hermes.HermesCitizenApi;
 import us.idinfor.smartcitizen.data.api.hermes.entity.ItemsList;
 import us.idinfor.smartcitizen.data.api.hermes.entity.User;
@@ -85,6 +86,31 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
     }
 
     @Override
+    public long getLastStepsTimeSentFromPreferences(){
+        return mPrefs.getLong(Constants.PROPERTY_LAST_STEPS_TIME_SENT,Utils.getStartTimeRange(Constants.RANGE_DAY));
+    }
+
+    @Override
+    public long getLastDistanceTimeSentFromPreferences(){
+        return mPrefs.getLong(Constants.PROPERTY_LAST_DISTANCE_TIME_SENT,Utils.getStartTimeRange(Constants.RANGE_DAY));
+    }
+
+    @Override
+    public long getLastCaloriesExpendedTimeSentFromPreferences(){
+        return mPrefs.getLong(Constants.PROPERTY_LAST_CALORIES_EXPENDED_TIME_SENT,Utils.getStartTimeRange(Constants.RANGE_DAY));
+    }
+
+    @Override
+    public long getLastHeartRateTimeSentFromPreferences(){
+        return mPrefs.getLong(Constants.PROPERTY_LAST_HEART_RATE_TIME_SENT,Utils.getStartTimeRange(Constants.RANGE_DAY));
+    }
+
+    @Override
+    public long getLastSleepTimeSentFromPreferences(){
+        return mPrefs.getLong(Constants.PROPERTY_LAST_SLEEP_TIME_SENT, Utils.getStartTimeRange(Constants.RANGE_DAY));
+    }
+
+    @Override
     public DataReadRequest.Builder buildGoogleFitLocationsRequest() {
         DataReadRequest.Builder builder = new DataReadRequest.Builder()
                 .read(DataType.TYPE_LOCATION_SAMPLE);
@@ -95,6 +121,34 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
     public DataReadRequest.Builder buildGoogleFitActivitiesRequest() {
         DataReadRequest.Builder builder = new DataReadRequest.Builder()
                 .aggregate(DataType.TYPE_ACTIVITY_SEGMENT,DataType.AGGREGATE_ACTIVITY_SUMMARY);
+        return builder;
+    }
+
+    @Override
+    public DataReadRequest.Builder buildGoogleFitStepsRequest() {
+        DataReadRequest.Builder builder = new DataReadRequest.Builder()
+                .read(DataType.TYPE_STEP_COUNT_DELTA);
+        return builder;
+    }
+
+    @Override
+    public DataReadRequest.Builder buildGoogleFitDistancesRequest() {
+        DataReadRequest.Builder builder = new DataReadRequest.Builder()
+                .read(DataType.TYPE_DISTANCE_DELTA);
+        return builder;
+    }
+
+    @Override
+    public DataReadRequest.Builder buildGoogleFitCaloriesExpendedRequest() {
+        DataReadRequest.Builder builder = new DataReadRequest.Builder()
+                .read(DataType.TYPE_CALORIES_EXPENDED);
+        return builder;
+    }
+
+    @Override
+    public DataReadRequest.Builder buildGoogleFitHeartRateSamplesRequest() {
+        DataReadRequest.Builder builder = new DataReadRequest.Builder()
+                .read(DataType.TYPE_HEART_RATE_BPM);
         return builder;
     }
 
@@ -142,60 +196,120 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
                         .observeOn(AndroidSchedulers.mainThread()));
     }
 
+    //@RxLogObservable
+    @Override
+    public Observable<List<StepCountDeltaFit>> queryStepsToGoogleFit(long startTime, long endTime) {
+
+        DataReadRequest.Builder dataReadRequestBuilder = buildGoogleFitStepsRequest();
+
+        dataReadRequestBuilder.setTimeRange(startTime,endTime, TimeUnit.MILLISECONDS);
+
+        DataReadRequest dataReadRequest = dataReadRequestBuilder.build();
+        DataReadRequest dataReadRequestServer = dataReadRequestBuilder.enableServerQueries().build();
+
+        return RxFit.checkConnection()
+                .andThen(RxFit.History.read(dataReadRequestServer)
+                        .compose(new RxFit.OnExceptionResumeNext.Single<>(RxFit.History.read(dataReadRequest)))
+                        .flatMapObservable(dataReadResult -> Observable.just(
+                                SyncServiceUtils.getStepsListFromDataSets(dataReadResult.getDataSets())
+                        ))
+                        .subscribeOn(Schedulers.computation())
+                        .observeOn(AndroidSchedulers.mainThread()));
+    }
+
+    //@RxLogObservable
+    @Override
+    public Observable<List<DistanceDeltaFit>> queryDistancesToGoogleFit(long startTime, long endTime) {
+
+        DataReadRequest.Builder dataReadRequestBuilder = buildGoogleFitDistancesRequest();
+
+        dataReadRequestBuilder.setTimeRange(startTime,endTime, TimeUnit.MILLISECONDS);
+
+        DataReadRequest dataReadRequest = dataReadRequestBuilder.build();
+        DataReadRequest dataReadRequestServer = dataReadRequestBuilder.enableServerQueries().build();
+
+        return RxFit.checkConnection()
+                .andThen(RxFit.History.read(dataReadRequestServer)
+                        .compose(new RxFit.OnExceptionResumeNext.Single<>(RxFit.History.read(dataReadRequest)))
+                        .flatMapObservable(dataReadResult -> Observable.just(
+                                SyncServiceUtils.getDistanceListFromDataSets(dataReadResult.getDataSets())
+                        ))
+                        .subscribeOn(Schedulers.computation())
+                        .observeOn(AndroidSchedulers.mainThread()));
+    }
+
+    //@RxLogObservable
+    @Override
+    public Observable<List<CaloriesExpendedFit>> queryCaloriesExpendedToGoogleFit(long startTime, long endTime) {
+
+        DataReadRequest.Builder dataReadRequestBuilder = buildGoogleFitCaloriesExpendedRequest();
+
+        dataReadRequestBuilder.setTimeRange(startTime,endTime, TimeUnit.MILLISECONDS);
+
+        DataReadRequest dataReadRequest = dataReadRequestBuilder.build();
+        DataReadRequest dataReadRequestServer = dataReadRequestBuilder.enableServerQueries().build();
+
+        return RxFit.checkConnection()
+                .andThen(RxFit.History.read(dataReadRequestServer)
+                        .compose(new RxFit.OnExceptionResumeNext.Single<>(RxFit.History.read(dataReadRequest)))
+                        .flatMapObservable(dataReadResult -> Observable.just(
+                                SyncServiceUtils.getCaloriesExpendedListFromDataSets(dataReadResult.getDataSets())
+                        ))
+                        .subscribeOn(Schedulers.computation())
+                        .observeOn(AndroidSchedulers.mainThread()));
+    }
+
+    //@RxLogObservable
+    @Override
+    public Observable<List<HeartRateSampleFit>> queryHeartRateSamplesToGoogleFit(long startTime, long endTime) {
+
+        DataReadRequest.Builder dataReadRequestBuilder = buildGoogleFitHeartRateSamplesRequest();
+
+        dataReadRequestBuilder.setTimeRange(startTime,endTime, TimeUnit.MILLISECONDS);
+
+        DataReadRequest dataReadRequest = dataReadRequestBuilder.build();
+        DataReadRequest dataReadRequestServer = dataReadRequestBuilder.enableServerQueries().build();
+
+        return RxFit.checkConnection()
+                .andThen(RxFit.History.read(dataReadRequestServer)
+                        .compose(new RxFit.OnExceptionResumeNext.Single<>(RxFit.History.read(dataReadRequest)))
+                        .flatMapObservable(dataReadResult -> Observable.just(
+                                SyncServiceUtils.getHeartRateSampleListFromDataSets(dataReadResult.getDataSets())
+                        ))
+                        .subscribeOn(Schedulers.computation())
+                        .observeOn(AndroidSchedulers.mainThread()));
+    }
+
+    @Override
+    public Observable<List<ActivitySegmentFit>> querySleepActivityToGoogleFit(long startTime, long endTime) {
+
+        DataReadRequest.Builder dataReadRequestBuilder = buildGoogleFitActivitiesRequest();
+
+        dataReadRequestBuilder
+                .setTimeRange(startTime, endTime, TimeUnit.MILLISECONDS)
+                .bucketByActivitySegment(1,TimeUnit.MINUTES);
+
+        DataReadRequest dataReadRequest = dataReadRequestBuilder.build();
+        DataReadRequest dataReadRequestServer = dataReadRequestBuilder.enableServerQueries().build();
+
+        return RxFit.checkConnection()
+                .andThen(RxFit.History.read(dataReadRequestServer)
+                        .compose(new RxFit.OnExceptionResumeNext.Single<>(RxFit.History.read(dataReadRequest)))
+                        .flatMapObservable(dataReadResult -> Observable.just(
+                                SyncServiceUtils.getSleepActivityListFromBuckets(dataReadResult.getBuckets())
+                        ))
+                        .subscribeOn(Schedulers.computation())
+                        .observeOn(AndroidSchedulers.mainThread()));
+    }
+
     @Override
     public void uploadPeriodicLocations(List<LocationSampleFit> locations) {
         ItemsList<LocationSampleFit> items = new ItemsList<>(
                 getUserFromPreferences().getEmail(),
                 locations);
         uploadLocationsToHermesCitizen(items);
-        uploadLocationsToZtreamy(items, ZtreamyApi.EVENT_TYPE_PERIODIC_LOCATIONS);
+        uploadDataToZtreamy(items,ZtreamyApi.LIST_KEY_LOCATIONS,ZtreamyApi.EVENT_TYPE_PERIODIC_LOCATIONS);
         mPrefs.edit().putLong(Constants.PROPERTY_LAST_LOCATION_TIME_SENT,new Date().getTime()).commit();
-    }
-
-    @Override
-    public void uploadFullDayLocations(List<LocationSampleFit> locations) {
-        ItemsList<LocationSampleFit> items = new ItemsList<>(
-                getUserFromPreferences().getEmail(),
-                locations);
-        uploadLocationsToZtreamy(items,ZtreamyApi.EVENT_TYPE_FULL_LOCATIONS);
-    }
-
-    //@RxLogObservable
-    private void uploadLocationsToHermesCitizen(ItemsList<LocationSampleFit> items){
-        mRxNetwork.checkInternetConnection()
-            .andThen(mHermesCitizenApi.uploadLocations(items)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()))
-                .subscribe(integerResponse -> {
-                    if(integerResponse.body() == HermesCitizenApi.RESPONSE_OK){
-                            Log.i(TAG,"Locations uploaded to Hermes Citizen server");
-                    }
-                },
-                throwable -> Log.e(TAG,"Locations not uploaded to Hermes Citizen server"));
-    }
-
-    //@RxLogObservable
-    private void uploadLocationsToZtreamy(ItemsList<LocationSampleFit> items, String eventType){
-        Map<String,Object> subMap = new HashMap<>(1);
-        subMap.put(ZtreamyApi.LOCATIONS_LIST_KEY,items.getItems());
-        Map<String,Object> map = new HashMap<>(1);
-        map.put(eventType,subMap);
-        Event ztreamyEvent = new Event(
-                getHash(items.getUser()),
-                ZtreamyApi.SYNTAX,
-                ZtreamyApi.APPLICATION_ID,
-                eventType,
-                map);
-        mRxNetwork.checkInternetConnection()
-                .andThen(mZtreamyApi.uploadLocations(ztreamyEvent)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()))
-                .subscribe(response -> {
-                    if(response.isSuccessful()){
-                        Log.i(TAG,"Locations uploaded to Ztreamy");
-                    }
-                },
-                throwable -> Log.e(TAG,"Locations not uploaded to Ztreamy"));
     }
 
     @Override
@@ -204,8 +318,61 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
                 getUserFromPreferences().getEmail(),
                 activities);
         uploadActivitiesToHermesCitizen(items);
-        uploadActivitiesToZtreamy(items, ZtreamyApi.EVENT_TYPE_PERIODIC_ACTIVITIES);
+        uploadDataToZtreamy(items,ZtreamyApi.LIST_KEY_ACTIVITIES,ZtreamyApi.EVENT_TYPE_PERIODIC_ACTIVITIES);
         mPrefs.edit().putLong(Constants.PROPERTY_LAST_ACTIVITY_TIME_SENT,new Date().getTime()).commit();
+    }
+
+    @Override
+    public void uploadPeriodicSteps(List<StepCountDeltaFit> stepsList) {
+        ItemsList<StepCountDeltaFit> items = new ItemsList<>(
+                getUserFromPreferences().getEmail(),
+                stepsList);
+        uploadDataToZtreamy(items, ZtreamyApi.LIST_KEY_STEPS, ZtreamyApi.EVENT_TYPE_PERIODIC_STEPS);
+        mPrefs.edit().putLong(Constants.PROPERTY_LAST_STEPS_TIME_SENT,new Date().getTime()).commit();
+    }
+
+    @Override
+    public void uploadPeriodicDistances(List<DistanceDeltaFit> distances) {
+        ItemsList<DistanceDeltaFit> items = new ItemsList<>(
+                getUserFromPreferences().getEmail(),
+                distances);
+        uploadDataToZtreamy(items, ZtreamyApi.LIST_KEY_DISTANCES, ZtreamyApi.EVENT_TYPE_PERIODIC_DISTANCES);
+        mPrefs.edit().putLong(Constants.PROPERTY_LAST_DISTANCE_TIME_SENT,new Date().getTime()).commit();
+    }
+
+    @Override
+    public void uploadPeriodicCaloriesExpended(List<CaloriesExpendedFit> caloriesExpended) {
+        ItemsList<CaloriesExpendedFit> items = new ItemsList<>(
+                getUserFromPreferences().getEmail(),
+                caloriesExpended);
+        uploadDataToZtreamy(items, ZtreamyApi.LIST_KEY_CALORIES_EXPENDED, ZtreamyApi.EVENT_TYPE_PERIODIC_CALORIES_EXPENDED);
+        mPrefs.edit().putLong(Constants.PROPERTY_LAST_CALORIES_EXPENDED_TIME_SENT,new Date().getTime()).commit();
+    }
+
+    @Override
+    public void uploadPeriodicHeartRateSample(List<HeartRateSampleFit> heartRates) {
+        ItemsList<HeartRateSampleFit> items = new ItemsList<>(
+                getUserFromPreferences().getEmail(),
+                heartRates);
+        uploadDataToZtreamy(items, ZtreamyApi.LIST_KEY_HEART_RATES, ZtreamyApi.EVENT_TYPE_PERIODIC_HEART_RATES);
+        mPrefs.edit().putLong(Constants.PROPERTY_LAST_HEART_RATE_TIME_SENT,new Date().getTime()).commit();
+    }
+
+    @Override
+    public void uploadPeriodicSleep(List<ActivitySegmentFit> activities) {
+        ItemsList<ActivitySegmentFit> items = new ItemsList<>(
+                getUserFromPreferences().getEmail(),
+                activities);
+        uploadDataToZtreamy(items,ZtreamyApi.LIST_KEY_SLEEP,ZtreamyApi.EVENT_TYPE_PERIODIC_SLEEP);
+        mPrefs.edit().putLong(Constants.PROPERTY_LAST_SLEEP_TIME_SENT,new Date().getTime()).commit();
+    }
+
+    @Override
+    public void uploadFullDayLocations(List<LocationSampleFit> locations) {
+        ItemsList<LocationSampleFit> items = new ItemsList<>(
+                getUserFromPreferences().getEmail(),
+                locations);
+        uploadDataToZtreamy(items,ZtreamyApi.LIST_KEY_LOCATIONS,ZtreamyApi.EVENT_TYPE_FULL_LOCATIONS);
     }
 
     @Override
@@ -213,7 +380,76 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
         ItemsList<ActivitySegmentFit> items = new ItemsList<>(
                 getUserFromPreferences().getEmail(),
                 activities);
-        uploadActivitiesToZtreamy(items, ZtreamyApi.EVENT_TYPE_FULL_ACTIVITIES);
+        uploadDataToZtreamy(items,ZtreamyApi.LIST_KEY_ACTIVITIES,ZtreamyApi.EVENT_TYPE_FULL_ACTIVITIES);
+    }
+
+    @Override
+    public void uploadFullDaySteps(List<StepCountDeltaFit> steps) {
+        ItemsList<StepCountDeltaFit> items = new ItemsList<>(
+                getUserFromPreferences().getEmail(),
+                steps);
+        uploadDataToZtreamy(items,ZtreamyApi.LIST_KEY_STEPS,ZtreamyApi.EVENT_TYPE_FULL_STEPS);
+    }
+
+    @Override
+    public void uploadFullDayDistances(List<DistanceDeltaFit> distances) {
+        ItemsList<DistanceDeltaFit> items = new ItemsList<>(
+                getUserFromPreferences().getEmail(),
+                distances);
+        uploadDataToZtreamy(items,ZtreamyApi.LIST_KEY_DISTANCES,ZtreamyApi.EVENT_TYPE_FULL_DISTANCES);
+    }
+
+    @Override
+    public void uploadFullDayCaloriesExpended(List<CaloriesExpendedFit> caloriesExpended) {
+        ItemsList<CaloriesExpendedFit> items = new ItemsList<>(
+                getUserFromPreferences().getEmail(),
+                caloriesExpended);
+        uploadDataToZtreamy(items,ZtreamyApi.LIST_KEY_CALORIES_EXPENDED,ZtreamyApi.EVENT_TYPE_FULL_CALORIES_EXPENDED);
+    }
+
+    @Override
+    public void uploadFullDayHeartRates(List<HeartRateSampleFit> heartRates) {
+        ItemsList<HeartRateSampleFit> items = new ItemsList<>(
+                getUserFromPreferences().getEmail(),
+                heartRates);
+        uploadDataToZtreamy(items,ZtreamyApi.LIST_KEY_HEART_RATES,ZtreamyApi.EVENT_TYPE_FULL_HEART_RATES);
+    }
+
+    private void uploadDataToZtreamy(ItemsList items, String listKey, String eventType){
+        Map<String,Object> subMap = new HashMap<>(1);
+        subMap.put(listKey,items.getItems());
+        Map<String,Object> map = new HashMap<>(1);
+        map.put(eventType,subMap);
+        Event ztreamyEvent = new Event(
+                SyncServiceUtils.getHash(items.getUser()),
+                ZtreamyApi.SYNTAX,
+                ZtreamyApi.APPLICATION_ID,
+                eventType,
+                map);
+        mRxNetwork.checkInternetConnection()
+                .andThen(mZtreamyApi.uploadEvent(ztreamyEvent)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread()))
+                .subscribe(response -> {
+                            if(response.isSuccessful()){
+                                Log.i(TAG, eventType + " sent to Ztreamy");
+                            }
+                        },
+                        throwable -> Log.e(TAG, eventType + " not sent to Ztreamy"));
+    }
+
+    //@RxLogObservable
+    private void uploadLocationsToHermesCitizen(ItemsList<LocationSampleFit> items){
+        mRxNetwork.checkInternetConnection()
+                .andThen(mHermesCitizenApi.uploadLocations(items)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread()))
+                .subscribe(integerResponse -> {
+                            if(integerResponse.body() == HermesCitizenApi.RESPONSE_OK){
+                                Log.i(TAG,"Locations uploaded to Hermes Citizen server");
+                            }
+                        },
+                        throwable -> Log.e(TAG,"Locations not uploaded to Hermes Citizen server"));
     }
 
     //@RxLogObservable
@@ -228,47 +464,6 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
                     }
                 },
                 throwable -> Log.e(TAG,"Activities not uploaded to Hermes Citizen server"));
-    }
-
-    //@RxLogObservable
-    private void uploadActivitiesToZtreamy(ItemsList<ActivitySegmentFit> items, String eventType){
-        Map<String,Object> subMap = new HashMap<>(1);
-        subMap.put(ZtreamyApi.ACTIVITIES_LIST_KEY,items.getItems());
-        Map<String,Object> map = new HashMap<>(1);
-        map.put(eventType,subMap);
-        Event ztreamyEvent = new Event(
-                getHash(items.getUser()),
-                ZtreamyApi.SYNTAX,
-                ZtreamyApi.APPLICATION_ID,
-                eventType,
-                map);
-        mRxNetwork.checkInternetConnection()
-                .andThen(mZtreamyApi.uploadActivities(ztreamyEvent)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()))
-                .subscribe(response -> {
-                    if(response.isSuccessful()){
-                        Log.i(TAG,"Activities uploaded to Ztreamy");
-                    }
-                },
-                throwable -> Log.e(TAG,"Activities not uploaded to Ztreamy"));
-    }
-
-    private String getHash(String stringToHash){
-        String hashedEmail = "";
-        MessageDigest messageDigest;
-        try {
-            messageDigest = MessageDigest.getInstance("SHA-256");
-            messageDigest.reset();
-            hashedEmail =  bin2hex(messageDigest.digest(stringToHash.getBytes()));
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return hashedEmail;
-    }
-
-    private String bin2hex(byte[] data) {
-        return String.format("%0" + (data.length*2) + "x", new BigInteger(1, data));
     }
 
 }
