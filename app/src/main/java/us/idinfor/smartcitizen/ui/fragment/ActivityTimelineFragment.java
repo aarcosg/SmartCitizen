@@ -17,8 +17,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.data.api.google.fit.ActivityDetails;
@@ -35,11 +36,12 @@ public class ActivityTimelineFragment extends BaseFragment implements ActivityTi
     @Inject
     ActivityTimelinePresenter mActivityTimelinePresenter;
 
-    @Bind(R.id.progressBar)
+    @BindView(R.id.progressBar)
     ProgressBar mProgressBar;
-    @Bind(R.id.activitiesRecyclerView)
+    @BindView(R.id.activitiesRecyclerView)
     RecyclerView mActivitiesRecyclerView;
 
+    private Unbinder mUnbinder;
     private ActivityTimelineAdapter mAdapter;
 
     public ActivityTimelineFragment() {
@@ -55,7 +57,7 @@ public class ActivityTimelineFragment extends BaseFragment implements ActivityTi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View fragmentView = inflater.inflate(R.layout.fragment_activity_timeline, container, false);
-        ButterKnife.bind(this, fragmentView);
+        mUnbinder = ButterKnife.bind(this, fragmentView);
         this.mActivityTimelinePresenter.setView(this);
         this.mActivityTimelinePresenter.onCreateView();
         return fragmentView;
@@ -76,7 +78,7 @@ public class ActivityTimelineFragment extends BaseFragment implements ActivityTi
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.unbind(this);
+        mUnbinder.unbind();
     }
 
     @Override

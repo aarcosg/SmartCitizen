@@ -20,10 +20,10 @@ import android.widget.TextView;
 
 import javax.inject.Inject;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import us.idinfor.smartcitizen.R;
-import us.idinfor.smartcitizen.utils.Utils;
 import us.idinfor.smartcitizen.data.api.hermes.entity.User;
 import us.idinfor.smartcitizen.di.HasComponent;
 import us.idinfor.smartcitizen.di.components.DaggerMainComponent;
@@ -33,6 +33,7 @@ import us.idinfor.smartcitizen.mvp.presenter.MainPresenter;
 import us.idinfor.smartcitizen.mvp.view.MainView;
 import us.idinfor.smartcitizen.service.SyncService;
 import us.idinfor.smartcitizen.ui.fragment.FitnessFragment;
+import us.idinfor.smartcitizen.utils.Utils;
 
 public class MainActivity extends BaseActivity
         implements MainView, HasComponent<MainComponent>, NavigationView.OnNavigationItemSelectedListener {
@@ -42,11 +43,11 @@ public class MainActivity extends BaseActivity
     private static final long DRAWER_DELAY_MS = 265;
     private static final String NAV_ITEM_ID = "nav_item_id";
 
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar mToolbar;
-    @Bind(R.id.navigation_view)
+    @BindView(R.id.navigation_view)
     NavigationView mNavigationView;
-    @Bind(R.id.drawer_layout)
+    @BindView(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
     TextView mUserNameTV;
 
@@ -55,6 +56,7 @@ public class MainActivity extends BaseActivity
     @Inject
     MainPresenter mMainPresenter;
 
+    private Unbinder mUnbinder;
     private MainComponent mMainComponent;
     private final Handler mDrawerActionHandler = new Handler();
     private ActionBarDrawerToggle mDrawerToggle;
@@ -80,7 +82,7 @@ public class MainActivity extends BaseActivity
             return;
         }
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+        mUnbinder = ButterKnife.bind(this);
         buildActionBarToolbar(getString(R.string.app_name),false);
 
         mTitle = mDrawerTitle = getTitle();
@@ -107,7 +109,7 @@ public class MainActivity extends BaseActivity
         if(mDrawerLayout != null){
             mDrawerLayout.removeDrawerListener(mDrawerToggle);
         }
-        ButterKnife.unbind(this);
+        mUnbinder.unbind();
     }
 
     @Override

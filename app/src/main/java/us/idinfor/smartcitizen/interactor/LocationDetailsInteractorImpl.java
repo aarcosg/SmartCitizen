@@ -36,7 +36,7 @@ public class LocationDetailsInteractorImpl implements LocationDetailsInteractor 
 
         return RxFit.checkConnection()
                 .andThen(RxFit.History.read(dataReadRequestServer)
-                        .compose(new RxFit.OnExceptionResumeNext.Single<>(RxFit.History.read(dataReadRequest)))
+                        .compose(RxFit.OnExceptionResumeNext.with(RxFit.History.read(dataReadRequest)))
                         .flatMapObservable(dataReadResult -> Observable.just(
                                 GoogleFitHelper.getPointListFromDataSets(dataReadResult.getDataSets())
                         ))

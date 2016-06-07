@@ -26,9 +26,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnItemSelected;
+import butterknife.Unbinder;
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
 import us.idinfor.smartcitizen.di.components.LocationDetailsComponent;
@@ -43,13 +44,14 @@ public class LocationDetailsFragment extends BaseFragment implements LocationDet
     @Inject
     LocationDetailsPresenter mLocationDetailsPresenter;
 
-    @Bind(R.id.toolbarSpinner)
+    @BindView(R.id.toolbarSpinner)
     AppCompatSpinner mToolbarSpinner;
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     Toolbar mToolbar;
-    @Bind(R.id.progressBar)
+    @BindView(R.id.progressBar)
     ProgressBar mProgressBar;
 
+    private Unbinder mUnbinder;
     private GoogleMap mMap;
     private HeatmapTileProvider mProvider;
     private TileOverlay mOverlay;
@@ -67,7 +69,7 @@ public class LocationDetailsFragment extends BaseFragment implements LocationDet
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         final View fragmentView = inflater.inflate(R.layout.fragment_location_details, container, false);
-        ButterKnife.bind(this, fragmentView);
+        mUnbinder =  ButterKnife.bind(this, fragmentView);
         this.mLocationDetailsPresenter.setView(this);
         this.mLocationDetailsPresenter.onCreateView();
         return fragmentView;
@@ -88,7 +90,7 @@ public class LocationDetailsFragment extends BaseFragment implements LocationDet
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.unbind(this);
+        mUnbinder.unbind();
     }
 
     @Override

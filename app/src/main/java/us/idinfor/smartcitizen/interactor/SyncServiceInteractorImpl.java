@@ -165,7 +165,7 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
 
         return RxFit.checkConnection()
                 .andThen(RxFit.History.read(dataReadRequestServer)
-                        .compose(new RxFit.OnExceptionResumeNext.Single<>(RxFit.History.read(dataReadRequest)))
+                        .compose(RxFit.OnExceptionResumeNext.with(RxFit.History.read(dataReadRequest)))
                         .flatMapObservable(dataReadResult -> Observable.just(
                                 SyncServiceUtils.getLocationListFromDataSets(dataReadResult.getDataSets())
                         ))
@@ -188,7 +188,7 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
 
         return RxFit.checkConnection()
                 .andThen(RxFit.History.read(dataReadRequestServer)
-                        .compose(new RxFit.OnExceptionResumeNext.Single<>(RxFit.History.read(dataReadRequest)))
+                        .compose(RxFit.OnExceptionResumeNext.with(RxFit.History.read(dataReadRequest)))
                         .flatMapObservable(dataReadResult -> Observable.just(
                                 SyncServiceUtils.getActivitySegmentListFromBuckets(dataReadResult.getBuckets())
                         ))
@@ -209,7 +209,7 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
 
         return RxFit.checkConnection()
                 .andThen(RxFit.History.read(dataReadRequestServer)
-                        .compose(new RxFit.OnExceptionResumeNext.Single<>(RxFit.History.read(dataReadRequest)))
+                        .compose(RxFit.OnExceptionResumeNext.with(RxFit.History.read(dataReadRequest)))
                         .flatMapObservable(dataReadResult -> Observable.just(
                                 SyncServiceUtils.getStepsListFromDataSets(dataReadResult.getDataSets())
                         ))
@@ -230,7 +230,7 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
 
         return RxFit.checkConnection()
                 .andThen(RxFit.History.read(dataReadRequestServer)
-                        .compose(new RxFit.OnExceptionResumeNext.Single<>(RxFit.History.read(dataReadRequest)))
+                        .compose(RxFit.OnExceptionResumeNext.with(RxFit.History.read(dataReadRequest)))
                         .flatMapObservable(dataReadResult -> Observable.just(
                                 SyncServiceUtils.getDistanceListFromDataSets(dataReadResult.getDataSets())
                         ))
@@ -251,7 +251,7 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
 
         return RxFit.checkConnection()
                 .andThen(RxFit.History.read(dataReadRequestServer)
-                        .compose(new RxFit.OnExceptionResumeNext.Single<>(RxFit.History.read(dataReadRequest)))
+                        .compose(RxFit.OnExceptionResumeNext.with(RxFit.History.read(dataReadRequest)))
                         .flatMapObservable(dataReadResult -> Observable.just(
                                 SyncServiceUtils.getCaloriesExpendedListFromDataSets(dataReadResult.getDataSets())
                         ))
@@ -272,7 +272,7 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
 
         return RxFit.checkConnection()
                 .andThen(RxFit.History.read(dataReadRequestServer)
-                        .compose(new RxFit.OnExceptionResumeNext.Single<>(RxFit.History.read(dataReadRequest)))
+                        .compose(RxFit.OnExceptionResumeNext.with(RxFit.History.read(dataReadRequest)))
                         .flatMapObservable(dataReadResult -> Observable.just(
                                 SyncServiceUtils.getHeartRateSampleListFromDataSets(dataReadResult.getDataSets())
                         ))
@@ -294,7 +294,7 @@ public class SyncServiceInteractorImpl implements SyncServiceInteractor {
 
         return RxFit.checkConnection()
                 .andThen(RxFit.History.read(dataReadRequestServer)
-                        .compose(new RxFit.OnExceptionResumeNext.Single<>(RxFit.History.read(dataReadRequest)))
+                        .compose(RxFit.OnExceptionResumeNext.with(RxFit.History.read(dataReadRequest)))
                         .flatMapObservable(dataReadResult -> Observable.just(
                                 SyncServiceUtils.getSleepActivityListFromBuckets(dataReadResult.getBuckets())
                         ))

@@ -53,7 +53,7 @@ public class FitnessInteractorImpl implements FitnessInteractor {
 
         return RxFit.checkConnection()
             .andThen(RxFit.History.read(dataReadRequestServer)
-            .compose(new RxFit.OnExceptionResumeNext.Single<>(RxFit.History.read(dataReadRequest)))
+            .compose(RxFit.OnExceptionResumeNext.with(RxFit.History.read(dataReadRequest)))
             .flatMapObservable(dataReadResult -> Observable.from(dataReadResult.getBuckets()))
             .flatMap(bucket -> Observable.just(GoogleFitHelper.getActivityDetailsFromBucket(bucket))
             .subscribeOn(Schedulers.computation())

@@ -30,12 +30,12 @@ import java.text.NumberFormat;
 
 import javax.inject.Inject;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 import us.idinfor.smartcitizen.Constants;
 import us.idinfor.smartcitizen.R;
-import us.idinfor.smartcitizen.utils.Utils;
 import us.idinfor.smartcitizen.data.api.google.fit.ActivityDetails;
 import us.idinfor.smartcitizen.di.components.MainComponent;
 import us.idinfor.smartcitizen.mvp.presenter.FitnessPresenter;
@@ -43,41 +43,43 @@ import us.idinfor.smartcitizen.mvp.view.FitnessView;
 import us.idinfor.smartcitizen.ui.activity.ActivityTimelineActivity;
 import us.idinfor.smartcitizen.ui.activity.LocationDetailsActivity;
 import us.idinfor.smartcitizen.ui.adapter.ActivityDurationPagerAdapter;
+import us.idinfor.smartcitizen.utils.Utils;
 
 public class FitnessFragment extends BaseFragment implements FitnessView {
 
     private static final String TAG = FitnessFragment.class.getCanonicalName();
 
-    @Bind(R.id.progressBar)
+    @BindView(R.id.progressBar)
     ProgressBar mProgressBar;
-    @Bind(R.id.stepsCounter)
+    @BindView(R.id.stepsCounter)
     TextView mStepsCounter;
-    @Bind(R.id.distanceCounter)
+    @BindView(R.id.distanceCounter)
     TextView mDistanceCounter;
-    @Bind(R.id.caloriesCounter)
+    @BindView(R.id.caloriesCounter)
     TextView mCaloriesCounter;
-    @Bind(R.id.timePager)
+    @BindView(R.id.timePager)
     ViewPager mTimePager;
-    @Bind(R.id.timePagerIndicator)
+    @BindView(R.id.timePagerIndicator)
     CirclePageIndicator mTimePagerIndicator;
-    @Bind(R.id.heartRateCounter)
+    @BindView(R.id.heartRateCounter)
     TextView mHeartRateCounter;
-    @Bind(R.id.date)
+    @BindView(R.id.date)
     TextView mDate;
-    @Bind(R.id.activityDetailsBtn)
+    @BindView(R.id.activityDetailsBtn)
     Button mActivityDetailsBtn;
-    @Bind(R.id.locationDetailsBtn)
+    @BindView(R.id.locationDetailsBtn)
     Button mLocationDetailsBtn;
-    @Bind(R.id.stepsProgress)
+    @BindView(R.id.stepsProgress)
     ProgressBar mStepsProgress;
-    @Bind(R.id.distanceProgress)
+    @BindView(R.id.distanceProgress)
     ProgressBar mDistanceProgress;
-    @Bind(R.id.caloriesProgress)
+    @BindView(R.id.caloriesProgress)
     ProgressBar mCaloriesProgress;
 
     @Inject
     FitnessPresenter mFitnessPresenter;
 
+    private Unbinder mUnbinder;
     private GoogleMap mMap;
     private PolygonOptions mBoundingBoxPolygon;
     private LatLngBounds mBounds;
@@ -106,7 +108,7 @@ public class FitnessFragment extends BaseFragment implements FitnessView {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View fragmentView = inflater.inflate(R.layout.fragment_fitness, container, false);
-        ButterKnife.bind(this, fragmentView);
+        mUnbinder = ButterKnife.bind(this, fragmentView);
         this.mFitnessPresenter.onCreateView();
         return fragmentView;
     }
@@ -126,7 +128,7 @@ public class FitnessFragment extends BaseFragment implements FitnessView {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.unbind(this);
+        mUnbinder.unbind();
     }
 
     @Override

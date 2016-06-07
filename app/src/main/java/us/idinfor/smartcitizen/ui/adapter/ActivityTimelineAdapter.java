@@ -20,11 +20,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import us.idinfor.smartcitizen.R;
-import us.idinfor.smartcitizen.utils.Utils;
 import us.idinfor.smartcitizen.data.api.google.fit.ActivityDetails;
+import us.idinfor.smartcitizen.utils.Utils;
 
 public class ActivityTimelineAdapter extends RecyclerView.Adapter<ActivityTimelineAdapter.ViewHolder> implements View.OnClickListener {
 
@@ -126,19 +126,19 @@ public class ActivityTimelineAdapter extends RecyclerView.Adapter<ActivityTimeli
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.icon)
+        @BindView(R.id.icon)
         RoundedImageView mIcon;
-        @Bind(R.id.wrapper)
+        @BindView(R.id.wrapper)
         LinearLayout mWrapper;
-        @Bind(R.id.duration)
+        @BindView(R.id.duration)
         TextView mDuration;
-        @Bind(R.id.startTime)
+        @BindView(R.id.startTime)
         TextView mStartTime;
-        @Bind(R.id.stepsCounter)
+        @BindView(R.id.stepsCounter)
         TextView mStepsCounter;
-        @Bind(R.id.caloriesCounter)
+        @BindView(R.id.caloriesCounter)
         TextView mCaloriesCounter;
-        @Bind(R.id.distanceCounter)
+        @BindView(R.id.distanceCounter)
         TextView mDistanceCounter;
 
         public ViewHolder(View itemView) {

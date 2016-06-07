@@ -10,33 +10,35 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import us.idinfor.smartcitizen.R;
-import us.idinfor.smartcitizen.utils.Utils;
 import us.idinfor.smartcitizen.data.api.google.fit.entity.ActivitySummaryFit;
+import us.idinfor.smartcitizen.utils.Utils;
 
 public class ActivityDurationPagerAdapter extends PagerAdapter {
 
-    Context mContext;
-    LayoutInflater mLayoutInflater;
-    List<ActivitySummaryFit> activities;
-    @Bind(R.id.activityIcon)
+    private Context mContext;
+    private LayoutInflater mLayoutInflater;
+    private List<ActivitySummaryFit> mActivities;
+    private Unbinder mUnbinder;
+    @BindView(R.id.activityIcon)
     ImageView mActivityIcon;
-    @Bind(R.id.activityDuration)
+    @BindView(R.id.activityDuration)
     TextView mActivityDuration;
-    @Bind(R.id.activityName)
+    @BindView(R.id.activityName)
     TextView mActivityName;
 
     public ActivityDurationPagerAdapter(Context context, List<ActivitySummaryFit> activities) {
         mContext = context;
-        this.activities = activities;
+        mActivities = activities;
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
     public int getCount() {
-        return activities.size();
+        return mActivities.size();
     }
 
     @Override
@@ -47,8 +49,8 @@ public class ActivityDurationPagerAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         View itemView = mLayoutInflater.inflate(R.layout.activity_duration_pager_item, container, false);
-        ButterKnife.bind(this, itemView);
-        ActivitySummaryFit activitySummary = activities.get(position);
+        mUnbinder = ButterKnife.bind(this, itemView);
+        ActivitySummaryFit activitySummary = mActivities.get(position);
 
         Integer icon = Utils.getIconResourceId(mContext,activitySummary.getName());
 
@@ -76,6 +78,6 @@ public class ActivityDurationPagerAdapter extends PagerAdapter {
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
         container.removeView((View) object);
-        ButterKnife.unbind(object);
+        mUnbinder.unbind();
     }
 }
