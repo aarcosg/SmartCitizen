@@ -90,7 +90,9 @@ public class LocationDetailsFragment extends BaseFragment implements LocationDet
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mUnbinder.unbind();
+       if(mUnbinder != null){
+           mUnbinder.unbind();
+       }
     }
 
     @Override

@@ -74,7 +74,9 @@ public class LoginFragment extends BaseFragment implements LoginView{
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mUnbinder.unbind();
+       if(mUnbinder != null){
+           mUnbinder.unbind();
+       }
     }
 
     @Override

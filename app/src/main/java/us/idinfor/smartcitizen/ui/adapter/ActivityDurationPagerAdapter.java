@@ -78,6 +78,8 @@ public class ActivityDurationPagerAdapter extends PagerAdapter {
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
         container.removeView((View) object);
-        mUnbinder.unbind();
+       if(mUnbinder != null){
+           mUnbinder.unbind();
+       }
     }
 }

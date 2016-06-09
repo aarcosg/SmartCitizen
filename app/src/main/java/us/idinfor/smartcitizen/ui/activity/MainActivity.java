@@ -109,7 +109,9 @@ public class MainActivity extends BaseActivity
         if(mDrawerLayout != null){
             mDrawerLayout.removeDrawerListener(mDrawerToggle);
         }
-        mUnbinder.unbind();
+        if(mUnbinder != null){
+           mUnbinder.unbind();
+        }
     }
 
     @Override

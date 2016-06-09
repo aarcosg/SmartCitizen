@@ -78,7 +78,9 @@ public class ActivityTimelineFragment extends BaseFragment implements ActivityTi
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mUnbinder.unbind();
+       if(mUnbinder != null){
+           mUnbinder.unbind();
+       }
     }
 
     @Override

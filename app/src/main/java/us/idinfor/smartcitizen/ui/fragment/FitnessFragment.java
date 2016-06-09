@@ -128,7 +128,9 @@ public class FitnessFragment extends BaseFragment implements FitnessView {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        mUnbinder.unbind();
+       if(mUnbinder != null){
+           mUnbinder.unbind();
+       }
     }
 
     @Override
