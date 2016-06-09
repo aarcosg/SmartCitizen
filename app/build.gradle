@@ -26,8 +26,8 @@ android {
         applicationId "us.idinfor.smartcitizen"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 8
-        versionName "1.2.4"
+        versionCode 9
+        versionName "1.2.5"
     }
     buildTypes {
         release {
@@ -66,7 +66,7 @@ dependencies {
     compile 'com.android.support:multidex:1.0.1'
 
     //Google Play Services
-    compile 'com.google.android.gms:play-services:9.0.2'
+    compile 'com.google.android.gms:play-services:8.4.0'
 
     //ButterKnife
     compile 'com.jakewharton:butterknife:8.0.1'
