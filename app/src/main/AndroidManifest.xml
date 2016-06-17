@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="us.idinfor.smartcitizen">
+    package="es.us.hermes.smartcitizen">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -11,14 +11,14 @@
     <uses-permission android:name="android.permission.BODY_SENSORS" />
 
     <application
-        android:name=".SmartCitizenApplication"
+        android:name="es.us.hermes.smartcitizen.SmartCitizenApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ui.activity.MainActivity"
+            android:name="es.us.hermes.smartcitizen.ui.activity.MainActivity"
             android:label="@string/app_name"
             android:configChanges="orientation|screenSize">
             <intent-filter>
@@ -27,47 +27,47 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activity.LoginActivity"
+            android:name="es.us.hermes.smartcitizen.ui.activity.LoginActivity"
             android:label="@string/title_activity_login"
             android:configChanges="orientation|screenSize"/>
         <activity
-            android:name=".ui.activity.SettingsActivity"
+            android:name="es.us.hermes.smartcitizen.ui.activity.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".ui.activity.MainActivity"
+            android:parentActivityName="es.us.hermes.smartcitizen.ui.activity.MainActivity"
             android:configChanges="orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activity.MainActivity" />
+                android:value="es.us.hermes.smartcitizen.ui.activity.MainActivity" />
         </activity>
         <activity
-            android:name=".ui.activity.LocationDetailsActivity"
+            android:name="es.us.hermes.smartcitizen.ui.activity.LocationDetailsActivity"
             android:label="@string/title_activity_location_details"
-            android:parentActivityName=".ui.activity.MainActivity"
+            android:parentActivityName="es.us.hermes.smartcitizen.ui.activity.MainActivity"
             android:theme="@style/AppTheme"
             android:configChanges="orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activity.MainActivity" />
+                android:value="es.us.hermes.smartcitizen.ui.activity.MainActivity" />
         </activity>
         <activity
-            android:name=".ui.activity.ActivityTimelineActivity"
+            android:name="es.us.hermes.smartcitizen.ui.activity.ActivityTimelineActivity"
             android:label="@string/title_activity_activity_timeline"
-            android:parentActivityName=".ui.activity.MainActivity"
+            android:parentActivityName="es.us.hermes.smartcitizen.ui.activity.MainActivity"
             android:theme="@style/AppTheme"
             android:configChanges="orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activity.MainActivity" />
+                android:value="es.us.hermes.smartcitizen.ui.activity.MainActivity" />
         </activity>
 
-        <receiver android:name=".receiver.OnBootReceiver">
+        <receiver android:name="es.us.hermes.smartcitizen.receiver.OnBootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
         <service
-            android:name=".service.SyncService"
+            android:name="es.us.hermes.smartcitizen.service.SyncService"
             android:exported="false" />
 
         <meta-data

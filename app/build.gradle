@@ -1,6 +1,26 @@
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven { url 'https://maven.fabric.io/public' }
+    }
+    dependencies {
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+        classpath 'me.tatarka:gradle-retrolambda:3.3.0-beta4'
+        classpath 'io.fabric.tools:gradle:1.+'
+        //Debug
+        //classpath 'com.fernandocejas.frodo:frodo-plugin:0.8.2'
+    }
+}
+
+repositories {
+    maven { url "https://jitpack.io" }
+    maven { url 'https://maven.fabric.io/public' }
+}
+
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'io.fabric'
+apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'me.tatarka.retrolambda'
 //Debug
 //apply plugin: 'com.fernandocejas.frodo'
@@ -23,11 +43,11 @@ android {
     compileSdkVersion 23
     buildToolsVersion '23.0.3'
     defaultConfig {
-        applicationId "us.idinfor.smartcitizen"
+        applicationId "es.us.hermes.smartcitizen"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 9
-        versionName "1.2.5"
+        versionCode 1
+        versionName "1.0.0"
     }
     buildTypes {
         release {
@@ -45,6 +65,7 @@ android {
         }
     }
     dexOptions {
+        incremental true
         javaMaxHeapSize "4g"
     }
     compileOptions {
@@ -83,13 +104,13 @@ dependencies {
     compile 'com.google.code.gson:gson:2.6.2'
 
     //View Pager Indicator
-    compile 'com.viewpagerindicator:library:2.4.1@aar'
+    compile 'com.github.JakeWharton:ViewPagerIndicator:2.4.1'
 
     //Rounded Image View
     compile 'com.makeramen:roundedimageview:2.2.1'
 
     //Fabric - Crashlytics
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.7@aar') {
         transitive = true;
     }
 
