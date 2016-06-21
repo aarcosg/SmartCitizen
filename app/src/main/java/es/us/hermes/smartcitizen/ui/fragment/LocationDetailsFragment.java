@@ -26,10 +26,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.BindView;
+import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnItemSelected;
-import butterknife.Unbinder;
 import es.us.hermes.smartcitizen.Constants;
 import es.us.hermes.smartcitizen.R;
 import es.us.hermes.smartcitizen.di.components.LocationDetailsComponent;
@@ -44,14 +43,14 @@ public class LocationDetailsFragment extends BaseFragment implements LocationDet
     @Inject
     LocationDetailsPresenter mLocationDetailsPresenter;
 
-    @BindView(R.id.toolbarSpinner)
+    @Bind(R.id.toolbarSpinner)
     AppCompatSpinner mToolbarSpinner;
-    @BindView(R.id.toolbar)
+    @Bind(R.id.toolbar)
     Toolbar mToolbar;
-    @BindView(R.id.progressBar)
+    @Bind(R.id.progressBar)
     ProgressBar mProgressBar;
 
-    private Unbinder mUnbinder;
+
     private GoogleMap mMap;
     private HeatmapTileProvider mProvider;
     private TileOverlay mOverlay;
@@ -69,7 +68,7 @@ public class LocationDetailsFragment extends BaseFragment implements LocationDet
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         final View fragmentView = inflater.inflate(R.layout.fragment_location_details, container, false);
-        mUnbinder =  ButterKnife.bind(this, fragmentView);
+         ButterKnife.bind(this, fragmentView);
         this.mLocationDetailsPresenter.setView(this);
         this.mLocationDetailsPresenter.onCreateView();
         return fragmentView;
@@ -90,9 +89,7 @@ public class LocationDetailsFragment extends BaseFragment implements LocationDet
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-       if(mUnbinder != null){
-           mUnbinder.unbind();
-       }
+        ButterKnife.unbind(this);
     }
 
     @Override

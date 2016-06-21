@@ -19,10 +19,9 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 import javax.inject.Inject;
 
-import butterknife.BindView;
+import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 import es.us.hermes.smartcitizen.R;
 import es.us.hermes.smartcitizen.di.components.LoginComponent;
 import es.us.hermes.smartcitizen.exception.ErrorMessageFactory;
@@ -40,10 +39,10 @@ public class LoginFragment extends BaseFragment implements LoginView{
     @Inject
     GoogleApiClient mGoogleApiClient;
 
-    @BindView(R.id.signInGoogleBtn)
+    @Bind(R.id.signInGoogleBtn)
     SignInButton mSignInGoogleBtn;
 
-    private Unbinder mUnbinder;
+
     private ProgressDialog mProgressDialog;
 
     public LoginFragment(){
@@ -59,7 +58,7 @@ public class LoginFragment extends BaseFragment implements LoginView{
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View fragmentView = inflater.inflate(R.layout.fragment_login, container, false);
-        mUnbinder = ButterKnife.bind(this, fragmentView);
+        ButterKnife.bind(this, fragmentView);
         customizeSignInGoogleBtn();
         this.mLoginPresenter.setView(this);
         return fragmentView;
@@ -74,9 +73,7 @@ public class LoginFragment extends BaseFragment implements LoginView{
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-       if(mUnbinder != null){
-           mUnbinder.unbind();
-       }
+        ButterKnife.unbind(this);
     }
 
     @Override

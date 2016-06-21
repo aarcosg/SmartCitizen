@@ -17,9 +17,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.BindView;
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
 import es.us.hermes.smartcitizen.Constants;
 import es.us.hermes.smartcitizen.R;
 import es.us.hermes.smartcitizen.data.api.google.fit.ActivityDetails;
@@ -36,12 +35,12 @@ public class ActivityTimelineFragment extends BaseFragment implements ActivityTi
     @Inject
     ActivityTimelinePresenter mActivityTimelinePresenter;
 
-    @BindView(R.id.progressBar)
+    @Bind(R.id.progressBar)
     ProgressBar mProgressBar;
-    @BindView(R.id.activitiesRecyclerView)
+    @Bind(R.id.activitiesRecyclerView)
     RecyclerView mActivitiesRecyclerView;
 
-    private Unbinder mUnbinder;
+
     private ActivityTimelineAdapter mAdapter;
 
     public ActivityTimelineFragment() {
@@ -57,7 +56,7 @@ public class ActivityTimelineFragment extends BaseFragment implements ActivityTi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View fragmentView = inflater.inflate(R.layout.fragment_activity_timeline, container, false);
-        mUnbinder = ButterKnife.bind(this, fragmentView);
+        ButterKnife.bind(this, fragmentView);
         this.mActivityTimelinePresenter.setView(this);
         this.mActivityTimelinePresenter.onCreateView();
         return fragmentView;
@@ -78,9 +77,7 @@ public class ActivityTimelineFragment extends BaseFragment implements ActivityTi
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-       if(mUnbinder != null){
-           mUnbinder.unbind();
-       }
+        ButterKnife.unbind(this);
     }
 
     @Override

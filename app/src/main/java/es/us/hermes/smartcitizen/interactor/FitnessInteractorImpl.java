@@ -11,12 +11,12 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import es.us.hermes.smartcitizen.data.api.google.fit.ActivityDetails;
 import es.us.hermes.smartcitizen.data.api.google.fit.GoogleFitHelper;
 import es.us.hermes.smartcitizen.utils.Utils;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class FitnessInteractorImpl implements FitnessInteractor {
 

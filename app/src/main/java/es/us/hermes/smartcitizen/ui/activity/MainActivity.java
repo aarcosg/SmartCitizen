@@ -20,9 +20,8 @@ import android.widget.TextView;
 
 import javax.inject.Inject;
 
-import butterknife.BindView;
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
 import es.us.hermes.smartcitizen.R;
 import es.us.hermes.smartcitizen.data.api.hermes.entity.User;
 import es.us.hermes.smartcitizen.di.HasComponent;
@@ -43,11 +42,11 @@ public class MainActivity extends BaseActivity
     private static final long DRAWER_DELAY_MS = 265;
     private static final String NAV_ITEM_ID = "nav_item_id";
 
-    @BindView(R.id.toolbar)
+    @Bind(R.id.toolbar)
     Toolbar mToolbar;
-    @BindView(R.id.navigation_view)
+    @Bind(R.id.navigation_view)
     NavigationView mNavigationView;
-    @BindView(R.id.drawer_layout)
+    @Bind(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
     TextView mUserNameTV;
 
@@ -56,7 +55,6 @@ public class MainActivity extends BaseActivity
     @Inject
     MainPresenter mMainPresenter;
 
-    private Unbinder mUnbinder;
     private MainComponent mMainComponent;
     private final Handler mDrawerActionHandler = new Handler();
     private ActionBarDrawerToggle mDrawerToggle;
@@ -82,7 +80,7 @@ public class MainActivity extends BaseActivity
             return;
         }
         setContentView(R.layout.activity_main);
-        mUnbinder = ButterKnife.bind(this);
+        ButterKnife.bind(this);
         buildActionBarToolbar(getString(R.string.app_name),false);
 
         mTitle = mDrawerTitle = getTitle();
@@ -109,9 +107,7 @@ public class MainActivity extends BaseActivity
         if(mDrawerLayout != null){
             mDrawerLayout.removeDrawerListener(mDrawerToggle);
         }
-        if(mUnbinder != null){
-           mUnbinder.unbind();
-        }
+        ButterKnife.unbind(this);
     }
 
     @Override

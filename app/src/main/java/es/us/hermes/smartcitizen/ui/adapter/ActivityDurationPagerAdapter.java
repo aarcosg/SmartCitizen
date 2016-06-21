@@ -10,9 +10,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import butterknife.BindView;
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
 import es.us.hermes.smartcitizen.R;
 import es.us.hermes.smartcitizen.data.api.google.fit.entity.ActivitySummaryFit;
 import es.us.hermes.smartcitizen.utils.Utils;
@@ -22,12 +21,12 @@ public class ActivityDurationPagerAdapter extends PagerAdapter {
     private Context mContext;
     private LayoutInflater mLayoutInflater;
     private List<ActivitySummaryFit> mActivities;
-    private Unbinder mUnbinder;
-    @BindView(R.id.activityIcon)
+
+    @Bind(R.id.activityIcon)
     ImageView mActivityIcon;
-    @BindView(R.id.activityDuration)
+    @Bind(R.id.activityDuration)
     TextView mActivityDuration;
-    @BindView(R.id.activityName)
+    @Bind(R.id.activityName)
     TextView mActivityName;
 
     public ActivityDurationPagerAdapter(Context context, List<ActivitySummaryFit> activities) {
@@ -49,7 +48,7 @@ public class ActivityDurationPagerAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         View itemView = mLayoutInflater.inflate(R.layout.activity_duration_pager_item, container, false);
-        mUnbinder = ButterKnife.bind(this, itemView);
+        ButterKnife.bind(this, itemView);
         ActivitySummaryFit activitySummary = mActivities.get(position);
 
         Integer icon = Utils.getIconResourceId(mContext,activitySummary.getName());
@@ -78,8 +77,6 @@ public class ActivityDurationPagerAdapter extends PagerAdapter {
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
         container.removeView((View) object);
-       if(mUnbinder != null){
-           mUnbinder.unbind();
-       }
+        ButterKnife.unbind(this);
     }
 }

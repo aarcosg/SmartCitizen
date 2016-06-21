@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import butterknife.BindView;
+import butterknife.Bind;
 import butterknife.ButterKnife;
 import es.us.hermes.smartcitizen.R;
 import es.us.hermes.smartcitizen.data.api.google.fit.ActivityDetails;
@@ -126,19 +126,19 @@ public class ActivityTimelineAdapter extends RecyclerView.Adapter<ActivityTimeli
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.icon)
+        @Bind(R.id.icon)
         RoundedImageView mIcon;
-        @BindView(R.id.wrapper)
+        @Bind(R.id.wrapper)
         LinearLayout mWrapper;
-        @BindView(R.id.duration)
+        @Bind(R.id.duration)
         TextView mDuration;
-        @BindView(R.id.startTime)
+        @Bind(R.id.startTime)
         TextView mStartTime;
-        @BindView(R.id.stepsCounter)
+        @Bind(R.id.stepsCounter)
         TextView mStepsCounter;
-        @BindView(R.id.caloriesCounter)
+        @Bind(R.id.caloriesCounter)
         TextView mCaloriesCounter;
-        @BindView(R.id.distanceCounter)
+        @Bind(R.id.distanceCounter)
         TextView mDistanceCounter;
 
         public ViewHolder(View itemView) {

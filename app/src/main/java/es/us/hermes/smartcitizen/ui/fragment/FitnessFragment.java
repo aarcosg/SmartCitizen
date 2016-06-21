@@ -30,10 +30,9 @@ import java.text.NumberFormat;
 
 import javax.inject.Inject;
 
-import butterknife.BindView;
+import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 import es.us.hermes.smartcitizen.Constants;
 import es.us.hermes.smartcitizen.R;
 import es.us.hermes.smartcitizen.data.api.google.fit.ActivityDetails;
@@ -49,37 +48,36 @@ public class FitnessFragment extends BaseFragment implements FitnessView {
 
     private static final String TAG = FitnessFragment.class.getCanonicalName();
 
-    @BindView(R.id.progressBar)
+    @Bind(R.id.progressBar)
     ProgressBar mProgressBar;
-    @BindView(R.id.stepsCounter)
+    @Bind(R.id.stepsCounter)
     TextView mStepsCounter;
-    @BindView(R.id.distanceCounter)
+    @Bind(R.id.distanceCounter)
     TextView mDistanceCounter;
-    @BindView(R.id.caloriesCounter)
+    @Bind(R.id.caloriesCounter)
     TextView mCaloriesCounter;
-    @BindView(R.id.timePager)
+    @Bind(R.id.timePager)
     ViewPager mTimePager;
-    @BindView(R.id.timePagerIndicator)
+    @Bind(R.id.timePagerIndicator)
     CirclePageIndicator mTimePagerIndicator;
-    @BindView(R.id.heartRateCounter)
+    @Bind(R.id.heartRateCounter)
     TextView mHeartRateCounter;
-    @BindView(R.id.date)
+    @Bind(R.id.date)
     TextView mDate;
-    @BindView(R.id.activityDetailsBtn)
+    @Bind(R.id.activityDetailsBtn)
     Button mActivityDetailsBtn;
-    @BindView(R.id.locationDetailsBtn)
+    @Bind(R.id.locationDetailsBtn)
     Button mLocationDetailsBtn;
-    @BindView(R.id.stepsProgress)
+    @Bind(R.id.stepsProgress)
     ProgressBar mStepsProgress;
-    @BindView(R.id.distanceProgress)
+    @Bind(R.id.distanceProgress)
     ProgressBar mDistanceProgress;
-    @BindView(R.id.caloriesProgress)
+    @Bind(R.id.caloriesProgress)
     ProgressBar mCaloriesProgress;
 
     @Inject
     FitnessPresenter mFitnessPresenter;
 
-    private Unbinder mUnbinder;
     private GoogleMap mMap;
     private PolygonOptions mBoundingBoxPolygon;
     private LatLngBounds mBounds;
@@ -108,7 +106,7 @@ public class FitnessFragment extends BaseFragment implements FitnessView {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View fragmentView = inflater.inflate(R.layout.fragment_fitness, container, false);
-        mUnbinder = ButterKnife.bind(this, fragmentView);
+        ButterKnife.bind(this, fragmentView);
         this.mFitnessPresenter.onCreateView();
         return fragmentView;
     }
@@ -128,9 +126,7 @@ public class FitnessFragment extends BaseFragment implements FitnessView {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-       if(mUnbinder != null){
-           mUnbinder.unbind();
-       }
+        ButterKnife.unbind(this);
     }
 
     @Override
