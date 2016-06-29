@@ -31,38 +31,44 @@ public class FitnessInteractorImpl implements FitnessInteractor {
 
     @Override
     public void initGoogleFitApi() {
-        GoogleFitHelper.initFitApi(mContext);
+        if(Utils.areMandatoryAppPermissionsGranted(mContext)){
+            GoogleFitHelper.initFitApi(mContext);
+        }
     }
 
     @Override
     public void subscribeUserToGoogleFit(){
-        RxFit.checkConnection().subscribe(() -> GoogleFitHelper.subscribeFitnessData(mContext));
+        if(Utils.areMandatoryAppPermissionsGranted(mContext)){
+            RxFit.checkConnection().subscribe(() -> GoogleFitHelper.subscribeFitnessData(mContext));
+        }
     }
 
     //@RxLogObservable
     @Override
     public Observable<ActivityDetails> getGoogleFitQueryResponse(int timeRange) {
 
-        DataReadRequest.Builder dataReadRequestBuilder = buildFitDataReadRequest();
+        Observable<ActivityDetails> observable = Observable.empty();
 
-        dataReadRequestBuilder.setTimeRange(Utils.getStartTimeRange(timeRange),new Date().getTime(), TimeUnit.MILLISECONDS);
-        dataReadRequestBuilder.bucketByTime(1, TimeUnit.DAYS);
+        if(Utils.areMandatoryAppPermissionsGranted(mContext)){
+            DataReadRequest.Builder dataReadRequestBuilder = buildFitDataReadRequest();
 
-        DataReadRequest dataReadRequest = dataReadRequestBuilder.build();
-        DataReadRequest dataReadRequestServer = dataReadRequestBuilder.enableServerQueries().build();
+            dataReadRequestBuilder.setTimeRange(Utils.getStartTimeRange(timeRange),new Date().getTime(), TimeUnit.MILLISECONDS);
+            dataReadRequestBuilder.bucketByTime(1, TimeUnit.DAYS);
 
-        return RxFit.checkConnection()
-            .andThen(RxFit.History.read(dataReadRequestServer)
-            .compose(RxFit.OnExceptionResumeNext.with(RxFit.History.read(dataReadRequest)))
-            .flatMapObservable(dataReadResult -> Observable.from(dataReadResult.getBuckets()))
-            .flatMap(bucket -> Observable.just(GoogleFitHelper.getActivityDetailsFromBucket(bucket))
-            .subscribeOn(Schedulers.computation())
-            .observeOn(AndroidSchedulers.mainThread())));
-    }
+            DataReadRequest dataReadRequest = dataReadRequestBuilder.build();
+            DataReadRequest dataReadRequestServer = dataReadRequestBuilder.enableServerQueries().build();
 
-    @Override
-    public Observable<Boolean> requestMandatoryAppPermissions() {
-        return Utils.requestMandatoryAppPermissions(mContext);
+            observable = RxFit.checkConnection()
+                    .andThen(RxFit.History.read(dataReadRequestServer)
+                            .compose(RxFit.OnExceptionResumeNext.with(RxFit.History.read(dataReadRequest)))
+                            .flatMapObservable(dataReadResult -> Observable.from(dataReadResult.getBuckets()))
+                            .flatMap(bucket -> Observable.just(GoogleFitHelper.getActivityDetailsFromBucket(bucket))
+                                    .subscribeOn(Schedulers.computation())
+                                    .observeOn(AndroidSchedulers.mainThread())));
+        }
+
+        return observable;
+
     }
 
     @Override

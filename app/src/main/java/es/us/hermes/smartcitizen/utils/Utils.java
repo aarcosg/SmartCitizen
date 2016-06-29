@@ -4,19 +4,16 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.tbruyelle.rxpermissions.RxPermissions;
 
 import java.util.Calendar;
 
-import rx.Observable;
 import es.us.hermes.smartcitizen.Constants;
 import es.us.hermes.smartcitizen.R;
 
@@ -25,15 +22,6 @@ public class Utils {
 
     public static SharedPreferences getSharedPreferences(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
-    }
-
-    public static boolean isInternetAvailable(Context context){
-        ConnectivityManager cm =
-                (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        boolean isConnected = activeNetwork != null &&
-                activeNetwork.isConnectedOrConnecting();
-        return isConnected;
     }
 
     public static boolean isGooglePlayServicesAvailable(Activity activity) {
@@ -49,12 +37,9 @@ public class Utils {
         return true;
     }
 
-    public static Observable<Boolean> requestMandatoryAppPermissions(Context context){
-        return RxPermissions.getInstance(context)
-            .request(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.BODY_SENSORS
-            );
+    public static boolean areMandatoryAppPermissionsGranted(Context context){
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(context, Manifest.permission.BODY_SENSORS) == PackageManager.PERMISSION_GRANTED;
     }
 
     public static long getStartTimeRange(int range){
@@ -98,15 +83,5 @@ public class Utils {
         }
         return ContextCompat.getDrawable(context,drawable);
     }
-
-    /*public static boolean isServiceRunning(Context context, Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
-    }*/
 
 }

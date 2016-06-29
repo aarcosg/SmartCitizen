@@ -82,7 +82,6 @@ public class FitnessFragment extends BaseFragment implements FitnessView {
     private PolygonOptions mBoundingBoxPolygon;
     private LatLngBounds mBounds;
     private ActivityDetails mActivityDetails;
-    private Snackbar mPermissionsSnackbar;
 
     public static FitnessFragment newInstance() {
         FitnessFragment fragment = new FitnessFragment();
@@ -100,7 +99,6 @@ public class FitnessFragment extends BaseFragment implements FitnessView {
         super.onCreate(savedInstanceState);
         this.getComponent(MainComponent.class).inject(this);
         this.mFitnessPresenter.setView(this);
-        this.mFitnessPresenter.onCreate();
     }
 
     @Override
@@ -175,23 +173,6 @@ public class FitnessFragment extends BaseFragment implements FitnessView {
                 .setAction(getString(R.string.retry),
                         v -> this.mFitnessPresenter.queryGoogleFit(Constants.RANGE_DAY))
                 .show();
-    }
-
-    @Override
-    public void showAppPermissionsRequiredErrorMessage() {
-        mPermissionsSnackbar = Snackbar.make(mProgressBar.getRootView(),
-                getString(R.string.exception_message_permissions_required),
-                Snackbar.LENGTH_INDEFINITE)
-                .setAction(getString(R.string.retry),
-                        v -> this.mFitnessPresenter.requestAppPermissions());
-        mPermissionsSnackbar.show();
-    }
-
-    @Override
-    public void hideAppPermissionsRequiredErrorMessage(){
-        if(mPermissionsSnackbar != null && mPermissionsSnackbar.isShown()){
-            mPermissionsSnackbar.dismiss();
-        }
     }
 
     @Override

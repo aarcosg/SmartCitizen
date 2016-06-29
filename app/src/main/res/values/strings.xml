@@ -54,6 +54,7 @@
     <string name="exception_message_user_not_found">User not found</string>
     <string name="exception_message_user_already_taken">User already taken</string>
     <string name="exception_message_google_fit_query">Error getting Google Fit data</string>
+    <string name="exception_message_permissions_denied">SmartCitizen needs requested permissions to run properly</string>
 
 
     <string name="location">Location</string>
@@ -110,7 +111,7 @@
     <string name="loading">Loading</string>
     <string name="retry">Retry</string>
     <string name="user_signed_up">User signed up</string>
-    <string name="exception_message_permissions_required">Permissions required</string>
-
+    <string name="app_permissions_required">Permissions required</string>
+    <string name="app_permissions_rationale">SmartCitizen needs Access Fine Location and Body Sensors permissions in order to run properly</string>
 
 </resources>

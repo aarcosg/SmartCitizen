@@ -33,5 +33,4 @@ public class MainInteractorImpl implements MainInteractor {
         this.mPrefs.edit().putBoolean(Constants.PROPERTY_DRAWER_LEARNED, learned).commit();
     }
 
-
 }

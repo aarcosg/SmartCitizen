@@ -9,4 +9,6 @@ public interface MainView extends View {
     void openDrawerNotLearned();
     void selectDrawerItem();
     void setupBackgroundSyncService();
+    void onAppPermissionsDenied();
+
 }

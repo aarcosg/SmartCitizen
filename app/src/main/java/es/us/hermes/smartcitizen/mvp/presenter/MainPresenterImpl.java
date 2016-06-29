@@ -2,12 +2,12 @@ package es.us.hermes.smartcitizen.mvp.presenter;
 
 import javax.inject.Inject;
 
-import rx.Subscription;
-import rx.subscriptions.Subscriptions;
 import es.us.hermes.smartcitizen.data.api.hermes.entity.User;
 import es.us.hermes.smartcitizen.interactor.MainInteractor;
 import es.us.hermes.smartcitizen.mvp.view.MainView;
 import es.us.hermes.smartcitizen.mvp.view.View;
+import rx.Subscription;
+import rx.subscriptions.Subscriptions;
 
 public class MainPresenterImpl implements MainPresenter{
 
@@ -38,7 +38,6 @@ public class MainPresenterImpl implements MainPresenter{
         this.mMainView.openDrawerNotLearned();
         this.mMainView.setupNavigationDrawerHeader();
         this.mMainView.selectDrawerItem();
-        this.mMainView.setupBackgroundSyncService();
     }
 
     @Override
@@ -59,4 +58,5 @@ public class MainPresenterImpl implements MainPresenter{
         this.mMainInteractor.setDrawerLearnedInPreferences(true);
         this.mMainView.bindDrawerLearned(true);
     }
+
 }

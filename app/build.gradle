@@ -46,8 +46,8 @@ android {
         applicationId "es.us.hermes.smartcitizen"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 2
-        versionName "1.0.1"
+        versionCode 3
+        versionName "1.0.2"
     }
     buildTypes {
         release {
@@ -132,8 +132,9 @@ dependencies {
     //RxGoogleMaps
     compile 'com.sdoward:rxgooglemaps:1.0@aar'
 
-    //RxPermissions
-    compile 'com.tbruyelle.rxpermissions:rxpermissions:0.7.0@aar'
+    //Permissions Dispatcher
+    compile 'com.github.hotchemi:permissionsdispatcher:2.1.3'
+    apt 'com.github.hotchemi:permissionsdispatcher-processor:2.1.3'
 
     //LeakCanary
     //debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'

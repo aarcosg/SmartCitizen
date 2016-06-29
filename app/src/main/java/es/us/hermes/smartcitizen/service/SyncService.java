@@ -21,6 +21,7 @@ import es.us.hermes.smartcitizen.data.api.google.fit.GoogleFitHelper;
 import es.us.hermes.smartcitizen.data.api.hermes.entity.User;
 import es.us.hermes.smartcitizen.mvp.presenter.SyncServicePresenter;
 import es.us.hermes.smartcitizen.mvp.view.SyncServiceView;
+import es.us.hermes.smartcitizen.utils.Utils;
 
 public class SyncService extends Service implements SyncServiceView {
 
@@ -45,7 +46,9 @@ public class SyncService extends Service implements SyncServiceView {
     public void onCreate() {
         super.onCreate();
         this.initializeInjector();
-        GoogleFitHelper.initFitApi(this.getApplicationContext());
+        if(Utils.areMandatoryAppPermissionsGranted(mContext)){
+            GoogleFitHelper.initFitApi(mContext);
+        }
     }
 
     @Override
@@ -68,7 +71,7 @@ public class SyncService extends Service implements SyncServiceView {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG,"@onStartCommand");
         checkUser();
-        if(intent != null){
+        if(intent != null && Utils.areMandatoryAppPermissionsGranted(mContext)){
             this.mSyncServicePresenter.queryPeriodicLocations();
             this.mSyncServicePresenter.queryPeriodicActivities();
             this.mSyncServicePresenter.queryPeriodicSteps();

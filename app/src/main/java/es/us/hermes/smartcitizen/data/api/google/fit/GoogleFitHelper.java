@@ -22,17 +22,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import rx.Single;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import es.us.hermes.smartcitizen.Constants;
-import es.us.hermes.smartcitizen.utils.Utils;
 import es.us.hermes.smartcitizen.data.api.google.fit.entity.ActivitySummaryFit;
 import es.us.hermes.smartcitizen.data.api.google.fit.entity.CaloriesExpendedFit;
 import es.us.hermes.smartcitizen.data.api.google.fit.entity.DistanceDeltaFit;
 import es.us.hermes.smartcitizen.data.api.google.fit.entity.HeartRateSummaryFit;
 import es.us.hermes.smartcitizen.data.api.google.fit.entity.LocationBoundingBoxFit;
 import es.us.hermes.smartcitizen.data.api.google.fit.entity.StepCountDeltaFit;
+import rx.Single;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class GoogleFitHelper {
 
@@ -65,7 +64,7 @@ public class GoogleFitHelper {
     public static void subscribeFitnessData(Context context){
         for(DataType dataType : recordingDataTypes){
             Single<Status> statusObservable = RxFit.Recording.subscribe(dataType)
-                    .subscribeOn(Schedulers.io())
+                    .subscribeOn(Schedulers.immediate())
                     .observeOn(AndroidSchedulers.mainThread());
             statusObservable.subscribe(
                     status ->  handleSubscriptionStatus(status,dataType),
@@ -89,13 +88,18 @@ public class GoogleFitHelper {
 
     private static void handleSubscriptionException(Context context, Throwable throwable,
         Single<Status> observable, DataType dataType){
-            if(throwable instanceof SecurityException){
+           /* if(throwable instanceof SecurityException){
                 Utils.requestMandatoryAppPermissions(context).subscribe(granted -> {
-                    observable.subscribe(
-                            status -> handleSubscriptionStatus(status,dataType)
-                    );
+                    if(granted){
+                        observable.subscribe(
+                                status -> handleSubscriptionStatus(status,dataType)
+                        );
+                    }else{
+                        Log.w(TAG, "App permissions denied");
+                    }
                 });
-            }
+            }*/
+        Log.w(TAG, "App permissions required");
     }
 
     public static void unsubscribeFitnessData(){

@@ -1,18 +1,22 @@
 package es.us.hermes.smartcitizen.mvp.presenter;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.SupportMapFragment;
 import com.sdoward.rxgooglemap.MapObservableProvider;
 
 import javax.inject.Inject;
 
-import rx.Subscription;
-import rx.subscriptions.Subscriptions;
 import es.us.hermes.smartcitizen.Constants;
 import es.us.hermes.smartcitizen.interactor.FitnessInteractor;
 import es.us.hermes.smartcitizen.mvp.view.FitnessView;
 import es.us.hermes.smartcitizen.mvp.view.View;
+import rx.Subscription;
+import rx.subscriptions.Subscriptions;
 
 public class FitnessPresenterImpl implements FitnessPresenter{
+
+    private static final String TAG = FitnessPresenterImpl.class.getCanonicalName();
 
     private FitnessView mFitnessView;
     private final FitnessInteractor mFitnessInteractor;
@@ -28,12 +32,6 @@ public class FitnessPresenterImpl implements FitnessPresenter{
     @Override
     public void setView(View v) {
         mFitnessView = (FitnessView) v;
-    }
-
-    @Override
-    public void onCreate() {
-        this.mFitnessInteractor.initGoogleFitApi();
-        this.mFitnessInteractor.subscribeUserToGoogleFit();
     }
 
     @Override
@@ -57,6 +55,8 @@ public class FitnessPresenterImpl implements FitnessPresenter{
 
     @Override
     public void onResume() {
+        this.mFitnessInteractor.initGoogleFitApi();
+        this.mFitnessInteractor.subscribeUserToGoogleFit();
         this.queryGoogleFit(Constants.RANGE_DAY);
     }
 
@@ -82,30 +82,12 @@ public class FitnessPresenterImpl implements FitnessPresenter{
             );
     }
 
-    @Override
-    public void requestAppPermissions() {
-        this.mAppPermissionsSubscription = this.mFitnessInteractor.requestMandatoryAppPermissions()
-            .subscribe(granted -> {
-                onAppPermissionsGranted();
-            });
-    }
-
     private void handleException(Throwable throwable) {
         if(throwable instanceof SecurityException){
-            this.mFitnessView.showAppPermissionsRequiredErrorMessage();
-            this.mFitnessInteractor.requestMandatoryAppPermissions()
-                .subscribe(granted -> {
-                    onAppPermissionsGranted();
-                });
+            Log.w(TAG,"App permissions required");
         }else{
             this.mFitnessView.showGoogleFitErrorMessage();
         }
-    }
-
-    private void onAppPermissionsGranted(){
-        this.mAppPermissionsSubscription.unsubscribe();
-        this.mFitnessView.hideAppPermissionsRequiredErrorMessage();
-        this.queryGoogleFit(Constants.RANGE_DAY);
     }
 
 }
