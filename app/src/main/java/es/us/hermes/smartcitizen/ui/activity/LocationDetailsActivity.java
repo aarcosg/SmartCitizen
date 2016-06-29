@@ -37,6 +37,9 @@ public class LocationDetailsActivity extends BaseActivity implements HasComponen
 
     @Override
     public LocationDetailsComponent getComponent() {
+        if(this.mLocationDetailsComponent == null){
+            this.initializeInjector();
+        }
         return this.mLocationDetailsComponent;
     }
 

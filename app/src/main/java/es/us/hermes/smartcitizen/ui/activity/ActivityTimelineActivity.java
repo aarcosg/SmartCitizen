@@ -38,7 +38,10 @@ public class ActivityTimelineActivity extends BaseActivity implements HasCompone
 
     @Override
     public ActivityTimelineComponent getComponent() {
-        return mActivityTimelineComponent;
+        if(this.mActivityTimelineComponent == null){
+            this.initializeInjector();
+        }
+        return this.mActivityTimelineComponent;
     }
 
     public static void launch(Activity activity) {

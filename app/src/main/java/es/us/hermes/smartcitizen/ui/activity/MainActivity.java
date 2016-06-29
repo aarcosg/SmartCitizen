@@ -129,6 +129,9 @@ public class MainActivity extends BaseActivity
 
     @Override
     public MainComponent getComponent() {
+        if(this.mMainComponent == null){
+            this.initializeInjector();
+        }
         return this.mMainComponent;
     }
 

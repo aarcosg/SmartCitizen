@@ -43,7 +43,10 @@ public class LoginActivity extends BaseActivity implements HasComponent<LoginCom
 
     @Override
     public LoginComponent getComponent() {
-        return mLoginComponent;
+        if(this.mLoginComponent == null){
+            this.initializeInjector();
+        }
+        return this.mLoginComponent;
     }
 
     public static void launch(Activity activity) {
