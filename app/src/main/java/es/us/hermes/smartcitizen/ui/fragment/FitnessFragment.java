@@ -16,6 +16,8 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -77,6 +79,8 @@ public class FitnessFragment extends BaseFragment implements FitnessView {
 
     @Inject
     FitnessPresenter mFitnessPresenter;
+    @Inject
+    Tracker mTracker;
 
     private GoogleMap mMap;
     private PolygonOptions mBoundingBoxPolygon;
@@ -110,15 +114,17 @@ public class FitnessFragment extends BaseFragment implements FitnessView {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        this.mFitnessPresenter.onPause();
+    public void onResume() {
+        super.onResume();
+        mTracker.setScreenName(FitnessFragment.class.getName());
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+        this.mFitnessPresenter.onResume();
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        this.mFitnessPresenter.onResume();
+    public void onPause() {
+        super.onPause();
+        this.mFitnessPresenter.onPause();
     }
 
     @Override

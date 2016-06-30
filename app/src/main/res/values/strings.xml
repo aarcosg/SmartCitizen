@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">SmartCitizen</string>
     <string name="app_name_alt">Smart Citizen</string>
-    <string name="google_app_id">208008499190</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

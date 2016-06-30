@@ -3,10 +3,10 @@ package es.us.hermes.smartcitizen.di.components;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.google.android.gms.analytics.Tracker;
 import com.google.gson.Gson;
 
 import dagger.Component;
-import okhttp3.OkHttpClient;
 import es.us.hermes.smartcitizen.data.api.hermes.HermesCitizenApi;
 import es.us.hermes.smartcitizen.data.api.ztreamy.ZtreamyApi;
 import es.us.hermes.smartcitizen.di.modules.ApplicationModule;
@@ -24,6 +24,7 @@ import es.us.hermes.smartcitizen.receiver.OnBootReceiver;
 import es.us.hermes.smartcitizen.service.SyncService;
 import es.us.hermes.smartcitizen.ui.activity.BaseActivity;
 import es.us.hermes.smartcitizen.utils.RxNetwork;
+import okhttp3.OkHttpClient;
 
 @PerApp
 @Component(
@@ -42,6 +43,7 @@ public interface ApplicationComponent {
 
     Context getContext();
     SharedPreferences getSharedPreferences();
+    Tracker getGATracker();
 
     RxNetwork getRxNetwork();
     OkHttpClient getOkHttpClient();

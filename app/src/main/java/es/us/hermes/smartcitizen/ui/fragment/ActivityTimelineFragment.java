@@ -11,6 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,6 +37,8 @@ public class ActivityTimelineFragment extends BaseFragment implements ActivityTi
 
     @Inject
     ActivityTimelinePresenter mActivityTimelinePresenter;
+    @Inject
+    Tracker mTracker;
 
     @Bind(R.id.progressBar)
     ProgressBar mProgressBar;
@@ -63,15 +68,17 @@ public class ActivityTimelineFragment extends BaseFragment implements ActivityTi
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        this.mActivityTimelinePresenter.onPause();
+    public void onResume() {
+        super.onResume();
+        mTracker.setScreenName(ActivityTimelineFragment.class.getName());
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+        this.mActivityTimelinePresenter.onResume();
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        this.mActivityTimelinePresenter.onResume();
+    public void onPause() {
+        super.onPause();
+        this.mActivityTimelinePresenter.onPause();
     }
 
     @Override

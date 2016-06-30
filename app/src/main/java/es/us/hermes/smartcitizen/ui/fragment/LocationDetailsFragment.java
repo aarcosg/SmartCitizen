@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -42,6 +44,8 @@ public class LocationDetailsFragment extends BaseFragment implements LocationDet
 
     @Inject
     LocationDetailsPresenter mLocationDetailsPresenter;
+    @Inject
+    Tracker mTracker;
 
     @Bind(R.id.toolbarSpinner)
     AppCompatSpinner mToolbarSpinner;
@@ -49,7 +53,6 @@ public class LocationDetailsFragment extends BaseFragment implements LocationDet
     Toolbar mToolbar;
     @Bind(R.id.progressBar)
     ProgressBar mProgressBar;
-
 
     private GoogleMap mMap;
     private HeatmapTileProvider mProvider;
@@ -83,6 +86,8 @@ public class LocationDetailsFragment extends BaseFragment implements LocationDet
     @Override
     public void onResume() {
         super.onResume();
+        mTracker.setScreenName(LocationDetailsFragment.class.getName());
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
         this.mLocationDetailsPresenter.queryGoogleFit(mToolbarSpinner.getSelectedItemPosition());
     }
 

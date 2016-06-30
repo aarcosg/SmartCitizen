@@ -16,9 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import es.us.hermes.smartcitizen.Constants;
 import es.us.hermes.smartcitizen.data.api.google.fit.entity.ActivitySegmentFit;
 import es.us.hermes.smartcitizen.data.api.google.fit.entity.CaloriesExpendedFit;
@@ -34,6 +31,9 @@ import es.us.hermes.smartcitizen.data.api.ztreamy.entity.Event;
 import es.us.hermes.smartcitizen.service.SyncServiceUtils;
 import es.us.hermes.smartcitizen.utils.RxNetwork;
 import es.us.hermes.smartcitizen.utils.Utils;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class SyncServiceInteractorImpl implements SyncServiceInteractor {
 

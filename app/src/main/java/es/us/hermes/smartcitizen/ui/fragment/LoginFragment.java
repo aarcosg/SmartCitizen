@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.SignInButton;
@@ -38,10 +40,11 @@ public class LoginFragment extends BaseFragment implements LoginView{
     LoginPresenter mLoginPresenter;
     @Inject
     GoogleApiClient mGoogleApiClient;
+    @Inject
+    Tracker mTracker;
 
     @Bind(R.id.signInGoogleBtn)
     SignInButton mSignInGoogleBtn;
-
 
     private ProgressDialog mProgressDialog;
 
@@ -62,6 +65,13 @@ public class LoginFragment extends BaseFragment implements LoginView{
         customizeSignInGoogleBtn();
         this.mLoginPresenter.setView(this);
         return fragmentView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mTracker.setScreenName(LoginFragment.class.getName());
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     @Override
