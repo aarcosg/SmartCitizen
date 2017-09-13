@@ -1,17 +1,14 @@
 package es.us.hermes.smartcitizen.di.modules;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 
 import dagger.Module;
 import dagger.Provides;
-import es.us.hermes.smartcitizen.data.api.hermes.HermesCitizenApi;
-import es.us.hermes.smartcitizen.data.api.ztreamy.ZtreamyApi;
+import es.us.hermes.smartcitizen.data.api.HermesCitizenApi;
+import es.us.hermes.smartcitizen.data.api.ZtreamyApi;
 import es.us.hermes.smartcitizen.di.scopes.PerApp;
 import es.us.hermes.smartcitizen.interactor.ActivityTimelineInteractor;
 import es.us.hermes.smartcitizen.interactor.ActivityTimelineInteractorImpl;
-import es.us.hermes.smartcitizen.interactor.FitnessInteractor;
-import es.us.hermes.smartcitizen.interactor.FitnessInteractorImpl;
 import es.us.hermes.smartcitizen.interactor.LocationDetailsInteractor;
 import es.us.hermes.smartcitizen.interactor.LocationDetailsInteractorImpl;
 import es.us.hermes.smartcitizen.interactor.LoginInteractor;
@@ -37,11 +34,11 @@ public class InteractorsModule {
         return new MainInteractorImpl(preferences);
     }
 
-    @Provides
+    /*@Provides
     @PerApp
     public FitnessInteractor provideFitnessInteractor(Context context) {
         return new FitnessInteractorImpl(context);
-    }
+    }*/
 
     @Provides
     @PerApp

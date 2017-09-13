@@ -5,17 +5,15 @@ import com.google.android.gms.fitness.request.DataReadRequest;
 import com.google.android.gms.maps.model.LatLng;
 import com.patloew.rxfit.RxFit;
 
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import es.us.hermes.smartcitizen.data.GoogleFitHelper;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-import es.us.hermes.smartcitizen.data.api.google.fit.GoogleFitHelper;
-import es.us.hermes.smartcitizen.utils.Utils;
 
 public class LocationDetailsInteractorImpl implements LocationDetailsInteractor {
 
@@ -26,10 +24,10 @@ public class LocationDetailsInteractorImpl implements LocationDetailsInteractor 
 
     //@RxLogObservable
     @Override
-    public Observable<List<LatLng>> getGoogleFitQueryResponse(int timeRange) {
+    public Observable<List<LatLng>> getGoogleFitQueryResponse(long statTime, long endTime) {
         DataReadRequest.Builder dataReadRequestBuilder = buildFitDataReadRequest();
 
-        dataReadRequestBuilder.setTimeRange(Utils.getStartTimeRange(timeRange),new Date().getTime(), TimeUnit.MILLISECONDS);
+        dataReadRequestBuilder.setTimeRange(statTime, endTime, TimeUnit.MILLISECONDS);
 
         DataReadRequest dataReadRequest = dataReadRequestBuilder.build();
         DataReadRequest dataReadRequestServer = dataReadRequestBuilder.enableServerQueries().build();

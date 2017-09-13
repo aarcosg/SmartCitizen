@@ -17,8 +17,8 @@ import javax.inject.Inject;
 
 import es.us.hermes.smartcitizen.Constants;
 import es.us.hermes.smartcitizen.SmartCitizenApplication;
-import es.us.hermes.smartcitizen.data.api.google.fit.GoogleFitHelper;
-import es.us.hermes.smartcitizen.data.api.hermes.entity.User;
+import es.us.hermes.smartcitizen.data.GoogleFitHelper;
+import es.us.hermes.smartcitizen.mvp.model.hermes.User;
 import es.us.hermes.smartcitizen.mvp.presenter.SyncServicePresenter;
 import es.us.hermes.smartcitizen.mvp.view.SyncServiceView;
 import es.us.hermes.smartcitizen.utils.Utils;

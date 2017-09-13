@@ -6,13 +6,13 @@ import java.util.Calendar;
 import java.util.List;
 
 import rx.Observable;
-import es.us.hermes.smartcitizen.data.api.google.fit.entity.ActivitySegmentFit;
-import es.us.hermes.smartcitizen.data.api.google.fit.entity.CaloriesExpendedFit;
-import es.us.hermes.smartcitizen.data.api.google.fit.entity.DistanceDeltaFit;
-import es.us.hermes.smartcitizen.data.api.google.fit.entity.HeartRateSampleFit;
-import es.us.hermes.smartcitizen.data.api.google.fit.entity.LocationSampleFit;
-import es.us.hermes.smartcitizen.data.api.google.fit.entity.StepCountDeltaFit;
-import es.us.hermes.smartcitizen.data.api.hermes.entity.User;
+import es.us.hermes.smartcitizen.mvp.model.google.fit.ActivitySegmentFit;
+import es.us.hermes.smartcitizen.mvp.model.google.fit.CaloriesExpendedFit;
+import es.us.hermes.smartcitizen.mvp.model.google.fit.DistanceDeltaFit;
+import es.us.hermes.smartcitizen.mvp.model.google.fit.HeartRateSampleFit;
+import es.us.hermes.smartcitizen.mvp.model.google.fit.LocationSampleFit;
+import es.us.hermes.smartcitizen.mvp.model.google.fit.StepCountDeltaFit;
+import es.us.hermes.smartcitizen.mvp.model.hermes.User;
 
 public interface SyncServiceInteractor extends Interactor {
 

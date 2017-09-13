@@ -122,7 +122,7 @@
                         android:id="@+id/distanceIcon"
                         android:layout_width="@dimen/activity_details_icon_size"
                         android:layout_height="@dimen/activity_details_icon_size"
-                        android:src="@drawable/ic_place_24dp"
+                        android:src="@drawable/ic_place"
                         android:layout_gravity="center"
                         android:tint="@color/secondaryText"/>
 

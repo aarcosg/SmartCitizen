@@ -16,12 +16,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import es.us.hermes.smartcitizen.data.api.google.fit.entity.ActivitySegmentFit;
-import es.us.hermes.smartcitizen.data.api.google.fit.entity.CaloriesExpendedFit;
-import es.us.hermes.smartcitizen.data.api.google.fit.entity.DistanceDeltaFit;
-import es.us.hermes.smartcitizen.data.api.google.fit.entity.HeartRateSampleFit;
-import es.us.hermes.smartcitizen.data.api.google.fit.entity.LocationSampleFit;
-import es.us.hermes.smartcitizen.data.api.google.fit.entity.StepCountDeltaFit;
+import es.us.hermes.smartcitizen.mvp.model.google.fit.ActivitySegmentFit;
+import es.us.hermes.smartcitizen.mvp.model.google.fit.CaloriesExpendedFit;
+import es.us.hermes.smartcitizen.mvp.model.google.fit.DistanceDeltaFit;
+import es.us.hermes.smartcitizen.mvp.model.google.fit.HeartRateSampleFit;
+import es.us.hermes.smartcitizen.mvp.model.google.fit.LocationSampleFit;
+import es.us.hermes.smartcitizen.mvp.model.google.fit.StepCountDeltaFit;
 
 public class SyncServiceUtils {
 

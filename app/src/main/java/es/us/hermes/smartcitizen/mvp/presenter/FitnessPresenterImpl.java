@@ -7,12 +7,10 @@ import com.sdoward.rxgooglemap.MapObservableProvider;
 
 import javax.inject.Inject;
 
-import es.us.hermes.smartcitizen.Constants;
 import es.us.hermes.smartcitizen.interactor.FitnessInteractor;
 import es.us.hermes.smartcitizen.mvp.view.FitnessView;
 import es.us.hermes.smartcitizen.mvp.view.View;
-import rx.Subscription;
-import rx.subscriptions.Subscriptions;
+import rx.subscriptions.CompositeSubscription;
 
 public class FitnessPresenterImpl implements FitnessPresenter{
 
@@ -20,9 +18,7 @@ public class FitnessPresenterImpl implements FitnessPresenter{
 
     private FitnessView mFitnessView;
     private final FitnessInteractor mFitnessInteractor;
-    private Subscription mGoogleMapSubscription = Subscriptions.empty();
-    private Subscription mGoogleFitSubscription = Subscriptions.empty();
-    private Subscription mAppPermissionsSubscription = Subscriptions.empty();
+    private CompositeSubscription mSubscriptions =  new CompositeSubscription();
 
     @Inject
     public FitnessPresenterImpl(FitnessInteractor fitnessInteractor){
@@ -36,50 +32,45 @@ public class FitnessPresenterImpl implements FitnessPresenter{
 
     @Override
     public void onCreateView() {
+        this.mFitnessView.setTimeRange();
         this.mFitnessView.setupDateView();
         this.mFitnessView.setupMapView();
+        this.mFitnessView.setupNavArrowIcons();
     }
 
     @Override
     public void onPause() {
-        if(!this.mGoogleMapSubscription.isUnsubscribed()){
-            this.mGoogleMapSubscription.unsubscribe();
-        }
-        if(!this.mGoogleFitSubscription.isUnsubscribed()){
-            this.mGoogleFitSubscription.unsubscribe();
-        }
-        if(!this.mAppPermissionsSubscription.isUnsubscribed()){
-            this.mAppPermissionsSubscription.unsubscribe();
+        if(!this.mSubscriptions.isUnsubscribed()){
+            this.mSubscriptions.unsubscribe();
         }
     }
 
     @Override
     public void onResume() {
+        mSubscriptions = new CompositeSubscription();
         this.mFitnessInteractor.initGoogleFitApi();
         this.mFitnessInteractor.subscribeUserToGoogleFit();
-        this.queryGoogleFit(Constants.RANGE_DAY);
     }
 
     @Override
     public void initGoogleMap(SupportMapFragment mapFragment) {
         MapObservableProvider mapObservableProvider = new MapObservableProvider(mapFragment);
-        this.mGoogleMapSubscription = mapObservableProvider.getMapReadyObservable()
-                .subscribe(googleMap -> this.mFitnessView.onGoogleMapReady(googleMap));
+        this.mSubscriptions.add(mapObservableProvider.getMapReadyObservable()
+                .subscribe(googleMap -> this.mFitnessView.onGoogleMapReady(googleMap)));
     }
 
     @Override
-    public void queryGoogleFit(int timeRange){
-        this.mGoogleFitSubscription.unsubscribe();
+    public void queryFitnessData(long statTime, long endTime){
         this.mFitnessView.showProgressDialog();
-        this.mGoogleFitSubscription = this.mFitnessInteractor.getGoogleFitQueryResponse(timeRange)
-            .subscribe(
-                activityDetails -> this.mFitnessView.bindActivityDetails(activityDetails),
-                throwable -> {
-                    handleException(throwable);
-                    this.mFitnessView.hideProgressDialog();
-                },
-                () -> this.mFitnessView.hideProgressDialog()
-            );
+        this.mSubscriptions.add(this.mFitnessInteractor.getGoogleFitQueryResponse(statTime, endTime)
+                .subscribe(
+                        activityDetails -> this.mFitnessView.bindActivityDetails(activityDetails),
+                        throwable -> {
+                            handleException(throwable);
+                            this.mFitnessView.hideProgressDialog();
+                        },
+                        () -> this.mFitnessView.hideProgressDialog()
+                ));
     }
 
     private void handleException(Throwable throwable) {

@@ -2,7 +2,7 @@ package es.us.hermes.smartcitizen.mvp.view;
 
 import com.google.android.gms.maps.GoogleMap;
 
-import es.us.hermes.smartcitizen.data.api.google.fit.ActivityDetails;
+import es.us.hermes.smartcitizen.mvp.model.ActivityDetails;
 
 public interface FitnessView extends View {
 
@@ -13,4 +13,7 @@ public interface FitnessView extends View {
     void onGoogleMapReady(GoogleMap googleMap);
     void bindActivityDetails(ActivityDetails activityDetails);
     void showGoogleFitErrorMessage();
+    void setTimeRange();
+    void setupNavArrowIcons();
+
 }

@@ -34,7 +34,6 @@
         <activity
             android:name="es.us.hermes.smartcitizen.ui.activity.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName="es.us.hermes.smartcitizen.ui.activity.MainActivity"
             android:configChanges="orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -43,7 +42,6 @@
         <activity
             android:name="es.us.hermes.smartcitizen.ui.activity.LocationDetailsActivity"
             android:label="@string/title_activity_location_details"
-            android:parentActivityName="es.us.hermes.smartcitizen.ui.activity.MainActivity"
             android:theme="@style/AppTheme"
             android:configChanges="orientation|screenSize">
             <meta-data
@@ -53,7 +51,6 @@
         <activity
             android:name="es.us.hermes.smartcitizen.ui.activity.ActivityTimelineActivity"
             android:label="@string/title_activity_activity_timeline"
-            android:parentActivityName="es.us.hermes.smartcitizen.ui.activity.MainActivity"
             android:theme="@style/AppTheme"
             android:configChanges="orientation|screenSize">
             <meta-data

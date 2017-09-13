@@ -7,15 +7,14 @@ import com.google.android.gms.analytics.Tracker;
 import com.google.gson.Gson;
 
 import dagger.Component;
-import es.us.hermes.smartcitizen.data.api.hermes.HermesCitizenApi;
-import es.us.hermes.smartcitizen.data.api.ztreamy.ZtreamyApi;
+import es.us.hermes.smartcitizen.data.api.HermesCitizenApi;
+import es.us.hermes.smartcitizen.data.api.ZtreamyApi;
 import es.us.hermes.smartcitizen.di.modules.ApplicationModule;
 import es.us.hermes.smartcitizen.di.modules.InteractorsModule;
 import es.us.hermes.smartcitizen.di.modules.NetworkModule;
 import es.us.hermes.smartcitizen.di.modules.SyncServiceModule;
 import es.us.hermes.smartcitizen.di.scopes.PerApp;
 import es.us.hermes.smartcitizen.interactor.ActivityTimelineInteractor;
-import es.us.hermes.smartcitizen.interactor.FitnessInteractor;
 import es.us.hermes.smartcitizen.interactor.LocationDetailsInteractor;
 import es.us.hermes.smartcitizen.interactor.LoginInteractor;
 import es.us.hermes.smartcitizen.interactor.MainInteractor;
@@ -54,7 +53,7 @@ public interface ApplicationComponent {
 
     LoginInteractor getLoginInteractor();
     MainInteractor getMainInteractor();
-    FitnessInteractor getFitnessInteractor();
+    //FitnessInteractor getFitnessInteractor();
     ActivityTimelineInteractor getActivityTimelineInteractor();
     LocationDetailsInteractor getLocationDetailsInteractor();
     SyncServiceInteractor getSyncServiceInteractor();

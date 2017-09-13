@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import javax.inject.Inject;
 
 import es.us.hermes.smartcitizen.Constants;
-import es.us.hermes.smartcitizen.data.api.hermes.entity.User;
+import es.us.hermes.smartcitizen.mvp.model.hermes.User;
 
 public class MainInteractorImpl implements MainInteractor {
 

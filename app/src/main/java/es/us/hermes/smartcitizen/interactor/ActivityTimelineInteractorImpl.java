@@ -4,18 +4,16 @@ import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.patloew.rxfit.RxFit;
 
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
+import es.us.hermes.smartcitizen.mvp.model.ActivityDetails;
+import es.us.hermes.smartcitizen.data.GoogleFitHelper;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-import es.us.hermes.smartcitizen.data.api.google.fit.ActivityDetails;
-import es.us.hermes.smartcitizen.data.api.google.fit.GoogleFitHelper;
-import es.us.hermes.smartcitizen.utils.Utils;
 
 public class ActivityTimelineInteractorImpl implements ActivityTimelineInteractor {
 
@@ -26,10 +24,10 @@ public class ActivityTimelineInteractorImpl implements ActivityTimelineInteracto
 
     //@RxLogObservable
     @Override
-    public Observable<List<ActivityDetails>> getGoogleFitQueryResponse(int timeRange) {
+    public Observable<List<ActivityDetails>> getGoogleFitQueryResponse(long statTime, long endTime) {
         DataReadRequest.Builder dataReadRequestBuilder = buildFitDataReadRequest();
 
-        dataReadRequestBuilder.setTimeRange(Utils.getStartTimeRange(timeRange),new Date().getTime(), TimeUnit.MILLISECONDS);
+        dataReadRequestBuilder.setTimeRange(statTime, endTime, TimeUnit.MILLISECONDS);
         dataReadRequestBuilder.bucketByActivitySegment(1, TimeUnit.MINUTES);
 
         DataReadRequest dataReadRequest = dataReadRequestBuilder.build();

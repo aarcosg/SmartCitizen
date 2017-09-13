@@ -2,12 +2,11 @@ package es.us.hermes.smartcitizen.mvp.presenter;
 
 import javax.inject.Inject;
 
-import rx.Subscription;
-import rx.subscriptions.Subscriptions;
-import es.us.hermes.smartcitizen.Constants;
 import es.us.hermes.smartcitizen.interactor.ActivityTimelineInteractor;
 import es.us.hermes.smartcitizen.mvp.view.ActivityTimelineView;
 import es.us.hermes.smartcitizen.mvp.view.View;
+import rx.Subscription;
+import rx.subscriptions.Subscriptions;
 
 public class ActivityTimelinePresenterImpl implements ActivityTimelinePresenter{
 
@@ -27,6 +26,7 @@ public class ActivityTimelinePresenterImpl implements ActivityTimelinePresenter{
 
     @Override
     public void onCreateView() {
+        this.mActivityTimelineView.setTimeRange();
         this.mActivityTimelineView.setupAdapter();
         this.mActivityTimelineView.setupRecyclerView();
     }
@@ -39,15 +39,10 @@ public class ActivityTimelinePresenterImpl implements ActivityTimelinePresenter{
     }
 
     @Override
-    public void onResume() {
-        this.queryGoogleFit(Constants.RANGE_DAY);
-    }
-
-    @Override
-    public void queryGoogleFit(int timeRange) {
+    public void queryFitnessData(long statTime, long endTime) {
         this.mSubscription.unsubscribe();
         this.mActivityTimelineView.showProgressDialog();
-        this.mSubscription = this.mActivityTimelineInteractor.getGoogleFitQueryResponse(timeRange)
+        this.mSubscription = this.mActivityTimelineInteractor.getGoogleFitQueryResponse(statTime, endTime)
                 .subscribe(
                         activityDetailsList -> this.mActivityTimelineView.bindActivitiesList(activityDetailsList),
                         throwable -> {

@@ -16,7 +16,7 @@ import es.us.hermes.smartcitizen.BuildConfig;
 import es.us.hermes.smartcitizen.Constants;
 import es.us.hermes.smartcitizen.R;
 import es.us.hermes.smartcitizen.SmartCitizenApplication;
-import es.us.hermes.smartcitizen.data.api.google.fit.GoogleFitHelper;
+import es.us.hermes.smartcitizen.data.GoogleFitHelper;
 import es.us.hermes.smartcitizen.di.scopes.PerApp;
 import io.fabric.sdk.android.Fabric;
 

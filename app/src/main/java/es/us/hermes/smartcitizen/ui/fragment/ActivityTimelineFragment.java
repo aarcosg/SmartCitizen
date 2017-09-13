@@ -22,10 +22,9 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import es.us.hermes.smartcitizen.Constants;
 import es.us.hermes.smartcitizen.R;
-import es.us.hermes.smartcitizen.data.api.google.fit.ActivityDetails;
 import es.us.hermes.smartcitizen.di.components.ActivityTimelineComponent;
+import es.us.hermes.smartcitizen.mvp.model.ActivityDetails;
 import es.us.hermes.smartcitizen.mvp.presenter.ActivityTimelinePresenter;
 import es.us.hermes.smartcitizen.mvp.view.ActivityTimelineView;
 import es.us.hermes.smartcitizen.ui.adapter.ActivityTimelineAdapter;
@@ -34,6 +33,8 @@ import es.us.hermes.smartcitizen.ui.adapter.ActivityTimelineAdapter;
 public class ActivityTimelineFragment extends BaseFragment implements ActivityTimelineView {
 
     private static final String TAG = ActivityTimelineFragment.class.getCanonicalName();
+    private static final String ARG_RANGE_START_TIME = "ARG_RANGE_START_TIME";
+    private static final String ARG_RANGE_END_TIME = "ARG_RANGE_END_TIME";
 
     @Inject
     ActivityTimelinePresenter mActivityTimelinePresenter;
@@ -45,8 +46,18 @@ public class ActivityTimelineFragment extends BaseFragment implements ActivityTi
     @Bind(R.id.activitiesRecyclerView)
     RecyclerView mActivitiesRecyclerView;
 
-
     private ActivityTimelineAdapter mAdapter;
+    private long mRangeStartTime;
+    private long mRangeEndTime;
+
+    public static ActivityTimelineFragment newInstance(long rangeStartTime, long rangeEndTime) {
+        ActivityTimelineFragment fragment = new ActivityTimelineFragment();
+        Bundle args = new Bundle();
+        args.putLong(ARG_RANGE_START_TIME, rangeStartTime);
+        args.putLong(ARG_RANGE_END_TIME, rangeEndTime);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     public ActivityTimelineFragment() {
         setRetainInstance(true);
@@ -72,7 +83,7 @@ public class ActivityTimelineFragment extends BaseFragment implements ActivityTi
         super.onResume();
         mTracker.setScreenName(ActivityTimelineFragment.class.getName());
         mTracker.send(new HitBuilders.ScreenViewBuilder().build());
-        this.mActivityTimelinePresenter.onResume();
+        this.mActivityTimelinePresenter.queryFitnessData(mRangeStartTime,mRangeEndTime);
     }
 
     @Override
@@ -103,8 +114,16 @@ public class ActivityTimelineFragment extends BaseFragment implements ActivityTi
                 getString(R.string.exception_message_google_fit_query),
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction(getString(R.string.retry),
-                        v -> this.mActivityTimelinePresenter.queryGoogleFit(Constants.RANGE_DAY))
+                        v -> this.mActivityTimelinePresenter.queryFitnessData(mRangeStartTime,mRangeEndTime))
                 .show();
+    }
+
+    @Override
+    public void setTimeRange() {
+        if (getArguments() != null && !getArguments().isEmpty()) {
+            mRangeStartTime = getArguments().getLong(ARG_RANGE_START_TIME);
+            mRangeEndTime = getArguments().getLong(ARG_RANGE_END_TIME);
+        }
     }
 
     @Override

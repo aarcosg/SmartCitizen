@@ -7,6 +7,6 @@ public interface LocationDetailsPresenter extends Presenter {
 
     void onCreateView();
     void initGoogleMap(SupportMapFragment mMapFragment);
-    void queryGoogleFit(int timeRange);
+    void queryFitnessData(long statTime, long endTime);
 
 }

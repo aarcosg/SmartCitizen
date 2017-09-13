@@ -31,8 +31,10 @@ public class LocationDetailsPresenterImpl implements LocationDetailsPresenter {
 
     @Override
     public void onCreateView() {
+        this.mLocationDetailsView.setTimeRange();
         this.mLocationDetailsView.setupToolbar();
         this.mLocationDetailsView.setupMapView();
+        this.mLocationDetailsView.setupSpinner();
     }
 
     @Override
@@ -53,10 +55,10 @@ public class LocationDetailsPresenterImpl implements LocationDetailsPresenter {
     }
 
     @Override
-    public void queryGoogleFit(int timeRange) {
+    public void queryFitnessData(long statTime, long endTime) {
         this.mGoogleFitSubscription.unsubscribe();
         this.mLocationDetailsView.showProgressDialog();
-        this.mGoogleFitSubscription = this.mLocationDetailsInteractor.getGoogleFitQueryResponse(timeRange)
+        this.mGoogleFitSubscription = this.mLocationDetailsInteractor.getGoogleFitQueryResponse(statTime, endTime)
             .subscribe(
                 locations -> this.mLocationDetailsView.bindLocations(locations),
                 throwable -> {

@@ -2,7 +2,7 @@ package es.us.hermes.smartcitizen.mvp.presenter;
 
 import javax.inject.Inject;
 
-import es.us.hermes.smartcitizen.data.api.hermes.entity.User;
+import es.us.hermes.smartcitizen.mvp.model.hermes.User;
 import es.us.hermes.smartcitizen.interactor.MainInteractor;
 import es.us.hermes.smartcitizen.mvp.view.MainView;
 import es.us.hermes.smartcitizen.mvp.view.View;

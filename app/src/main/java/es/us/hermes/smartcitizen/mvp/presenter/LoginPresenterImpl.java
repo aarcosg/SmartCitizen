@@ -9,7 +9,7 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.Subscriptions;
-import es.us.hermes.smartcitizen.data.api.hermes.entity.User;
+import es.us.hermes.smartcitizen.mvp.model.hermes.User;
 import es.us.hermes.smartcitizen.interactor.LoginInteractor;
 import es.us.hermes.smartcitizen.mvp.view.LoginView;
 import es.us.hermes.smartcitizen.mvp.view.View;

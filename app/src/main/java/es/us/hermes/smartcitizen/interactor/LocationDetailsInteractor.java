@@ -10,6 +10,6 @@ import rx.Observable;
 public interface LocationDetailsInteractor extends Interactor {
 
     DataReadRequest.Builder buildFitDataReadRequest();
-    Observable<List<LatLng>> getGoogleFitQueryResponse(int timeRange);
+    Observable<List<LatLng>> getGoogleFitQueryResponse(long statTime, long endTime);
 
 }

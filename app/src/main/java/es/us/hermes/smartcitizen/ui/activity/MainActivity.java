@@ -29,15 +29,14 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import es.us.hermes.smartcitizen.R;
-import es.us.hermes.smartcitizen.data.api.hermes.entity.User;
+import es.us.hermes.smartcitizen.mvp.model.hermes.User;
 import es.us.hermes.smartcitizen.di.HasComponent;
 import es.us.hermes.smartcitizen.di.components.DaggerMainComponent;
 import es.us.hermes.smartcitizen.di.components.MainComponent;
-import es.us.hermes.smartcitizen.di.modules.FitnessModule;
 import es.us.hermes.smartcitizen.mvp.presenter.MainPresenter;
 import es.us.hermes.smartcitizen.mvp.view.MainView;
 import es.us.hermes.smartcitizen.service.SyncService;
-import es.us.hermes.smartcitizen.ui.fragment.FitnessFragment;
+import es.us.hermes.smartcitizen.ui.fragment.MainFitnessFragment;
 import es.us.hermes.smartcitizen.utils.Utils;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
@@ -149,7 +148,7 @@ public class MainActivity extends BaseActivity
         this.mMainComponent = DaggerMainComponent.builder()
                 .applicationComponent(getApplicationComponent())
                 .activityModule(getActivityModule())
-                .fitnessModule(new FitnessModule())
+                //.mainFitnessModule(new MainFitnessModule())
                 .build();
         this.mMainComponent.inject(this);
     }
@@ -263,7 +262,7 @@ public class MainActivity extends BaseActivity
         Fragment fragment = null;
         switch (mNavItemId) {
             case R.id.navigation_home:
-                fragment = FitnessFragment.newInstance();
+                fragment = MainFitnessFragment.newInstance();
                 break;
             case R.id.navigation_settings:
                 SettingsActivity.launch(this);

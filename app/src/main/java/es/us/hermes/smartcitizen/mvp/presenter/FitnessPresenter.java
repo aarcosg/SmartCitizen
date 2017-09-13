@@ -8,6 +8,6 @@ public interface FitnessPresenter extends Presenter {
     void onCreateView();
     void onResume();
     void initGoogleMap(SupportMapFragment mapFragment);
-    void queryGoogleFit(int timeRange);
+    void queryFitnessData(long statTime, long endTime);
 
 }

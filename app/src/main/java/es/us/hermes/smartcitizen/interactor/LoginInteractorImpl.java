@@ -10,11 +10,11 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import es.us.hermes.smartcitizen.Constants;
-import es.us.hermes.smartcitizen.data.api.hermes.HermesCitizenApi;
-import es.us.hermes.smartcitizen.data.api.hermes.entity.User;
-import es.us.hermes.smartcitizen.data.api.hermes.exception.UnknownErrorHermesException;
-import es.us.hermes.smartcitizen.data.api.hermes.exception.UserAlreadyExistsErrorHermesException;
-import es.us.hermes.smartcitizen.data.api.hermes.exception.UserNotRegisteredErrorHermesException;
+import es.us.hermes.smartcitizen.data.api.HermesCitizenApi;
+import es.us.hermes.smartcitizen.mvp.model.hermes.User;
+import es.us.hermes.smartcitizen.exception.hermes.UnknownErrorHermesException;
+import es.us.hermes.smartcitizen.exception.hermes.UserAlreadyExistsHermesException;
+import es.us.hermes.smartcitizen.exception.hermes.UserNotRegisteredHermesException;
 import es.us.hermes.smartcitizen.utils.RxNetwork;
 
 public class LoginInteractorImpl implements LoginInteractor {
@@ -78,10 +78,10 @@ public class LoginInteractorImpl implements LoginInteractor {
         Exception exception = new UnknownErrorHermesException();
         switch (apiResultCode){
             case HermesCitizenApi.RESPONSE_ERROR_USER_EXISTS:
-                exception = new UserAlreadyExistsErrorHermesException();
+                exception = new UserAlreadyExistsHermesException();
             break;
             case HermesCitizenApi.RESPONSE_ERROR_USER_NOT_REGISTERED:
-                exception = new UserNotRegisteredErrorHermesException();
+                exception = new UserNotRegisteredHermesException();
             break;
         }
         return exception;

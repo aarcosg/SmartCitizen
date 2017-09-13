@@ -8,7 +8,7 @@ import java.util.Date;
 import javax.inject.Inject;
 
 import rx.subscriptions.CompositeSubscription;
-import es.us.hermes.smartcitizen.data.api.hermes.entity.User;
+import es.us.hermes.smartcitizen.mvp.model.hermes.User;
 import es.us.hermes.smartcitizen.interactor.SyncServiceInteractor;
 import es.us.hermes.smartcitizen.mvp.view.SyncServiceView;
 import es.us.hermes.smartcitizen.mvp.view.View;

@@ -6,13 +6,12 @@ import com.google.android.gms.fitness.data.DataType;
 import com.google.android.gms.fitness.request.DataReadRequest;
 import com.patloew.rxfit.RxFit;
 
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import es.us.hermes.smartcitizen.data.api.google.fit.ActivityDetails;
-import es.us.hermes.smartcitizen.data.api.google.fit.GoogleFitHelper;
+import es.us.hermes.smartcitizen.mvp.model.ActivityDetails;
+import es.us.hermes.smartcitizen.data.GoogleFitHelper;
 import es.us.hermes.smartcitizen.utils.Utils;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -45,14 +44,14 @@ public class FitnessInteractorImpl implements FitnessInteractor {
 
     //@RxLogObservable
     @Override
-    public Observable<ActivityDetails> getGoogleFitQueryResponse(int timeRange) {
+    public Observable<ActivityDetails> getGoogleFitQueryResponse(long statTime, long endTime) {
 
         Observable<ActivityDetails> observable = Observable.empty();
 
         if(Utils.areMandatoryAppPermissionsGranted(mContext)){
             DataReadRequest.Builder dataReadRequestBuilder = buildFitDataReadRequest();
 
-            dataReadRequestBuilder.setTimeRange(Utils.getStartTimeRange(timeRange),new Date().getTime(), TimeUnit.MILLISECONDS);
+            dataReadRequestBuilder.setTimeRange(statTime, endTime, TimeUnit.MILLISECONDS);
             dataReadRequestBuilder.bucketByTime(1, TimeUnit.DAYS);
 
             DataReadRequest dataReadRequest = dataReadRequestBuilder.build();

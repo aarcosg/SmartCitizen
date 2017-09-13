@@ -23,7 +23,7 @@ import java.util.Locale;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import es.us.hermes.smartcitizen.R;
-import es.us.hermes.smartcitizen.data.api.google.fit.ActivityDetails;
+import es.us.hermes.smartcitizen.mvp.model.ActivityDetails;
 import es.us.hermes.smartcitizen.utils.Utils;
 
 public class ActivityTimelineAdapter extends RecyclerView.Adapter<ActivityTimelineAdapter.ViewHolder> implements View.OnClickListener {

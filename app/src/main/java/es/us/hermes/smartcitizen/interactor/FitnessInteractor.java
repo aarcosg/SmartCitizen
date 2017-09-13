@@ -2,7 +2,7 @@ package es.us.hermes.smartcitizen.interactor;
 
 import com.google.android.gms.fitness.request.DataReadRequest;
 
-import es.us.hermes.smartcitizen.data.api.google.fit.ActivityDetails;
+import es.us.hermes.smartcitizen.mvp.model.ActivityDetails;
 import rx.Observable;
 
 public interface FitnessInteractor extends Interactor {
@@ -10,6 +10,6 @@ public interface FitnessInteractor extends Interactor {
     void initGoogleFitApi();
     void subscribeUserToGoogleFit();
     DataReadRequest.Builder buildFitDataReadRequest();
-    Observable<ActivityDetails> getGoogleFitQueryResponse(int timeRange);
+    Observable<ActivityDetails> getGoogleFitQueryResponse(long statTime, long endTime);
 
 }

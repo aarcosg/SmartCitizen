@@ -11,6 +11,10 @@ public interface LocationDetailsView extends View {
     void onGoogleMapReady(GoogleMap googleMap);
     void showProgressDialog();
     void hideProgressDialog();
+    void setTimeRange();
+
+    void setupSpinner();
+
     void setupToolbar();
     void bindLocations(List<LatLng> pointList);
     void showGoogleFitErrorMessage();

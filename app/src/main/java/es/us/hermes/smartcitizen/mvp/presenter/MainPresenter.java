@@ -1,7 +1,7 @@
 package es.us.hermes.smartcitizen.mvp.presenter;
 
 
-import es.us.hermes.smartcitizen.data.api.hermes.entity.User;
+import es.us.hermes.smartcitizen.mvp.model.hermes.User;
 
 public interface MainPresenter extends Presenter {
 

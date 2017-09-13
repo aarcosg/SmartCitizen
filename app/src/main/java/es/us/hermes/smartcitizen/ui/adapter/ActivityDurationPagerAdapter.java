@@ -13,7 +13,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import es.us.hermes.smartcitizen.R;
-import es.us.hermes.smartcitizen.data.api.google.fit.entity.ActivitySummaryFit;
+import es.us.hermes.smartcitizen.mvp.model.google.fit.ActivitySummaryFit;
 import es.us.hermes.smartcitizen.utils.Utils;
 
 public class ActivityDurationPagerAdapter extends PagerAdapter {
