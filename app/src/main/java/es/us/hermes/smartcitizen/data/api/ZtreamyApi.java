@@ -10,7 +10,7 @@ import es.us.hermes.smartcitizen.mvp.model.ztreamy.Event;
 
 public interface ZtreamyApi {
 
-    String SERVICE_ENDPOINT = "http://hermes1.gast.it.uc3m.es:9100/";
+    String SERVICE_ENDPOINT = "http://hermes1.gast.it.uc3m.es:8080/";
     String APPLICATION_ID = "SmartCitizen";
     String SYNTAX = "application/json";
 
