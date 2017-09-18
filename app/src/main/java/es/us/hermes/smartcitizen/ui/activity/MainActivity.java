@@ -36,6 +36,7 @@ import es.us.hermes.smartcitizen.di.components.MainComponent;
 import es.us.hermes.smartcitizen.mvp.presenter.MainPresenter;
 import es.us.hermes.smartcitizen.mvp.view.MainView;
 import es.us.hermes.smartcitizen.service.SyncService;
+import es.us.hermes.smartcitizen.ui.fragment.BackupFragment;
 import es.us.hermes.smartcitizen.ui.fragment.MainFitnessFragment;
 import es.us.hermes.smartcitizen.utils.Utils;
 import permissions.dispatcher.NeedsPermission;
@@ -263,6 +264,9 @@ public class MainActivity extends BaseActivity
         switch (mNavItemId) {
             case R.id.navigation_home:
                 fragment = MainFitnessFragment.newInstance();
+                break;
+            case R.id.navigation_backup:
+                fragment = BackupFragment.newInstance();
                 break;
             case R.id.navigation_settings:
                 SettingsActivity.launch(this);

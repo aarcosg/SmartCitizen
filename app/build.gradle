@@ -1,7 +1,5 @@
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
-apply plugin: 'com.neenbedankt.android-apt'
-apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'com.google.gms.google-services'
 //Debug
 //apply plugin: 'com.fernandocejas.frodo'
@@ -13,8 +11,6 @@ buildscript {
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-        classpath 'me.tatarka:gradle-retrolambda:3.3.0-beta4'
         classpath 'io.fabric.tools:gradle:1.+'
         classpath 'com.google.gms:google-services:3.0.0'
         //Debug
@@ -43,13 +39,13 @@ android {
         }
     }
     compileSdkVersion 24
-    buildToolsVersion '24.0.1'
+    buildToolsVersion '25.0.0'
     defaultConfig {
         applicationId "es.us.hermes.smartcitizen"
         minSdkVersion 15
         targetSdkVersion 24
         versionCode 4
-        versionName "1.0.3"
+        versionName "1.0.3a"
     }
     buildTypes {
         release {
@@ -67,7 +63,6 @@ android {
         }
     }
     dexOptions {
-        incremental true
         javaMaxHeapSize "4g"
     }
     compileOptions {
@@ -92,6 +87,7 @@ dependencies {
     compile 'com.google.android.gms:play-services:9.0.0'
 
     //ButterKnife
+    annotationProcessor 'com.jakewharton:butterknife:7.0.1'
     compile 'com.jakewharton:butterknife:7.0.1'
 
     //Google Maps Utils
@@ -116,7 +112,7 @@ dependencies {
     }
 
     //Dagger 2
-    apt 'com.google.dagger:dagger-compiler:2.2'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.2'
     compile 'com.google.dagger:dagger:2.2'
 
     //Retrofit
@@ -136,7 +132,7 @@ dependencies {
 
     //Permissions Dispatcher
     compile 'com.github.hotchemi:permissionsdispatcher:2.1.3'
-    apt 'com.github.hotchemi:permissionsdispatcher-processor:2.1.3'
+    annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:2.1.3'
 
     //LeakCanary
     //debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
